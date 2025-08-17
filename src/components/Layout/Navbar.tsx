@@ -2,6 +2,7 @@ import { useState } from "react";
 import { HiBell } from "react-icons/hi";
 import { FiMenu } from "react-icons/fi";
 import { Avatar, Badge } from "flowbite-react";
+import { RxAvatar } from "react-icons/rx";
 
 type navbarProp = {
   toggleSidebar: () => void;
@@ -33,14 +34,14 @@ const Navbar = ({
 
       <div className="flex items-center space-x-8">
         <div className="relative cursor-pointer" onClick={handleNotificationClick}>
-          <HiBell size={24} className="text-gray-500 dark:text-gray-400" />
+          <HiBell size={32} className="text-gray-500 dark:text-gray-400" />
           {notificationCount > 0 && (
             <Badge color="failure" className="absolute -top-1 -right-1 rounded-full">
               {notificationCount}
             </Badge>
           )}
         </div>
-        <Avatar img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+        <Avatar rounded />
       </div>
     </nav>
   );

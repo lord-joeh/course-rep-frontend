@@ -16,6 +16,7 @@ import { HiMiniAcademicCap } from "react-icons/hi2";
 import { FaUserCheck } from "react-icons/fa";
 import { FiActivity } from "react-icons/fi";
 import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type SidebarProps = {
   isSidebarOpen: boolean,
@@ -25,6 +26,11 @@ type SidebarProps = {
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
   const { user, logout }= useAuth()
+  const navigate = useNavigate()
+  
+  const handleRedirect = (repPath: string, studentPath: string) =>{
+    navigate(user?.isRep? repPath : studentPath)
+  }
 
  return (
     <div
@@ -44,20 +50,20 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
         </div>
         <SidebarItems >
           <SidebarItemGroup>
-            <SidebarItem href={user?.isRep? '/rep/dashboard' : '/student/dashboard'} icon={HiHome}>Dashboard</SidebarItem>
-            <SidebarItem href={user?.isRep? '/rep/assignment' : '/student/assignment'} icon={MdAssignment}>Assignment</SidebarItem>
-            <SidebarItem href={user?.isRep? '/rep/attendance' : '/student/attendance'} icon={FaUserCheck}>Attendance</SidebarItem>
-           {user?.isRep && <SidebarItem href= '/rep/students' icon={HiUser}>Students</SidebarItem>} 
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/dashboard', '/students/dashboard')} icon={HiHome}>Dashboard</SidebarItem>
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/assignment', '/students/assignment')} icon={MdAssignment}>Assignment</SidebarItem>
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/attendance', '/students/attendance')} icon={FaUserCheck}>Attendance</SidebarItem>
+           {user?.isRep && <SidebarItem href= '' onClick={()=> handleRedirect('/reps/students', '')} icon={HiUser}>Students</SidebarItem>} 
             </SidebarItemGroup>
           <SidebarItemGroup>
-            <SidebarItem href={user?.isRep? '/rep/slides' : '/student/slides'} icon={MdLibraryBooks}>Slides</SidebarItem>
-            <SidebarItem href={user?.isRep? '/rep/events' : '/student/events'} icon={FiActivity}>Events</SidebarItem>
-            <SidebarItem href={user?.isRep? '/rep/groups' : '/student/groups'} icon={MdGroups}>Groups</SidebarItem>
-            {user?.isRep && <SidebarItem href='/rep/lecturers' icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/slides', '/students/slides')} icon={MdLibraryBooks}>Slides</SidebarItem>
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/events', '/students/events')} icon={FiActivity}>Events</SidebarItem>
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/groups', '/students/groups')} icon={MdGroups}>Groups</SidebarItem>
+            {user?.isRep && <SidebarItem href='/reps/lecturers' icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
             </SidebarItemGroup>
           <SidebarItemGroup>
-            <SidebarItem href={user?.isRep? '/rep/feedback' : '/student/feedback'} icon={VscFeedback}>Feedback</SidebarItem>
-           {user?.isRep && <SidebarItem href= '/rep/dashboard'  icon={MdSecurity}>Security</SidebarItem>} 
+            <SidebarItem href="" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>
+           {user?.isRep && <SidebarItem href= '/reps/dashboard'  icon={MdSecurity}>Security</SidebarItem>} 
             <SidebarItem href="" onClick={logout} icon={RiLogoutCircleLine}>Logout</SidebarItem>
             </SidebarItemGroup>
         </SidebarItems>

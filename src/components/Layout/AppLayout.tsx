@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import useAuth from "../../hooks/useAuth";
-type appLayout = {
-  children: React.ReactNode;
-};
+import { Outlet } from "react-router-dom";
 
-const AppLayout = ({ children }: appLayout) => {
+
+const AppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user } = useAuth();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -22,21 +19,9 @@ const AppLayout = ({ children }: appLayout) => {
     checkScreenSize();
 
     window.addEventListener("resize", checkScreenSize);
- 
+
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
-
-  useEffect(() => {
-    const showContent = () => {
-      const mainContent = document.querySelector("#app-content");
-      if (!user) {
-        mainContent?.classList.add("hide-main-content");
-      } else {
-        mainContent?.classList.remove("hide-main-content");
-      }
-    };
-    showContent();
-  }, [user]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -44,7 +29,6 @@ const AppLayout = ({ children }: appLayout) => {
 
   return (
     <div
-      id="app-content"
       className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900"
     >
       <Navbar toggleSidebar={toggleSidebar} />
@@ -56,7 +40,9 @@ const AppLayout = ({ children }: appLayout) => {
           onClick={toggleSidebar}
         />
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">{children}</div>
+        <div className="flex-1 overflow-y-auto p-6 md:p-8">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

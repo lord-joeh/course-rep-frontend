@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import axios from "axios";
-import { registerStudent } from "../../services/authService";
+import { registerStudent } from "../../services/studentService";
 import { Button, Label, TextInput, Spinner, Checkbox } from "flowbite-react";
 import { HiUser, HiMiniIdentification } from "react-icons/hi2";
 import { FaPhone } from "react-icons/fa6";
@@ -70,7 +70,7 @@ const Register = () => {
       console.log(response);
 
       if (response) {
-        navigate("/login");
+        navigate("/");
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -221,7 +221,7 @@ const Register = () => {
           Already have an Account?
           <span>
             {" "}
-            <a href="/login" className="text-[#03045e] hover:text-blue-300">
+            <a href="/" className="text-[#03045e] hover:text-blue-300">
               Login Here
             </a>
           </span>{" "}

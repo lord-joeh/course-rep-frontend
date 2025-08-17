@@ -11,7 +11,10 @@ interface ResetInterface {
   confirmPassword: string;
 }
 
-const loginStudent = async ({ studentId, password }: loginStudentArgs) => {
+export const loginStudent = async ({
+  studentId,
+  password,
+}: loginStudentArgs) => {
   const response = await api.post("/auth/login", { studentId, password });
   if (!response.data?.token) {
     throw new Error("Login failed");
@@ -26,19 +29,13 @@ const loginStudent = async ({ studentId, password }: loginStudentArgs) => {
   };
 };
 
-const registerStudent = async (registrationData: object) => {
-  const response = await api.post("/student/", registrationData);
-  if (!response.data) throw new Error("Registration failed");
-  return response.data;
-};
-
-const forgotPassword = async (forgotDetails: object) => {
+export const forgotPassword = async (forgotDetails: object) => {
   const response = await api.post("/auth/forgot", forgotDetails);
   if (!response.data) throw new Error("Failed requesting password reset");
   return response.data;
 };
 
-const resetPassword = async (resetData: ResetInterface) => {
+export const resetPassword = async (resetData: ResetInterface) => {
   const response = await api.post(
     `/auth/reset?token=${resetData?.token}`,
     resetData,
@@ -46,5 +43,3 @@ const resetPassword = async (resetData: ResetInterface) => {
   if (!response.data) throw new Error("Failed resetting password");
   return response.data;
 };
-
-export { loginStudent, registerStudent, forgotPassword, resetPassword };

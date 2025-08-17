@@ -6,23 +6,38 @@ import LoginPage from "../pages/loginPage";
 import RegisterPage from "../pages/registerPage";
 import ForgotPasswordPage from "../pages/forgotPasswordPage";
 import ResetPasswordPage from "../pages/resetPasswordPage";
+import PrivateRoute from "./PrivateRoute";
+import StudentsPage from "../pages/studentsPages/StudentsPage";
+import RepRoute from "./RepRoute";
+import StudentDetailsPage from "../pages/studentsPages/StudentDetailsPage";
+import StudentEditPage from "../pages/studentsPages/StudentEditPage";
 
 const AppRoute = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset" element={<ResetPasswordPage />} />
-      </Routes>
       <AuthProvider>
         <ThemeProvider>
           <Routes>
+            {/* Public */}
             <Route path="/" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset" element={<ResetPasswordPage />} />
+
+            {/* Rep */}
+            <Route element={<AppLayout />}>
+              <Route path="reps/*" element={<RepRoute />}>
+                <Route path="students" element={<StudentsPage />} />
+                <Route path="students/:studentId" element={<StudentDetailsPage />} />
+                <Route path="students/:studentId/edit" element={<StudentEditPage/>}/>
+              </Route>
+
+              {/* Students */}
+              <Route path="students/*" element={<PrivateRoute />}>
+                
+              </Route>
+            </Route>
           </Routes>
-          <AppLayout>
-            <Routes></Routes>
-          </AppLayout>
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

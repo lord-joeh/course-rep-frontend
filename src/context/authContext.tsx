@@ -102,7 +102,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
         setUser(loginResponse);
         localStorage.setItem("user", JSON.stringify(loginResponse));
-        navigate(loginResponse.isRep? '/rep/dashboard': '/student/dashboard');
+        navigate(loginResponse.isRep? '/reps/dashboard': '/students/dashboard');
       } catch (error) {
         console.error("Context login error:", error);
 
