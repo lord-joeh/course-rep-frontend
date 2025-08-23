@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { Avatar, Card, Spinner, Tooltip } from "flowbite-react";
+import { useState, useEffect, type ChangeEvent } from "react";
+import { Avatar, Card, Spinner, Tooltip, Button, Label } from "flowbite-react";
 import { SiGooglemessages } from "react-icons/si";
 import { FaUserEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
-import ToastMessage from "../common/ToastMessage";
-import { deleteStudent } from "../../services/studentService";
+import ToastMessage from "../../common/ToastMessage";
+import { deleteStudent } from "../../../services/studentService";
 import axios from "axios";
-import { DeleteConfirmationDialogue } from "../common/DeleteConfirmationDialogue";
-import MessageToStudentModal from "../common/MessageToStudentModal";
-import useAuth from "../../hooks/useAuth";
-import useStudentData from "../../hooks/useStudentData";
+import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
+import MessageToStudentModal from "../../common/MessageToStudentModal";
+import useAuth from "../../../hooks/useAuth";
+import useStudentData from "../../../hooks/useStudentData";
+import CommonModal from "../../common/CommonModal";
+import { updateStudent } from "../../../services/studentService";
 
 type ModalState = {
   isDeleteDialogueOpen: boolean;
   isMessageModalOpen: boolean;
+  isEditModalOpen: boolean;
   isDeleting: boolean;
+  isEditing: boolean;
   itemToDelete: string;
   idToDelete: string;
 };
@@ -39,9 +43,18 @@ const StudentInfo = () => {
   const [modalState, setModalState] = useState<ModalState>({
     isDeleteDialogueOpen: false,
     isMessageModalOpen: false,
+    isEditModalOpen: false,
     isDeleting: false,
+    isEditing: false,
     itemToDelete: "",
     idToDelete: "",
+  });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    status: "",
+    isRep: false,
   });
 
   const showToast = (message: string, type: "success" | "error") =>
@@ -54,6 +67,67 @@ const StudentInfo = () => {
 
   const closeMessageModal = () =>
     setModalState((prev) => ({ ...prev, isMessageModalOpen: false }));
+
+  const closeEditModal = () =>
+    setModalState((prev) => ({ ...prev, isEditModalOpen: false }));
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value, type } = e.target;
+    const newValue =
+      type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+
+    setFormData({
+      ...formData,
+      [name]: newValue,
+    });
+  };
+
+  useEffect(() => {
+    if (studentData) {
+      setFormData({
+        name: studentData.name || "",
+        email: studentData.email || "",
+        phone: studentData.phone || "",
+        status: studentData.status || "",
+        isRep: studentData.isRep || false,
+      });
+    }
+  }, [studentData]);
+
+  const handleUserEdit = async (e: ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!studentId) return;
+    try {
+      setModalState((prev) => ({ ...prev, isEditing: true }));
+      const response = await updateStudent(studentId, formData);
+
+      showToast(
+        response?.data?.message || "Student updated successfully",
+        "success",
+      );
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        showToast(
+          err.response?.data?.error || "Failed to update student.",
+          "error",
+        );
+      } else {
+        showToast(
+          "An unexpected error occurred while updating student.",
+          "error",
+        );
+      }
+    } finally {
+      setModalState((prev) => ({
+        ...prev,
+        isEditing: false,
+        isEditModalOpen: false,
+      }));
+      window.location.reload();
+    }
+  };
 
   const handleUserDelete = async (id: string) => {
     try {
@@ -85,6 +159,63 @@ const StudentInfo = () => {
     }
   };
 
+  const editBody = (
+    <div className="flex flex-col justify-center gap-5">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        Edit Student
+      </h1>
+
+      <form onSubmit={handleUserEdit} className="flex flex-col gap-4">
+        <>
+          <div>
+            <Label htmlFor="status">Status</Label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full rounded-md border p-2 dark:text-white"
+              required
+            >
+              <option value="">Select Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="suspended">Suspended</option>
+              <option value="withdrawn">Withdrawn</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              id="isRep"
+              name="isRep"
+              type="checkbox"
+              checked={formData.isRep}
+              onChange={handleChange}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <Label htmlFor="isRep">
+              {studentData?.isRep ? "Change to student" : "Change to Rep"}
+            </Label>
+          </div>
+        </>
+        <div className="flex justify-center gap-4">
+          <Button type="submit" disabled={modalState.isEditing} color="green">
+            {modalState.isEditing ? "Saving..." : "Save Changes"}
+          </Button>
+
+          <Button
+            color="alternative"
+            onClick={() =>
+              setModalState((prev) => ({ ...prev, isEditModalOpen: false }))
+            }
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
   return (
     <div className="flex flex-col justify-center gap-5">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -164,7 +295,9 @@ const StudentInfo = () => {
                 size="30px"
                 color="green"
                 className="cursor-pointer"
-                onClick={() => navigate(`edit`)}
+                onClick={() =>
+                  setModalState((prev) => ({ ...prev, isEditModalOpen: true }))
+                }
               />
             </Tooltip>
 
@@ -207,6 +340,12 @@ const StudentInfo = () => {
         isOpen={modalState.isMessageModalOpen}
         studentId={studentData?.id || ""}
         onClose={closeMessageModal}
+      />
+
+      <CommonModal
+        open={modalState.isEditModalOpen}
+        onClose={closeEditModal}
+        children={editBody}
       />
     </div>
   );

@@ -16,10 +16,10 @@ import {
 import { SiGooglemessages } from "react-icons/si";
 import { FaFileExport } from "react-icons/fa6";
 import { MdRefresh } from "react-icons/md";
-import { getStudents } from "../../services/studentService";
+import { getStudents } from "../../../services/studentService";
 import axios from "axios";
-import ToastMessage from "../common/ToastMessage";
-import MessageToStudentModal from "../common/MessageToStudentModal";
+import ToastMessage from "../../common/ToastMessage";
+import MessageToStudentModal from "../../common/MessageToStudentModal";
 import { useNavigate } from "react-router-dom";
 
 interface Student {
@@ -254,11 +254,7 @@ const Students = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={studentTableHeaders.length}>
-                  <Spinner
-                    size="md"
-                    className="me-4 animate-spin"
-                    color="warning"
-                  />{" "}
+                  <Spinner size="lg" className="me-4 animate-spin" />{" "}
                 </TableCell>
               </TableRow>
             ) : filteredStudents.length > 0 ? (
@@ -269,25 +265,19 @@ const Students = () => {
                 >
                   <TableCell
                     className="hover:cursor-pointer"
-                    onClick={() =>
-                      navigate(`${student?.id}`, { state: student })
-                    }
+                    onClick={() => navigate(`${student?.id}`)}
                   >
                     {index + 1}
                   </TableCell>
                   <TableCell
                     className="hover:cursor-pointer"
-                    onClick={() =>
-                      navigate(`${student?.id}`, { state: student })
-                    }
+                    onClick={() => navigate(`${student?.id}`)}
                   >
                     {student.id}
                   </TableCell>
                   <TableCell
                     className="hover:cursor-pointer"
-                    onClick={() =>
-                      navigate(`${student?.id}`, { state: student })
-                    }
+                    onClick={() => navigate(`${student?.id}`)}
                   >
                     {student.name}
                   </TableCell>

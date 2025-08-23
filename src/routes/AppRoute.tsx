@@ -10,7 +10,6 @@ import PrivateRoute from "./PrivateRoute";
 import StudentsPage from "../pages/studentsPages/StudentsPage";
 import RepRoute from "./RepRoute";
 import StudentDetailsPage from "../pages/studentsPages/StudentDetailsPage";
-import StudentEditPage from "../pages/studentsPages/StudentEditPage";
 
 const AppRoute = () => {
   return (
@@ -29,7 +28,6 @@ const AppRoute = () => {
               <Route path="reps/*" element={<RepRoute />}>
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="students/:studentId" element={<StudentDetailsPage />} />
-                <Route path="students/:studentId/edit" element={<StudentEditPage/>}/>
               </Route>
 
               {/* Students */}

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import useStudentData from "../../hooks/useStudentData";
+import useStudentData from "../../../hooks/useStudentData";
 import { useParams } from "react-router-dom";
-import ToastMessage from "../common/ToastMessage";
+import ToastMessage from "../../common/ToastMessage";
 import { Card, Spinner } from "flowbite-react";
 
 type groupType = {
@@ -49,7 +49,7 @@ const StudentGroups = () => {
         </div>
       )}
 
-      {!error && !isLoading && studentData?.Groups ? (
+      {!error && !isLoading && studentData?.Groups && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {studentData?.Groups.map((group: groupType) => (
             <Card key={group?.id} className="overscroll-x-auto">
@@ -65,10 +65,6 @@ const StudentGroups = () => {
             </Card>
           ))}
         </div>
-      ) : (
-        <Card>
-          <p>No Group</p>
-        </Card>
       )}
 
       {toast.isVisible && (
