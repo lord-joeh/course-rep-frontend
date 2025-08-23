@@ -9,6 +9,7 @@ interface StudentInfoProps {
   id: string;
   status: string;
   isRep: boolean;
+  Groups: [];
 }
 
 const useStudentData = (studentId: string | undefined) => {
@@ -30,7 +31,7 @@ const useStudentData = (studentId: string | undefined) => {
         const response = await studentById(studentId);
         const results = response?.data;
         console.log(response?.data);
-        
+
         if (results) {
           setStudent(results);
         } else {

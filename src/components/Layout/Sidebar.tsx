@@ -50,21 +50,21 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
         </div>
         <SidebarItems >
           <SidebarItemGroup>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/dashboard', '/students/dashboard')} icon={HiHome}>Dashboard</SidebarItem>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/assignment', '/students/assignment')} icon={MdAssignment}>Assignment</SidebarItem>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/attendance', '/students/attendance')} icon={FaUserCheck}>Attendance</SidebarItem>
-           {user?.isRep && <SidebarItem href= '' onClick={()=> handleRedirect('/reps/students', '')} icon={HiUser}>Students</SidebarItem>} 
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/dashboard', '/students/dashboard')} icon={HiHome}>Dashboard</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/assignment', '/students/assignment')} icon={MdAssignment}>Assignment</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/attendance', '/students/attendance')} icon={FaUserCheck}>Attendance</SidebarItem>
+           {user?.isRep && <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/students', '')} icon={HiUser}>Students</SidebarItem>} 
             </SidebarItemGroup>
           <SidebarItemGroup>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/slides', '/students/slides')} icon={MdLibraryBooks}>Slides</SidebarItem>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/events', '/students/events')} icon={FiActivity}>Events</SidebarItem>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/groups', '/students/groups')} icon={MdGroups}>Groups</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/slides', '/students/slides')} icon={MdLibraryBooks}>Slides</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/events', '/students/events')} icon={FiActivity}>Events</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/groups', '/students/groups')} icon={MdGroups}>Groups</SidebarItem>
             {user?.isRep && <SidebarItem href='/reps/lecturers' icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
             </SidebarItemGroup>
           <SidebarItemGroup>
-            <SidebarItem href="" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>
            {user?.isRep && <SidebarItem href= '/reps/dashboard'  icon={MdSecurity}>Security</SidebarItem>} 
-            <SidebarItem href="" onClick={logout} icon={RiLogoutCircleLine}>Logout</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={logout} icon={RiLogoutCircleLine}>Logout</SidebarItem>
             </SidebarItemGroup>
         </SidebarItems>
       </FlowbiteSidebar>

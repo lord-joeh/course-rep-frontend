@@ -4,11 +4,11 @@ import { SiGooglemessages } from "react-icons/si";
 import { FaUserEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
-import ToastMessage from "./ToastMessage";
+import ToastMessage from "../common/ToastMessage";
 import { deleteStudent } from "../../services/studentService";
 import axios from "axios";
-import { DeleteConfirmationDialogue } from "./DeleteConfirmationDialogue";
-import MessageToStudentModal from "./MessageToStudentModal";
+import { DeleteConfirmationDialogue } from "../common/DeleteConfirmationDialogue";
+import MessageToStudentModal from "../common/MessageToStudentModal";
 import useAuth from "../../hooks/useAuth";
 import useStudentData from "../../hooks/useStudentData";
 

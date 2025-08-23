@@ -1,19 +1,27 @@
-import React from "react";
-import StudentInfo from "../common/StudentInfo";
-import StudentGroups from "../common/StudentGroups";
-import { useLocation } from "react-router-dom";
+import StudentInfo from "./StudentInfo";
+import StudentGroups from "./StudentGroups";
+import { Button } from "flowbite-react";
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const StudentDetails = () => {
-  const location = useLocation();
-  const studentDetails = location.state;
-  const { name, phone, email, id } = studentDetails;
-
+  const navigate = useNavigate();
   return (
-    <div className="grid grid-cols-1 gap-6 p-3 font-sans sm:grid-cols-2">
-      <StudentInfo name={name} phone={phone} email={email} studentId={id} />
+    <>
+      <Button
+        color="alternative"
+        className="cursor-pointer"
+        onClick={() => navigate(-1)}
+      >
+        <FaArrowLeft className="me-2" />
+        Back
+      </Button>
+      <div className="grid grid-cols-1 gap-6 p-3 font-sans sm:grid-cols-2">
+        <StudentInfo />
 
-      <StudentGroups studentId={id} />
-    </div>
+        <StudentGroups />
+      </div>
+    </>
   );
 };
 

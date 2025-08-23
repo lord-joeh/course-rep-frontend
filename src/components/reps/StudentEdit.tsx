@@ -75,7 +75,7 @@ const StudentEdit = () => {
         "success",
       );
 
-      setTimeout(() => navigate(-1), 1500);
+      setTimeout(() => navigate(-1), 1000);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         showToast(

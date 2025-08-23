@@ -188,7 +188,7 @@ const Students = () => {
           placeholder="Search students..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500 md:w-auto"
+          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
         <Button onClick={handleExport}>
           <FaFileExport className="me-2 h-4 w-4" /> Export Students
