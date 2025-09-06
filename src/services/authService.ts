@@ -24,7 +24,6 @@ export const loginStudent = async ({
     ...response.data,
     isRep: results.data.isRep,
     token: results.token,
-    refreshToken: results.refreshToken,
     name: results.data.name,
   };
 };

@@ -25,7 +25,6 @@ type UserType = {
   phone: string;
   status: string;
   token: string;
-  refreshToken?: string;
   data?: object;
 };
 
@@ -54,7 +53,15 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     localStorage.removeItem("user");
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (e) {
+    }
     setUser(null);
     clearAuthData();
     navigate("/");
