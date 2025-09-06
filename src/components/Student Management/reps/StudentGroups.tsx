@@ -1,6 +1,4 @@
 import { useState } from "react";
-import useStudentData from "../../../hooks/useStudentData";
-import { useParams } from "react-router-dom";
 import ToastMessage from "../../common/ToastMessage";
 import { Card, Spinner } from "flowbite-react";
 
@@ -15,10 +13,19 @@ type groupType = {
   };
 };
 
-const StudentGroups = () => {
-  const { studentId } = useParams();
-  const { studentData, isLoading, error } = useStudentData(studentId);
+type StudentGroupsProps = {
+  studentData: {
+    Groups: groupType[];
+  };
+  isLoading: boolean;
+  error: string | null;
+};
 
+const StudentGroups = ({
+  studentData,
+  isLoading,
+  error,
+}: StudentGroupsProps) => {
   const [toast, setToast] = useState<{
     message: string;
     type: "error" | "success";

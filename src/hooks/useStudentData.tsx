@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { isAxiosError } from "axios";
 import { studentById } from "../services/studentService";
 
 interface StudentInfoProps {
@@ -36,7 +36,7 @@ const useStudentData = (studentId: string | undefined) => {
           setError("Student not found.");
         }
       } catch (err) {
-        if (axios.isAxiosError(err)) {
+        if (isAxiosError(err)) {
           setError(
             err.response?.data?.error || "Failed to fetch student details.",
           );

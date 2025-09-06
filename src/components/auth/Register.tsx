@@ -67,7 +67,6 @@ const Register = () => {
     setError("");
     try {
       const response = await registerStudent(registerData);
-      console.log(response);
 
       if (response) {
         navigate("/");

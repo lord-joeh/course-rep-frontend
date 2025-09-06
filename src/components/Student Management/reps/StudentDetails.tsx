@@ -2,10 +2,24 @@ import StudentInfo from "./StudentInfo";
 import StudentGroups from "./StudentGroups";
 import { Button } from "flowbite-react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import useStudentData from "../../../hooks/useStudentData";
 
 const StudentDetails = () => {
   const navigate = useNavigate();
+  const { studentId } = useParams();
+  const { studentData, isLoading, error } = useStudentData(studentId);
+
+  const defaultStudentData = {
+    name: "",
+    phone: "",
+    email: "",
+    id: "",
+    status: "",
+    isRep: false,
+    Groups: [],
+  };
+
   return (
     <>
       <Button
@@ -17,9 +31,17 @@ const StudentDetails = () => {
         Back
       </Button>
       <div className="grid grid-cols-1 gap-6 p-3 font-sans sm:grid-cols-2">
-        <StudentInfo />
+        <StudentInfo
+          studentData={studentData ?? defaultStudentData}
+          isLoading={isLoading}
+          error={error}
+        />
 
-        <StudentGroups />
+        <StudentGroups
+          studentData={studentData ?? defaultStudentData}
+          isLoading={isLoading}
+          error={error}
+        />
       </div>
     </>
   );

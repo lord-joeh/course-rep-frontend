@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Button,
   Card,
@@ -107,16 +107,23 @@ const Students = () => {
     }
   };
 
-  useEffect(() => {
-    fetchStudentsData(pagination.currentPage, pagination.itemsPerPage);
+  const debouncedFetch = useCallback((page: number, perPage: number) => {
+    const timeoutId = setTimeout(() => {
+      fetchStudentsData(page, perPage);
+    }, 300);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
-    fetchStudentsData(1, pagination.itemsPerPage);
-  }, [pagination.itemsPerPage]);
+    const cleanup = debouncedFetch(
+      pagination.currentPage,
+      pagination.itemsPerPage,
+    );
+    return () => cleanup();
+  }, [pagination.currentPage, pagination.itemsPerPage, debouncedFetch]);
 
   const onPageChange = (pageNumber: number) => {
-    fetchStudentsData(pageNumber, pagination.itemsPerPage);
+    setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
   const handleRefresh = () => {
@@ -176,7 +183,7 @@ const Students = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-10">
+    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Students Management
       </h1>
@@ -222,10 +229,12 @@ const Students = () => {
           <select
             id="entries"
             className="rounded text-gray-900 dark:text-white"
+            value={pagination.itemsPerPage}
             onChange={(e) =>
               setPagination((prev) => ({
                 ...prev,
                 itemsPerPage: parseInt(e.target.value),
+                currentPage: 1,
               }))
             }
           >

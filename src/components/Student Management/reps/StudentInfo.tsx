@@ -6,11 +6,10 @@ import { MdDeleteForever } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
 import ToastMessage from "../../common/ToastMessage";
 import { deleteStudent } from "../../../services/studentService";
-import axios from "axios";
+import {isAxiosError} from "axios";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import useAuth from "../../../hooks/useAuth";
-import useStudentData from "../../../hooks/useStudentData";
 import CommonModal from "../../common/CommonModal";
 import { updateStudent } from "../../../services/studentService";
 
@@ -24,9 +23,22 @@ type ModalState = {
   idToDelete: string;
 };
 
-const StudentInfo = () => {
+type studentDataHook = {
+  error: string | null;
+  isLoading: boolean;
+  studentData: {
+    name: string;
+    phone: string;
+    email: string;
+    id: string;
+    status: string;
+    isRep: boolean;
+    Groups: any[];
+  };
+};
+
+const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
   const { studentId } = useParams();
-  const { studentData, isLoading, error } = useStudentData(studentId);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -108,7 +120,7 @@ const StudentInfo = () => {
         "success",
       );
     } catch (err) {
-      if (axios.isAxiosError(err)) {
+      if (isAxiosError(err)) {
         showToast(
           err.response?.data?.error || "Failed to update student.",
           "error",
@@ -137,9 +149,9 @@ const StudentInfo = () => {
         response?.data?.message || "Student deleted successfully",
         "success",
       );
-      setTimeout(() => navigate("/reps/students"), 1500);
+      navigate(-1);
     } catch (err) {
-      if (axios.isAxiosError(err)) {
+      if (isAxiosError(err)) {
         showToast(
           err.response?.data?.error || "Failed to delete student.",
           "error",
