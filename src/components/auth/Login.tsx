@@ -43,7 +43,6 @@ const Login = () => {
       setError("");
       const response = await loginStudent(loginData);
       login(response);
-      console.log(response);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         setError(error.response?.data.error);

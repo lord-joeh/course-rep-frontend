@@ -59,7 +59,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/slides', '/students/slides')} icon={MdLibraryBooks}>Slides</SidebarItem>
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/events', '/students/events')} icon={FiActivity}>Events</SidebarItem>
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/groups', '/students/groups')} icon={MdGroups}>Groups</SidebarItem>
-            {user?.isRep && <SidebarItem href='/reps/lecturers' icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
+            {user?.isRep && <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/lecturers', '')} icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
             </SidebarItemGroup>
           <SidebarItemGroup>
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>

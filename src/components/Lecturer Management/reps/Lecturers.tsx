@@ -39,7 +39,6 @@ type ModalState = {
   isEditing: boolean;
   itemToDelete: string;
   idToDelete: string;
-  currentModal: React.ReactNode | null;
 };
 type courseType = { name: string };
 
@@ -67,7 +66,6 @@ const Lecturers = () => {
     itemToDelete: "",
     idToDelete: "",
     isAdding: false,
-    currentModal: null,
   });
 
   const [formData, setFormData] = useState({
@@ -103,7 +101,6 @@ const Lecturers = () => {
       const response = await lecturerService.getLecturers();
 
       setLecturers(response.data || []);
-      console.log(lecturers);
     } catch (error) {
       if (isAxiosError(error)) {
         setToast({
@@ -151,12 +148,6 @@ const Lecturers = () => {
         isDeleting: false,
         isDeleteDialogueOpen: false,
       }));
-
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-      });
     }
   };
 
@@ -191,7 +182,6 @@ const Lecturers = () => {
           isAdding: false,
           isModalOpen: false,
           isEditing: false,
-          currentModal: null,
         }));
         setEditId(null);
         setFormData({ name: "", email: "", phone: "" });
@@ -223,7 +213,6 @@ const Lecturers = () => {
           isAdding: false,
           isModalOpen: false,
           isEditing: false,
-          currentModal: null,
         }));
         setFormData({ name: "", email: "", phone: "" });
         setEditId(null);
@@ -307,7 +296,7 @@ const Lecturers = () => {
               <Label htmlFor="Lecturer phone"> Phone</Label>
             </div>
             <TextInput
-              type="text"
+              type="tel"
               id="lecturer-phone"
               placeholder="Lecturer's Phone Number"
               name="phone"
@@ -318,6 +307,7 @@ const Lecturers = () => {
               icon={FaPhone}
               className="sm:text-sm md:text-base"
               autoComplete="off"
+              max={10}
             />
           </div>
         </>
@@ -340,7 +330,6 @@ const Lecturers = () => {
                 ...prev,
                 isModalOpen: false,
                 isEditing: false,
-                currentModal: null,
               }));
               setEditId(null);
               setFormData({ name: "", email: "", phone: "" });
@@ -435,7 +424,6 @@ const Lecturers = () => {
                               ...prev,
                               isModalOpen: true,
                               isEditing: true,
-                              currentModal: null,
                             }));
                           }}
                         />

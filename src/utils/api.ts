@@ -39,7 +39,6 @@ api.interceptors.request.use(
     } catch (error) {
       console.error("Failed to parse user data:", error);
       localStorage.removeItem("user");
-      window.location.href = "/login";
       return Promise.reject(error);
     }
 

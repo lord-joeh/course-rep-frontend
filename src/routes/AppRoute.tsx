@@ -10,7 +10,8 @@ import PrivateRoute from "./PrivateRoute";
 import StudentsPage from "../pages/studentsPages/StudentsPage";
 import RepRoute from "./RepRoute";
 import StudentDetailsPage from "../pages/studentsPages/StudentDetailsPage";
-import LecturersPage from "../pages/lecturersPage/lecturersPage";
+import LecturerPage from "../pages/lecturersPage/LecturerPage";
+import RepEventPage from "../pages/EventsPage/RepEventPage";
 
 const AppRoute = () => {
   return (
@@ -29,11 +30,13 @@ const AppRoute = () => {
               <Route path="reps/*" element={<RepRoute />}>
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="students/:studentId" element={<StudentDetailsPage />} />
-                <Route path="lecturers" element={<LecturersPage />} />
+                <Route path="lecturers" element={<LecturerPage />} />
+                <Route path="events" element={<RepEventPage />} />
               </Route>
 
               {/* Students */}
               <Route path="students/*" element={<PrivateRoute />}>
+              <Route path="events" element={<RepEventPage />} />
                 
               </Route>
             </Route>

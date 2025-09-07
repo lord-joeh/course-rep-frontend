@@ -55,13 +55,15 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (e) {
-    }
+      await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    } catch (e) {}
     setUser(null);
     clearAuthData();
     navigate("/");
@@ -75,8 +77,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         const parsedUser: UserType = JSON.parse(storedUser);
         if (isTokenValid(parsedUser.token)) {
           setUser(parsedUser);
-        } else {
-          logout();
         }
       }
     } catch (error) {
@@ -87,19 +87,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
   }, [logout]);
 
-  useEffect(() => {
-    if (!user) return;
-
-    const checkTokenValidity = () => {
-      if (!isTokenValid(user.token)) {
-        logout();
-      }
-    };
-
-    const interval = setInterval(checkTokenValidity, 60000);
-    return () => clearInterval(interval);
-  }, [user, logout]);
-
   const login = useCallback(
     (loginResponse: UserType) => {
       try {
@@ -109,7 +96,9 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
         setUser(loginResponse);
         localStorage.setItem("user", JSON.stringify(loginResponse));
-        navigate(loginResponse.isRep? '/reps/dashboard': '/students/dashboard');
+        navigate(
+          loginResponse.isRep ? "/reps/dashboard" : "/students/dashboard",
+        );
       } catch (error) {
         console.error("Context login error:", error);
 

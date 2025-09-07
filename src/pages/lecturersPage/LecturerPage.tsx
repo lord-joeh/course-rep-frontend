@@ -1,5 +1,5 @@
 import Lecturers from "../../components/Lecturer Management/reps/lecturers";
-const LecturersPage = () => {
+const LecturerPage = () => {
   return (
     <div className="min-h-screen max-w-6xl text-gray-900 dark:text-white">
       <Lecturers />
@@ -7,4 +7,4 @@ const LecturersPage = () => {
   );
 };
 
-export default LecturersPage;
+export default LecturerPage;

@@ -136,7 +136,7 @@ const Register = () => {
             <Label htmlFor="phone">Phone Number</Label>
           </div>
           <TextInput
-            type="text"
+            type="tel"
             id="phone"
             placeholder="0245678390"
             name="phone"
