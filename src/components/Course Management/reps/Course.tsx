@@ -29,7 +29,7 @@ import { formatTimeWithOffset } from "../../../helpers/formatTime";
 import { FaBook } from "react-icons/fa6";
 import { CiEdit } from "react-icons/ci";
 import {
-   IoCheckmarkCircleSharp,
+  IoCheckmarkCircleSharp,
   IoTimeOutline,
   IoTodayOutline,
 } from "react-icons/io5";
@@ -205,6 +205,10 @@ const Course = () => {
 
   useEffect(() => {
     fetchCoursesData();
+    setCourseStudent((prev) => ({
+      ...prev,
+      studentId: user ? user?.data?.id : "",
+    }));
   }, []);
 
   const handleCourseSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
