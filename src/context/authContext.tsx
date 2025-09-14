@@ -25,7 +25,12 @@ type UserType = {
   phone: string;
   status: string;
   token: string;
-  data?: object;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  };
 };
 
 const isTokenValid = (token: string | null): boolean => {
@@ -91,7 +96,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     (loginResponse: UserType) => {
       try {
         if (!isTokenValid(loginResponse.token)) {
-          throw new Error("Login failed: Token is invalid or expired.");
+          throw new Error("Token is invalid or expired.");
         }
 
         setUser(loginResponse);

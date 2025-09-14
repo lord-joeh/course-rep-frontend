@@ -15,7 +15,7 @@ const ToastMessage = ({ message, type, onClose }: ToastType) => {
     const timer = setTimeout(() => {
       setIsVisible(false);
       onClose();
-    }, 7000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, [onClose]);
 

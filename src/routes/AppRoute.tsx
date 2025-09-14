@@ -2,16 +2,18 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../context/authContext";
 import { ThemeProvider } from "../context/themeContext";
 import AppLayout from "../components/Layout/AppLayout";
-import LoginPage from "../pages/loginPage";
-import RegisterPage from "../pages/registerPage";
-import ForgotPasswordPage from "../pages/forgotPasswordPage";
-import ResetPasswordPage from "../pages/resetPasswordPage";
+import LoginPage from "../pages/Auth Pages/loginPage";
+import RegisterPage from "../pages/Auth Pages/registerPage";
+import ForgotPasswordPage from "../pages/Auth Pages/forgotPasswordPage";
+import ResetPasswordPage from "../pages/Auth Pages/resetPasswordPage";
 import PrivateRoute from "./PrivateRoute";
 import StudentsPage from "../pages/studentsPages/StudentsPage";
 import RepRoute from "./RepRoute";
 import StudentDetailsPage from "../pages/studentsPages/StudentDetailsPage";
 import LecturerPage from "../pages/lecturersPage/LecturerPage";
 import RepEventPage from "../pages/EventsPage/RepEventPage";
+import CourseRepPage from "../pages/Course Pages/courseRepPage";
+import CourseStudentPage from "../pages/Course Pages/CourseStudentPage";
 
 const AppRoute = () => {
   return (
@@ -32,12 +34,13 @@ const AppRoute = () => {
                 <Route path="students/:studentId" element={<StudentDetailsPage />} />
                 <Route path="lecturers" element={<LecturerPage />} />
                 <Route path="events" element={<RepEventPage />} />
+                <Route path="courses" element={<CourseRepPage/>} />
               </Route>
 
               {/* Students */}
               <Route path="students/*" element={<PrivateRoute />}>
               <Route path="events" element={<RepEventPage />} />
-                
+              <Route path="courses" element={<CourseStudentPage />} />
               </Route>
             </Route>
           </Routes>

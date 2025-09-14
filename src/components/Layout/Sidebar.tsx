@@ -14,6 +14,7 @@ import { VscFeedback } from "react-icons/vsc";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { HiMiniAcademicCap } from "react-icons/hi2";
 import { FaUserCheck } from "react-icons/fa";
+import { IoBookSharp } from "react-icons/io5";
 import { FiActivity } from "react-icons/fi";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -62,8 +63,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             {user?.isRep && <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/lecturers', '')} icon={HiMiniAcademicCap}>Lecturers</SidebarItem>}
             </SidebarItemGroup>
           <SidebarItemGroup>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/courses', '/students/courses')} icon={IoBookSharp}>Courses</SidebarItem>
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>
-           {user?.isRep && <SidebarItem href= '/reps/dashboard'  icon={MdSecurity}>Security</SidebarItem>} 
+           {user?.isRep && <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/security', '')} icon={MdSecurity}>Security</SidebarItem>}
             <SidebarItem className="cursor-pointer" onClick={logout} icon={RiLogoutCircleLine}>Logout</SidebarItem>
             </SidebarItemGroup>
         </SidebarItems>

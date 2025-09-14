@@ -18,7 +18,7 @@ import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialo
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { HiCalendarDateRange } from "react-icons/hi2";
-import { formatTimeWithOffset } from "../../../utils/formatTime";
+import { formatTimeWithOffset } from "../../../helpers/formatTime";
 
 interface Event {
   id: string;
@@ -387,7 +387,7 @@ const Events = () => {
         <input
           id="search"
           type="search"
-          placeholder="Search events..."
+          placeholder="Search event..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"

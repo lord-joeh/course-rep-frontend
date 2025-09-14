@@ -132,7 +132,7 @@ const Students = () => {
 
   const handleExport = () => {
     const headers = ["Student ID", "Name", "Phone Number", "Email"]
-      .map((h) => `"${h}"`)
+      .map((header) => `"${header}"`)
       .join(",");
     const rows = students
       .map(

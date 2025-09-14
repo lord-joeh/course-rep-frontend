@@ -42,17 +42,19 @@ type ModalState = {
 };
 type courseType = { name: string };
 
+interface ToastInterface {
+  message: string;
+  type: "error" | "success";
+  isVisible: boolean;
+}
+
 const Lecturers = () => {
   const [lecturers, setLecturers] = useState<Lecturer[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "error" | "success";
-    isVisible: boolean;
-  }>({
+  const [toast, setToast] = useState<ToastInterface>({
     message: "",
     type: "error",
     isVisible: false,
@@ -361,13 +363,10 @@ const Lecturers = () => {
       </div>
       <Button
         onClick={() => {
-          setFormData({ name: "", email: "", phone: "" });
-          setEditId(null);
           setModalState((prev) => ({
             ...prev,
             isModalOpen: true,
             isEditing: false,
-            currentModal: null,
           }));
         }}
         className="flex w-50 justify-start"
@@ -402,8 +401,8 @@ const Lecturers = () => {
                   <TableCell>{lecturer?.email}</TableCell>
                   <TableCell>
                     {lecturer?.Courses.map(
-                      (course: courseType) => course?.name,
-                    )}
+                      (course: courseType) => (course?.name),
+                    ).join(", ")}
                   </TableCell>
 
                   <TableCell>
