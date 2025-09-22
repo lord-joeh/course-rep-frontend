@@ -17,7 +17,7 @@ import { SiGooglemessages } from "react-icons/si";
 import { FaFileExport } from "react-icons/fa6";
 import { MdRefresh } from "react-icons/md";
 import { getStudents } from "../../../services/studentService";
-import axios from "axios";
+import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +37,12 @@ type PaginationType = {
   totalItems: number;
 };
 
+interface ToastInterface {
+  message: string;
+  type: "error" | "success";
+  isVisible: boolean;
+}
+
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -51,11 +57,7 @@ const Students = () => {
     totalItems: 0,
   });
 
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "error" | "success";
-    isVisible: boolean;
-  }>({
+  const [toast, setToast] = useState<ToastInterface>({
     message: "",
     type: "error",
     isVisible: false,
@@ -88,7 +90,7 @@ const Students = () => {
         totalPages: response.data?.pagination?.totalPages || 1,
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         setToast({
           message: error.response?.data?.error || "Error fetching students",
           type: "error",

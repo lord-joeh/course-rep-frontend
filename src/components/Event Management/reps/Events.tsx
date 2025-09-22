@@ -413,7 +413,7 @@ const Events = () => {
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Upcoming Events
       </h1>
-      <div className="event-grid grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="event-grid grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
           <Card>
             <Spinner size="lg" />

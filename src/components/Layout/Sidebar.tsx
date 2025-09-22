@@ -64,7 +64,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             </SidebarItemGroup>
           <SidebarItemGroup>
             <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/courses', '/students/courses')} icon={IoBookSharp}>Courses</SidebarItem>
-            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/feedback', '/students/feedback')} icon={VscFeedback}>Feedback</SidebarItem>
+            <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/feedbacks', '/students/feedbacks')} icon={VscFeedback}>Feedback</SidebarItem>
            {user?.isRep && <SidebarItem className="cursor-pointer" onClick={()=> handleRedirect('/reps/security', '')} icon={MdSecurity}>Security</SidebarItem>}
             <SidebarItem className="cursor-pointer" onClick={logout} icon={RiLogoutCircleLine}>Logout</SidebarItem>
             </SidebarItemGroup>

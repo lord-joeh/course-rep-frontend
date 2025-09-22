@@ -2,18 +2,19 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../context/authContext";
 import { ThemeProvider } from "../context/themeContext";
 import AppLayout from "../components/Layout/AppLayout";
-import LoginPage from "../pages/Auth Pages/loginPage";
-import RegisterPage from "../pages/Auth Pages/registerPage";
-import ForgotPasswordPage from "../pages/Auth Pages/forgotPasswordPage";
-import ResetPasswordPage from "../pages/Auth Pages/resetPasswordPage";
+import LoginPage from "../pages/Auth Pages/LoginPage";
+import RegisterPage from "../pages/Auth Pages/RegisterPage";
+import ForgotPasswordPage from "../pages/Auth Pages/ForgotPasswordPage";
+import ResetPasswordPage from "../pages/Auth Pages/ResetPasswordPage";
 import PrivateRoute from "./PrivateRoute";
-import StudentsPage from "../pages/studentsPages/StudentsPage";
+import StudentsPage from "../pages/students Pages/StudentsPage";
 import RepRoute from "./RepRoute";
-import StudentDetailsPage from "../pages/studentsPages/StudentDetailsPage";
-import LecturerPage from "../pages/lecturersPage/LecturerPage";
-import RepEventPage from "../pages/EventsPage/RepEventPage";
-import CourseRepPage from "../pages/Course Pages/courseRepPage";
+import StudentDetailsPage from "../pages/students Pages/StudentDetailsPage";
+import LecturerPage from "../pages/lecturers Page/LecturerPage";
+import RepEventPage from "../pages/Events Page/RepEventPage";
+import CourseRepPage from "../pages/Course Pages/CourseRepPage";
 import CourseStudentPage from "../pages/Course Pages/CourseStudentPage";
+import RepFeedbackPage from "../pages/Feedback Page/RepFeedbackPage";
 
 const AppRoute = () => {
   return (
@@ -35,6 +36,7 @@ const AppRoute = () => {
                 <Route path="lecturers" element={<LecturerPage />} />
                 <Route path="events" element={<RepEventPage />} />
                 <Route path="courses" element={<CourseRepPage/>} />
+                <Route path="feedbacks" element={<RepFeedbackPage/>} />
               </Route>
 
               {/* Students */}

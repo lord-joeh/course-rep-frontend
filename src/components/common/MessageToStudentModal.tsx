@@ -24,17 +24,19 @@ interface MessageInterface {
   messageType: "SMS" | "email";
 }
 
+interface ToastInterface {
+  message: string;
+  type: "error" | "success";
+  isVisible: boolean;
+}
+
 const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
   const [isSending, setSending] = useState<boolean>(false);
   const [messageData, setMessageData] = useState<MessageInterface>({
     message: "",
     messageType: "SMS",
   });
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "error" | "success";
-    isVisible: boolean;
-  }>({
+  const [toast, setToast] = useState<ToastInterface>({
     message: "",
     type: "error",
     isVisible: false,
