@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import * as FeedbackService from "../../../services/feedbackService";
 import { isAxiosError } from "axios";
-import { MdRefresh } from "react-icons/md";
+import { MdDeleteForever, MdRefresh } from "react-icons/md";
 import { Avatar, Button, Card, Pagination, Spinner } from "flowbite-react";
 import { VscFeedback } from "react-icons/vsc";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
+import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
+import AddFeedback from "../students/Feedback";
 
 interface Feedback {
   id: string;
@@ -146,6 +148,37 @@ const Feedbacks = () => {
     );
   }, [feedbacks, searchQuery]);
 
+  const handleFeedbackDelete = async (id: string) => {
+    try {
+      setModalState((prev) => ({ ...prev, isDeleting: true }));
+      const response = await FeedbackService.deleteFeedback(id);
+      showToast(
+        response?.data?.message || "Feedback deleted successfully",
+        "success",
+      );
+      handleRefresh();
+    } catch (err) {
+      if (isAxiosError(err)) {
+        showToast(
+          err.response?.data?.error || "Failed to delete Feedback.",
+          "error",
+        );
+      } else {
+        showToast(
+          "An unexpected error occurred while deleting Feedback.",
+          "error",
+        );
+      }
+    } finally {
+      setModalState((prev) => ({
+        ...prev,
+        isDeleting: false,
+        isDeleteDialogueOpen: false,
+        isEditing: false,
+      }));
+    }
+  };
+
   const viewModalContent = (
     <div className="flex flex-col justify-center gap-5">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -154,7 +187,7 @@ const Feedbacks = () => {
           : `${formData.Student.name}'s Feedback`}
       </h1>
 
-      <div>{formData?.content}</div>
+      <div className="dark:text-white">{formData?.content}</div>
       <div className="flex justify-center gap-4 p-2">
         <Button
           disabled={formData.is_anonymous}
@@ -168,11 +201,25 @@ const Feedbacks = () => {
         <Button
           color="alternative"
           onClick={() => {
-            setModalState((prev) => ({ ...prev, isAdding: false }));
+            setModalState((prev) => ({ ...prev, isEditing: false }));
           }}
         >
           Close
         </Button>
+
+        <span
+          onClick={() =>
+            setModalState((prev) => ({
+              ...prev,
+              isDeleteDialogueOpen: true,
+              itemToDelete: `${formData?.content.slice(0, 30)}...` || "",
+              idToDelete: formData?.id || "",
+            }))
+          }
+          className="mt-2 cursor-pointer px-8"
+        >
+          <MdDeleteForever size={24} color="red" />
+        </span>
       </div>
     </div>
   );
@@ -199,8 +246,7 @@ const Feedbacks = () => {
         onClick={() => {
           setModalState((prev) => ({
             ...prev,
-            isModalOpen: true,
-            isEditing: false,
+            isAdding: true,
           }));
         }}
         className="flex w-50 justify-start"
@@ -214,9 +260,7 @@ const Feedbacks = () => {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          <Card>
-            <Spinner size="lg" />
-          </Card>
+          <Spinner size="lg" />
         ) : filteredFeedbacks.length > 0 ? (
           filteredFeedbacks.map((feedback: Feedback) => (
             <div
@@ -232,7 +276,9 @@ const Feedbacks = () => {
                 </span>
               </div>
               <div className="flex flex-col justify-center space-y-2 p-2">
-                {`${feedback?.content.slice(0, 150)}...`}
+                {feedback.content.length > 100
+                  ? `${feedback?.content.slice(0, 100)}...`
+                  : feedback.content}
               </div>
               <div className="flex justify-center gap-4 p-2">
                 <Button
@@ -253,8 +299,9 @@ const Feedbacks = () => {
                       studentId: feedback?.studentId,
                       is_anonymous: feedback?.is_anonymous,
                       Student: { name: feedback.Student.name },
+                      id: feedback.id,
                     }));
-                    setModalState((prev) => ({ ...prev, isAdding: true }));
+                    setModalState((prev) => ({ ...prev, isEditing: true }));
                   }}
                 >
                   View
@@ -295,13 +342,28 @@ const Feedbacks = () => {
       )}
 
       <CommonModal
-        open={modalState.isAdding}
+        open={modalState.isAdding || modalState.isEditing}
         onClose={() => {
-          setModalState((prev) => ({ ...prev, isAdding: false }));
+          setModalState((prev) => ({
+            ...prev,
+            isAdding: false,
+            isEditing: false,
+          }));
         }}
       >
-        {viewModalContent}
+        {modalState.isEditing && viewModalContent}
+        {modalState.isAdding && <AddFeedback />}
       </CommonModal>
+
+      <DeleteConfirmationDialogue
+        isOpen={modalState.isDeleteDialogueOpen}
+        isDeleting={modalState.isDeleting}
+        handleDelete={() => handleFeedbackDelete(modalState.idToDelete)}
+        onClose={() => {
+          setModalState((prev) => ({ ...prev, isDeleteDialogueOpen: false }));
+        }}
+        itemToDelete={modalState.itemToDelete}
+      />
     </div>
   );
 };

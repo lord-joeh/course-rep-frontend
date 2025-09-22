@@ -15,6 +15,7 @@ import RepEventPage from "../pages/Events Page/RepEventPage";
 import CourseRepPage from "../pages/Course Pages/CourseRepPage";
 import CourseStudentPage from "../pages/Course Pages/CourseStudentPage";
 import RepFeedbackPage from "../pages/Feedback Page/RepFeedbackPage";
+import StudentFeedbackPage from "../pages/Feedback Page/StudentFeedbackPage";
 
 const AppRoute = () => {
   return (
@@ -43,6 +44,7 @@ const AppRoute = () => {
               <Route path="students/*" element={<PrivateRoute />}>
               <Route path="events" element={<RepEventPage />} />
               <Route path="courses" element={<CourseStudentPage />} />
+              <Route path="feedbacks" element={<StudentFeedbackPage />} />
               </Route>
             </Route>
           </Routes>

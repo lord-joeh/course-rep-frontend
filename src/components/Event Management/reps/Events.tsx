@@ -380,9 +380,14 @@ const Events = () => {
   );
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        Events Management
-      </h1>
+      {user && user.isRep ? (
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Events Management
+        </h1>
+      ) : (
+        ""
+      )}
+
       <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <input
           id="search"
