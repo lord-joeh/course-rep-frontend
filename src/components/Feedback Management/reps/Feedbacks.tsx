@@ -235,9 +235,9 @@ const Feedbacks = () => {
           placeholder="Search feedback..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
+          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
-        <Button onClick={handleRefresh}>
+        <Button onClick={handleRefresh} className="w-50">
           <MdRefresh className="me-2 h-4 w-4" /> Refresh
         </Button>
       </div>
@@ -258,7 +258,7 @@ const Feedbacks = () => {
         Recent Feedbacks
       </h1>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {isLoading ? (
           <Spinner size="lg" />
         ) : filteredFeedbacks.length > 0 ? (

@@ -155,6 +155,16 @@ const Lecturers = () => {
 
   const handleLecturerSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    let userErrorMessage = "";
+    if (formData.name.length < 1)
+      userErrorMessage = "Lecturer's name cannot be empty";
+    if (formData.email.length < 1)
+      userErrorMessage = "Lecturer's email cannot be empty";
+    if (formData.phone.length < 1)
+      userErrorMessage = "Lecturer's phone cannot be empty";
+
+    if (userErrorMessage) return showToast(userErrorMessage, "error");
+
     if (modalState.isEditing && editId) {
       try {
         setModalState((prev) => ({ ...prev, isAdding: true }));
@@ -355,9 +365,9 @@ const Lecturers = () => {
           placeholder="Search lecturers..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
+          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
-        <Button onClick={handleRefresh}>
+        <Button onClick={handleRefresh} className="w-[15%]">
           <MdRefresh className="me-2 h-4 w-4" /> Refresh
         </Button>
       </div>
@@ -401,7 +411,7 @@ const Lecturers = () => {
                   <TableCell>{lecturer?.email}</TableCell>
                   <TableCell>
                     {lecturer?.Courses.map(
-                      (course: courseType) => (course?.name),
+                      (course: courseType) => course?.name,
                     ).join(", ")}
                   </TableCell>
 

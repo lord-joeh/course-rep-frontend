@@ -380,13 +380,9 @@ const Events = () => {
   );
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
-      {user && user.isRep ? (
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Events Management
-        </h1>
-      ) : (
-        ""
-      )}
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        {user && user.isRep ? "Event Management" : "Events"}
+      </h1>
 
       <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
         <input
@@ -395,9 +391,9 @@ const Events = () => {
           placeholder="Search event..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
+          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none"
         />
-        <Button onClick={handleRefresh}>
+        <Button onClick={handleRefresh} className="w-[15%]">
           <MdRefresh className="me-2 h-4 w-4" /> Refresh
         </Button>
       </div>
@@ -418,7 +414,7 @@ const Events = () => {
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Upcoming Events
       </h1>
-      <div className="event-grid grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {isLoading ? (
           <Card>
             <Spinner size="lg" />

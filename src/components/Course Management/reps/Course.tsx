@@ -112,7 +112,14 @@ const Course = () => {
     isAdding: false,
   });
 
-  const courseTableHeader = ["#", "COURSE", "DAY", "TIME", "ACTIONS"];
+  const courseTableHeader = [
+    "#",
+    "COURSE CODE",
+    "COURSE",
+    "DAY",
+    "TIME",
+    "ACTIONS",
+  ];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -519,7 +526,7 @@ const Course = () => {
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        Course Management
+        {user && user.isRep ? "Course Management" : "Courses"}
       </h1>
 
       <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -531,7 +538,7 @@ const Course = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
-        <Button onClick={handleRefresh}>
+        <Button onClick={handleRefresh} className="w-[15%]">
           <MdRefresh className="me-2 h-4 w-4" /> Refresh
         </Button>
       </div>
@@ -575,6 +582,7 @@ const Course = () => {
                   className="hover:bg-gray-200 hover:dark:bg-gray-600"
                 >
                   <TableCell>{index + 1}</TableCell>
+                  <TableCell>{course?.id}</TableCell>
                   <TableCell>{course?.name}</TableCell>
                   <TableCell>{course?.day}</TableCell>
                   <TableCell>{`${formatTimeWithOffset(course?.createdAt, course?.start_time)} - ${formatTimeWithOffset(course?.createdAt, course?.end_time)}`}</TableCell>
