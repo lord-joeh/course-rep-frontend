@@ -19,27 +19,10 @@ import {
 import { FaEdit, FaMagic } from "react-icons/fa";
 import AddNewGroup from "./AddNewGroup";
 import { IoEyeOutline } from "react-icons/io5";
+import { PaginationType, GroupInterface, Course, ToastInterface, MagicInterface } from "../../../utils/Interfaces";
 
-export interface GroupInterface {
-  id: string;
-  name: string;
-  courseId: string;
-  isGeneral: boolean;
-  description: string;
-  Course: { name: string };
-}
 
-export interface Course {
-  id: string;
-  name: string;
-}
 
-export interface PaginationType {
-  currentPage: number;
-  totalPages: number;
-  itemsPerPage: number;
-  totalItems: number;
-}
 
 export interface ModalState {
   isAdding: boolean;
@@ -52,17 +35,7 @@ export interface ModalState {
   idToDelete: string;
 }
 
-export interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
 
-export interface MagicInterface {
-  courseId: string;
-  studentsPerGroup: number;
-  isGeneral: boolean;
-}
 
 const Groups = () => {
   const [groups, setGroups] = useState<GroupInterface[]>([]);

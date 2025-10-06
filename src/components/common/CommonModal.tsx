@@ -1,11 +1,6 @@
-import React from "react";
 import { Modal, ModalHeader, ModalBody } from "flowbite-react";
+import { ModalInterface } from "../../utils/Interfaces";
 
-interface ModalInterface {
-  open: boolean;
-  children: React.ReactNode;
-  onClose: () => void;
-}
 const CommonModal = ({ open, onClose, children }: ModalInterface) => {
   return (
     <>

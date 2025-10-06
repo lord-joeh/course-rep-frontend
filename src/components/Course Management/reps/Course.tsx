@@ -34,46 +34,16 @@ import {
   IoTodayOutline,
 } from "react-icons/io5";
 
-interface Course {
-  id: string;
-  name: string;
-  lecturerId: string;
-  day: string;
-  start_time: string;
-  end_time: string;
-  semester: string;
-  slidesFolderID: string;
-  createdAt: string;
-}
-
-type ModalState = {
-  isAdding: boolean;
-  isDeleteDialogueOpen: boolean;
-  isModalOpen: boolean;
-  isDeleting: boolean;
-  isEditing: boolean;
-  itemToDelete: string;
-  idToDelete: string;
-};
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
-
-interface Lecturer {
-  id: string;
-  name: string;
-}
-
-interface CourseStudentData {
-  courseId: string;
-  studentId: string;
-}
+import {
+  CourseInterface,
+  ModalState,
+  ToastInterface,
+  Lecturer,
+  CourseStudentData,
+} from "../../../utils/Interfaces";
 
 const Course = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<CourseInterface[]>([]);
   const [lecturers, setLecturers] = useState<Lecturer[]>([]);
   const { user } = useAuth();
   const [courseStudent, setCourseStudent] = useState<CourseStudentData>({
@@ -85,7 +55,7 @@ const Course = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [editId, setEditId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<Course>({
+  const [formData, setFormData] = useState<CourseInterface>({
     id: "",
     name: "",
     day: "",
@@ -576,7 +546,7 @@ const Course = () => {
                 </TableCell>
               </TableRow>
             ) : filteredCourses.length > 0 ? (
-              filteredCourses.map((course: Course, index) => (
+              filteredCourses.map((course: CourseInterface, index) => (
                 <TableRow
                   key={course?.id}
                   className="hover:bg-gray-200 hover:dark:bg-gray-600"

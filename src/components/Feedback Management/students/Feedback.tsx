@@ -5,21 +5,10 @@ import { isAxiosError } from "axios";
 import { Button, Checkbox, Textarea, Label } from "flowbite-react";
 import { VscFeedback } from "react-icons/vsc";
 import ToastMessage from "../../common/ToastMessage";
-
-interface Feedback {
-  studentId: string;
-  content: string;
-  is_anonymous: boolean;
-}
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import { ToastInterface, FeedbackStudent } from "../../../utils/Interfaces";
 
 const Feedback = () => {
-  const [feedback, setFeedback] = useState<Feedback>({
+  const [feedback, setFeedback] = useState<FeedbackStudent>({
     studentId: "",
     content: "",
     is_anonymous: false,

@@ -9,37 +9,12 @@ import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import AddFeedback from "../students/Feedback";
-
-interface Feedback {
-  id: string;
-  studentId: string;
-  content: string;
-  is_anonymous: boolean;
-  Student: { name: string };
-}
-
-interface PaginationType {
-  currentPage: number;
-  totalPages: number;
-  itemsPerPage: number;
-  totalItems: number;
-}
-
-interface ModalState {
-  isAdding: boolean;
-  isDeleteDialogueOpen: boolean;
-  isModalOpen: boolean;
-  isDeleting: boolean;
-  isEditing: boolean;
-  itemToDelete: string;
-  idToDelete: string;
-}
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import {
+  PaginationType,
+  ModalState,
+  ToastInterface,
+  Feedback,
+} from "../../../utils/Interfaces";
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);

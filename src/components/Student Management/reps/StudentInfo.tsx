@@ -6,12 +6,13 @@ import { MdDeleteForever } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
 import ToastMessage from "../../common/ToastMessage";
 import { deleteStudent } from "../../../services/studentService";
-import {isAxiosError} from "axios";
+import { isAxiosError } from "axios";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import useAuth from "../../../hooks/useAuth";
 import CommonModal from "../../common/CommonModal";
 import { updateStudent } from "../../../services/studentService";
+import { studentDataHook } from "../../../utils/Interfaces";
 
 type ModalState = {
   isDeleteDialogueOpen: boolean;
@@ -21,20 +22,6 @@ type ModalState = {
   isEditing: boolean;
   itemToDelete: string;
   idToDelete: string;
-};
-
-type studentDataHook = {
-  error: string | null;
-  isLoading: boolean;
-  studentData: {
-    name: string;
-    phone: string;
-    email: string;
-    id: string;
-    status: string;
-    isRep: boolean;
-    Groups: any[];
-  };
 };
 
 const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {

@@ -22,31 +22,12 @@ import {
 } from "flowbite-react";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import { HiUser } from "react-icons/hi";
-
-interface Lecturer {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  Courses: [];
-}
-
-type ModalState = {
-  isAdding: boolean;
-  isDeleteDialogueOpen: boolean;
-  isModalOpen: boolean;
-  isDeleting: boolean;
-  isEditing: boolean;
-  itemToDelete: string;
-  idToDelete: string;
-};
-type courseType = { name: string };
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import {
+  ModalState,
+  Lecturer,
+  ToastInterface,
+  courseType,
+} from "../../../utils/Interfaces";
 
 const Lecturers = () => {
   const [lecturers, setLecturers] = useState<Lecturer[]>([]);

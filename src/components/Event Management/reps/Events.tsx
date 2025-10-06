@@ -19,30 +19,7 @@ import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { HiCalendarDateRange } from "react-icons/hi2";
 import { formatTimeWithOffset } from "../../../helpers/formatTime";
-
-interface Event {
-  id: string;
-  description: string;
-  date: string;
-  time: string;
-  venue: string;
-}
-
-type ModalState = {
-  isAdding: boolean;
-  isDeleteDialogueOpen: boolean;
-  isModalOpen: boolean;
-  isDeleting: boolean;
-  isEditing: boolean;
-  itemToDelete: string;
-  idToDelete: string;
-};
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import { ModalState, ToastInterface, Event } from "../../../utils/Interfaces";
 
 const Events = () => {
   const [events, setEvents] = useState<Event[]>([]);

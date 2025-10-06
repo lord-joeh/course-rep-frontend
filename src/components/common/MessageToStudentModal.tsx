@@ -13,22 +13,11 @@ import React, { useEffect, useState } from "react";
 import ToastMessage from "./ToastMessage";
 import { sendMessageToStudent } from "../../services/notificationServices";
 
-interface MessageProp {
-  isOpen: boolean;
-  studentId: string;
-  onClose: () => void;
-}
-
-interface MessageInterface {
-  message: string;
-  messageType: "SMS" | "email";
-}
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import {
+  MessageProp,
+  MessageInterface,
+  ToastInterface,
+} from "../../utils/Interfaces";
 
 const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
   const [isSending, setSending] = useState<boolean>(false);

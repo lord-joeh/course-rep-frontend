@@ -1,24 +1,28 @@
 import React, { useState } from "react";
-import { GroupInterface, ToastInterface, Course } from "./Groups";
 import { TextInput, Label, Checkbox, Button } from "flowbite-react";
 import { FaMagic } from "react-icons/fa";
 import { addGroup } from "../../../services/groupsService";
 import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
 
-interface AddNewGroupProps {
-  courses?: Course[];
-  onSuccess?: (message?: string) => void;
-}
+import {
+  AddNewGroupProps,
+  GroupInterface,
+  ToastInterface,
+  Course,
+} from "../../../utils/Interfaces";
 
-const AddNewGroup: React.FC<AddNewGroupProps> = ({ courses = [], onSuccess }) => {
+const AddNewGroup: React.FC<AddNewGroupProps> = ({
+  courses = [],
+  onSuccess,
+}) => {
   const [formData, setFormData] = useState<GroupInterface>({
     id: "",
     name: "",
     courseId: "",
     isGeneral: false,
     description: "",
-    Course: {name: ""}
+    Course: { name: "" },
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [toast, setToast] = useState<ToastInterface>({

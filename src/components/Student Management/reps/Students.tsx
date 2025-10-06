@@ -21,27 +21,11 @@ import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import { useNavigate } from "react-router-dom";
-
-interface Student {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  status: "active";
-}
-
-type PaginationType = {
-  currentPage: number;
-  totalPages: number;
-  itemsPerPage: number;
-  totalItems: number;
-};
-
-interface ToastInterface {
-  message: string;
-  type: "error" | "success";
-  isVisible: boolean;
-}
+import {
+  PaginationType,
+  ToastInterface,
+  Student,
+} from "../../../utils/Interfaces";
 
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);

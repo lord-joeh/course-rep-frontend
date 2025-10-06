@@ -1,25 +1,7 @@
 import { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import { Card, Spinner } from "flowbite-react";
-
-type groupType = {
-  id: string;
-  name: string;
-  Course: {
-    name: string;
-  };
-  GroupMember: {
-    isLeader: boolean;
-  };
-};
-
-type StudentGroupsProps = {
-  studentData: {
-    Groups: groupType[];
-  };
-  isLoading: boolean;
-  error: string | null;
-};
+import { groupType, StudentGroupsProps } from "../../../utils/Interfaces";
 
 const StudentGroups = ({
   studentData,

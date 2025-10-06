@@ -1,12 +1,8 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Toast, ToastToggle } from "flowbite-react";
 import { HiCheck, HiX } from "react-icons/hi";
 
-type ToastType = {
-  message: string;
-  type: string;
-  onClose: () => void | null;
-};
+import { ToastType } from "../../utils/Interfaces";
 
 const ToastMessage = ({ message, type, onClose }: ToastType) => {
   const [isVisible, setIsVisible] = useState(true);
