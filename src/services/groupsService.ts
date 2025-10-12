@@ -1,4 +1,4 @@
-import { GroupInterface, MagicInterface } from "../components/Groups Management/reps/Groups";
+import { GroupInterface, MagicInterface } from "../utils/Interfaces";
 import api from "../utils/api";
 
 export const getGroups = async (
@@ -24,9 +24,18 @@ export const createMagicGroups = async (magicData: MagicInterface) => {
   return response.data;
 };
 
-export const updateGroup = async (id: string, formData: Partial<GroupInterface>) => {
+export const updateGroup = async (
+  id: string,
+  formData: Partial<GroupInterface>,
+) => {
   const response = await api.put(`/groups/${id}`, formData);
   if (!response?.data) throw new Error("Failed updating group");
+  return response.data;
+};
+
+export const getGroupMembers = async (id: string) => {
+  const response = await api.get(`/groups/${id}`);
+  if (!response?.data) throw new Error("Failed fetching group");
   return response.data;
 };
 

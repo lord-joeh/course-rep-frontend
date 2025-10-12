@@ -127,8 +127,8 @@ export type navbarProp = {
 };
 
 export type SidebarProps = {
-  isSidebarOpen: boolean,
-  toggleSidebar: ()=> void
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
 };
 
 export interface Lecturer {
@@ -180,4 +180,32 @@ export interface Student {
   phone: string;
   email: string;
   status: "active";
+}
+
+export interface GroupEditInterface {
+  coursesList: Course[];
+  closeEditModal: () => void;
+  selectedGroup: Partial<GroupInterface>;
+  onSuccess: (message: string) => void;
+}
+
+export interface MagicGroupsProp {
+  coursesList: Course[];
+  onSuccess: (message: string) => void;
+}
+
+export interface GroupMembersInterface extends GroupInterface {
+  Course: Course;
+  Students: {
+    id: string;
+    name: string;
+    email: string;
+    GroupMember: {
+      isLeader: boolean;
+    };
+  }[];
+}
+
+export interface GroupMemberProp {
+groupId: string
 }

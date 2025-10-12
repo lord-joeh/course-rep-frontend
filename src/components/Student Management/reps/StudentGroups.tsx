@@ -43,10 +43,10 @@ const StudentGroups = ({
           {studentData?.Groups.map((group: groupType) => (
             <Card key={group?.id} className="overscroll-x-auto">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {group?.name}
+                {group?.name || ""}
               </p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {group?.Course.name}
+                {group?.Course?.name || "General Group"}
               </p>
               <p className="text-gray-900 dark:text-white">
                 {group?.GroupMember.isLeader ? "Leader" : "Member"}

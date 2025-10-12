@@ -216,7 +216,7 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
     </div>
   );
   return (
-    <div className="flex flex-col justify-center gap-5">
+    <div className="flex flex-col justify-start gap-5">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
         Student Details
       </h1>

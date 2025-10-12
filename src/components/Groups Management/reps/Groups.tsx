@@ -12,17 +12,20 @@ import {
   Pagination,
   Spinner,
   Label,
-  TextInput,
-  Checkbox,
   Tooltip,
 } from "flowbite-react";
 import { FaEdit, FaMagic } from "react-icons/fa";
 import AddNewGroup from "./AddNewGroup";
 import { IoEyeOutline } from "react-icons/io5";
-import { PaginationType, GroupInterface, Course, ToastInterface, MagicInterface } from "../../../utils/Interfaces";
-
-
-
+import {
+  PaginationType,
+  GroupInterface,
+  Course,
+  ToastInterface,
+} from "../../../utils/Interfaces";
+import EditGroup from "./EditGroup";
+import CreateMagicGroups from "./CreateMagicGroups";
+import { useNavigate } from "react-router-dom";
 
 export interface ModalState {
   isAdding: boolean;
@@ -35,8 +38,6 @@ export interface ModalState {
   idToDelete: string;
 }
 
-
-
 const Groups = () => {
   const [groups, setGroups] = useState<GroupInterface[]>([]);
   const [coursesList, setCoursesList] = useState<Course[]>([]);
@@ -44,26 +45,12 @@ const Groups = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterQuery, setFilterQuery] = useState<string>("");
   const [editForm, setEditForm] = useState<Partial<GroupInterface>>({});
-  const [magicData, setMagicData] = useState<MagicInterface>({
-    courseId: "",
-    studentsPerGroup: 0,
-    isGeneral: false,
-  });
-
-  const closeEditModal = () => {
-    setEditForm({});
-    setModalState((prev) => ({
-      ...prev,
-      isModalOpen: false,
-      isEditing: false,
-    }));
-  };
-
   const [toast, setToast] = useState<ToastInterface>({
     message: "",
     type: "error",
     isVisible: false,
   });
+  const navigate = useNavigate();
 
   const [modalState, setModalState] = useState<ModalState>({
     isDeleteDialogueOpen: false,
@@ -142,7 +129,7 @@ const Groups = () => {
     }
   };
 
-  const debouncedFetch = useCallback(
+  const debouncedGroupDataFetch = useCallback(
     (page: number, perPage: number, courseId: string) => {
       const timeoutId = setTimeout(() => {
         fetchGroupsData(page, perPage, courseId);
@@ -154,7 +141,7 @@ const Groups = () => {
 
   useEffect(() => {
     fetchCourses();
-    const cleanup = debouncedFetch(
+    const cleanup = debouncedGroupDataFetch(
       pagination.currentPage,
       pagination.itemsPerPage,
       filterQuery,
@@ -163,7 +150,7 @@ const Groups = () => {
   }, [
     pagination.currentPage,
     pagination.itemsPerPage,
-    debouncedFetch,
+    debouncedGroupDataFetch,
     filterQuery,
   ]);
 
@@ -188,42 +175,6 @@ const Groups = () => {
       ),
     );
   }, [groups, searchQuery]);
-
-  const handleEditChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target as HTMLInputElement | HTMLSelectElement;
-    setEditForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const submitEdit = async () => {
-    if (!editForm?.id) return showToast("Invalid group selected", "error");
-    try {
-      setModalState((prev) => ({ ...prev, isDeleting: false }));
-      const response = await groupService.updateGroup(editForm.id, {
-        name: editForm.name,
-        courseId: editForm.courseId,
-        description: editForm.description,
-      });
-      showToast(
-        response?.data?.message || "Group updated successfully",
-        "success",
-      );
-      closeEditModal();
-      fetchGroupsData(
-        pagination.currentPage,
-        pagination.itemsPerPage,
-        filterQuery,
-      );
-    } catch (error) {
-      if (isAxiosError(error)) {
-        showToast(
-          error.response?.data?.error || "Error updating group",
-          "error",
-        );
-      } else showToast("An unexpected error occurred.", "error");
-    }
-  };
 
   const handleGroupDelete = async () => {
     try {
@@ -255,40 +206,31 @@ const Groups = () => {
     }
   };
 
-  const handleMagicSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const response = await groupService.createMagicGroups(magicData);
+  const conditionToShowModals: boolean =
+    modalState.doMagic || modalState.isModalOpen || modalState.isAdding;
 
-      showToast(response?.message || "Groups created successfully", "success");
-      fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
-    } catch (err) {
-      if (isAxiosError(err)) {
-        showToast(
-          err.response?.data?.error || "Failed to create groups.",
-          "error",
-        );
-      } else {
-        showToast(
-          "An unexpected error occurred while creating groups.",
-          "error",
-        );
-      }
-    } finally {
-      setLoading(false);
+  const closeFunctions = () => {
+    if (modalState.isAdding) {
+      setModalState((prev) => ({
+        ...prev,
+        isAdding: false,
+      }));
+    }
+    if (modalState.doMagic) {
       setModalState((prev) => ({
         ...prev,
         doMagic: false,
       }));
-      setMagicData({
-        courseId: "",
-        studentsPerGroup: 0,
-        isGeneral: false,
-      });
+    }
+    if (modalState.isModalOpen) {
+      setEditForm({});
+      setModalState((prev) => ({
+        ...prev,
+        isModalOpen: false,
+        isEditing: false,
+      }));
     }
   };
-
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -427,7 +369,11 @@ const Groups = () => {
                   </Button>
 
                   <Tooltip content="View Group Members">
-                    <IoEyeOutline size={24} className="mt-2" />
+                    <IoEyeOutline
+                      size={24}
+                      className="mt-2 cursor-pointer"
+                      onClick={() => navigate(`${group.id}`)}
+                    />
                   </Tooltip>
                 </div>
               </div>
@@ -458,175 +404,56 @@ const Groups = () => {
       )}
 
       <CommonModal
-        open={modalState.isAdding}
-        onClose={() => {
-          setModalState((prev) => ({
-            ...prev,
-            isAdding: false,
-          }));
-        }}
+        open={conditionToShowModals}
+        onClose={() => closeFunctions()}
       >
-        <AddNewGroup
-          courses={coursesList}
-          onSuccess={(message?: string) => {
-            if (message) showToast(message, "success");
-            setModalState((prev) => ({ ...prev, isAdding: false }));
-            fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
-          }}
-        />
-      </CommonModal>
+        {modalState.isAdding && (
+          <AddNewGroup
+            courses={coursesList}
+            onSuccess={(message?: string) => {
+              if (message) showToast(message, "success");
+              setModalState((prev) => ({ ...prev, isAdding: false }));
+              fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
+            }}
+          />
+        )}
 
-      {/* Edit Modal */}
-      <CommonModal
-        open={modalState.isModalOpen}
-        onClose={() => {
-          setEditForm({});
-          setModalState((prev) => ({
-            ...prev,
-            isModalOpen: false,
-            isEditing: false,
-          }));
-        }}
-      >
-        <div className="p-4">
-          <h2 className="mb-4 text-2xl font-bold">Edit Group</h2>
-          <div className="flex flex-col gap-3">
-            <Label htmlFor="edit-name">Name</Label>
-            <TextInput
-              id="edit-name"
-              name="name"
-              value={editForm?.name || ""}
-              onChange={handleEditChange}
-              className="rounded"
-            />
+        {modalState.isModalOpen && (
+          <EditGroup
+            coursesList={coursesList}
+            selectedGroup={editForm}
+            closeEditModal={() =>
+              setModalState((prev) => ({
+                ...prev,
+                isModalOpen: false,
+                isEditing: false,
+              }))
+            }
+            onSuccess={(message?: string) => {
+              if (message) showToast(message, "success");
+              setModalState((prev) => ({
+                ...prev,
+                isEditing: false,
+                isModalOpen: false,
+              }));
+              fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
+            }}
+          />
+        )}
 
-            <Label htmlFor="edit-description">Description</Label>
-            <TextInput
-              id="edit-description"
-              name="description"
-              value={editForm?.description || ""}
-              onChange={handleEditChange}
-              className="rounded"
-            />
-
-            <Label htmlFor="edit-course">Course</Label>
-            <select
-              id="edit-course"
-              name="courseId"
-              value={editForm?.courseId || ""}
-              onChange={handleEditChange}
-              className="rounded text-gray-900 dark:text-white"
-            >
-              <option value="">General</option>
-              {coursesList?.map((c: Course) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-
-            <div className="mt-3 flex flex-grow-1 justify-center gap-2">
-              <Button
-                onClick={closeEditModal}
-                className="w-40 focus:border-none"
-              >
-                Cancel
-              </Button>
-              <Button
-                color="green"
-                outline
-                onClick={submitEdit}
-                className="w-50"
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CommonModal>
-
-      <CommonModal
-        open={modalState.doMagic}
-        onClose={() => {
-          setModalState((prev) => ({ ...prev, doMagic: false }));
-        }}
-      >
-        <div className="container">
-          <h2 className="mb-4 text-2xl font-bold">Create Magic Groups</h2>
-          <form onSubmit={handleMagicSubmit}>
-            <div className="flex flex-col gap-3">
-              <div className="mt-2 flex items-center gap-2">
-                <Label htmlFor="courseId">Select course to create groups</Label>
-                <select
-                  id="courseId"
-                  className="rounded text-gray-900 dark:text-white"
-                  value={magicData.courseId}
-                  onChange={(e) =>
-                    setMagicData((prev) => ({
-                      ...prev,
-                      courseId: e.target.value,
-                    }))
-                  }
-                  name="courseId"
-                  disabled={magicData.isGeneral}
-                >
-                  <option value="" disabled>
-                    Select Course
-                  </option>
-                  {coursesList?.map((c: Course) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mt-2 block">
-                <Label htmlFor="studentsPerGroup">
-                  Number of students Per Group
-                </Label>
-                <TextInput
-                  id="studentsPerGroup"
-                  name="studentsPerGroup"
-                  type="number"
-                  value={magicData.studentsPerGroup}
-                  placeholder="Enter number of students per group"
-                  required
-                  onChange={(e) =>
-                    setMagicData((prev) => ({
-                      ...prev,
-                      studentsPerGroup: parseInt(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="mt-4 flex items-center gap-2">
-                <Checkbox
-                  id="isGeneral"
-                  name="isGeneral"
-                  checked={magicData.isGeneral}
-                  onChange={(e) => {
-                    setMagicData((prev) => ({
-                      ...prev,
-                      isGeneral: e.target.checked,
-                    }));
-                  }}
-                />
-                <Label htmlFor="isGeneral">General Group</Label>
-              </div>
-
-              <Button
-                type="submit"
-                className="mt-4 flex w-70 justify-center place-self-center"
-                disabled={isLoading}
-              >
-                <FaMagic className="me-2 h-4 w-4" />
-                {isLoading ? "Doing Magic..." : "Do Magic"}
-              </Button>
-            </div>
-          </form>
-        </div>
+        {modalState.doMagic && (
+          <CreateMagicGroups
+            coursesList={coursesList}
+            onSuccess={(message?: string) => {
+              if (message) showToast(message, "success");
+              setModalState((prev) => ({
+                ...prev,
+                doMagic: false,
+              }));
+              fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
+            }}
+          />
+        )}
       </CommonModal>
 
       <DeleteConfirmationDialogue

@@ -17,6 +17,7 @@ import CourseStudentPage from "../pages/Course Pages/CourseStudentPage";
 import RepFeedbackPage from "../pages/Feedback Page/RepFeedbackPage";
 import StudentFeedbackPage from "../pages/Feedback Page/StudentFeedbackPage";
 import RepGroupPage from "../pages/Groups Page/RepGroupPage";
+import GroupMembersPage from "../pages/Groups Page/GroupMembersPage";
 
 const AppRoute = () => {
   return (
@@ -40,6 +41,7 @@ const AppRoute = () => {
                 <Route path="courses" element={<CourseRepPage/>} />
                 <Route path="feedbacks" element={<RepFeedbackPage/>} />
                 <Route path="groups" element={<RepGroupPage/>} />
+                <Route path="groups/:groupId" element={<GroupMembersPage/>} />
               </Route>
 
               {/* Students */}
