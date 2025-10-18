@@ -249,7 +249,7 @@ const Students = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={studentTableHeaders.length}>
-                  <Spinner size="lg" className="me-4 animate-spin" />{" "}
+                  <Spinner size="lg" className="me-4" />{" "}
                 </TableCell>
               </TableRow>
             ) : filteredStudents.length > 0 ? (

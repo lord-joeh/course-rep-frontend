@@ -1,4 +1,4 @@
-import { GroupInterface, MagicInterface } from "../utils/Interfaces";
+import { GroupInterface, MagicInterface, NewGroupMemberInterface } from "../utils/Interfaces";
 import api from "../utils/api";
 
 export const getGroups = async (
@@ -18,6 +18,13 @@ export const addGroup = async (formData: GroupInterface) => {
   if (!response?.data) throw new Error("Failed creating group");
   return response.data;
 };
+
+export const addGroupMember = async (formData: NewGroupMemberInterface) => {
+  const response = await api.post(`/groups/member`, formData);
+  if (!response?.data) throw new Error("Failed adding group member");
+  return response.data;
+};
+
 export const createMagicGroups = async (magicData: MagicInterface) => {
   const response = await api.post(`/groups/custom`, magicData);
   if (!response?.data) throw new Error("Failed creating groups");
@@ -42,5 +49,11 @@ export const getGroupMembers = async (id: string) => {
 export const deleteGroup = async (id: string) => {
   const response = await api.delete(`/groups/${id}`);
   if (!response?.data) throw new Error("Failed deleting group");
+  return response.data;
+};
+
+export const deleteGroupMember = async (id: string) => {
+  const response = await api.delete(`/groups/member/${id}`);
+  if (!response?.data) throw new Error("Failed deleting group member");
   return response.data;
 };

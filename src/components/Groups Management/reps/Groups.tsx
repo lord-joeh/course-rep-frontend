@@ -267,9 +267,9 @@ const Groups = () => {
         </Button>
 
         <div className="flex items-center gap-2">
-          <Label htmlFor="entries">Select course to get groups</Label>
+          <Label htmlFor="course-filter">Select course to get groups</Label>
           <select
-            id="entries"
+            id="course-filter"
             className="rounded text-gray-900 dark:text-white"
             value={filterQuery}
             onChange={(e) => {
@@ -280,7 +280,7 @@ const Groups = () => {
               }));
             }}
           >
-            <option value="">General Groups</option>
+            <option value="">All Groups</option>
             {coursesList?.map((c: Course) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -314,7 +314,7 @@ const Groups = () => {
 
       {groups && (
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Showing Groups For {filterQuery || "General"}
+          Showing Groups For {filterQuery || "All"}
         </h1>
       )}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -325,17 +325,17 @@ const Groups = () => {
             <Card key={group?.id} className="overscroll-x-auto">
               <div className="flex flex-col items-start justify-between">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {group?.name}
+                  {group?.name || ""}
                 </p>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  {group?.description}
+                  {group?.description || ""}
                 </p>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  {group?.Course.name}
+                  {group?.Course?.name || "General Group"}
                 </p>
-                <div className="mt-2 flex justify-center gap-4 pt-2">
+                <div className="mt-2 flex justify-between gap-4 pt-2">
                   <Button
-                    color="green"
+                    color="gray"
                     onClick={() => {
                       setEditForm({ ...group });
                       setModalState((prev) => ({

@@ -207,5 +207,15 @@ export interface GroupMembersInterface extends GroupInterface {
 }
 
 export interface GroupMemberProp {
-groupId: string
+  groupId: string;
+}
+
+export interface NewGroupMemberInterface {
+  studentId: string;
+  groupId: string;
+}
+
+export interface NewGroupMemberProp {
+  onSuccess: (message: string) => void;
+  groupId: string;
 }
