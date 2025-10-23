@@ -124,7 +124,6 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
         isEditing: false,
         isEditModalOpen: false,
       }));
-      window.location.reload();
     }
   };
 

@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   GroupMembersInterface,
   ToastInterface,
-} from "../../../utils/Interfaces";
+} from "../../utils/Interfaces.ts";
 import { isAxiosError } from "axios";
 import {
   getGroupMembers,
   deleteGroupMember,
-} from "../../../services/groupsService";
+} from "../../services/groupsService.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -24,13 +24,13 @@ import {
 import { MdRefresh } from "react-icons/md";
 import { FaArrowLeft, FaUserTimes } from "react-icons/fa";
 import { SiGooglemessages } from "react-icons/si";
-import useAuth from "../../../hooks/useAuth";
-import ToastMessage from "../../common/ToastMessage";
-import MessageToStudentModal from "../../common/MessageToStudentModal";
+import useAuth from "../../hooks/useAuth.ts";
+import ToastMessage from "../common/ToastMessage.tsx";
+import MessageToStudentModal from "../common/MessageToStudentModal.tsx";
 import { HiUserAdd } from "react-icons/hi";
-import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
-import CommonModal from "../../common/CommonModal";
-import AddGroupMember from "./AddGroupMember";
+import { DeleteConfirmationDialogue } from "../common/DeleteConfirmationDialogue.tsx";
+import CommonModal from "../common/CommonModal.tsx";
+import AddGroupMember from "./reps/AddGroupMember.tsx";
 
 const GroupMembers = () => {
   const [groupData, setGroupData] = useState<GroupMembersInterface>();
@@ -87,7 +87,7 @@ const GroupMembers = () => {
 
   const handleRefresh = () => {
     if (groupId) {
-      fetchGroupData(groupId);
+      fetchGroupData(groupId).catch((err) => console.log(err));
     }
   };
 
@@ -103,7 +103,7 @@ const GroupMembers = () => {
 
   useEffect(() => {
     if (groupId) {
-      fetchGroupData(groupId);
+      fetchGroupData(groupId).catch((err) => console.log(err));
     }
   }, []);
 
@@ -193,31 +193,35 @@ const GroupMembers = () => {
           <p className="text-4xl font-extrabold text-blue-600">
             {groupLeader?.name || "No leader assigned"}
           </p>
-          <Tooltip content="send message to group leader">
-            <span
-              className="cursor-pointer"
-              onClick={() =>
-                setMessageModal({
-                  isOpen: true,
-                  studentId: groupLeader?.id ?? "",
-                })
-              }
-            >
-              <SiGooglemessages size={32} color="blue" />{" "}
-            </span>
-          </Tooltip>
+          {groupLeader && user?.isRep && (
+            <Tooltip content="send message to group leader">
+              <span
+                className="cursor-pointer"
+                onClick={() =>
+                  setMessageModal({
+                    isOpen: true,
+                    studentId: groupLeader?.id ?? "",
+                  })
+                }
+              >
+                <SiGooglemessages size={32} color="blue" />{" "}
+              </span>
+            </Tooltip>
+          )}
         </Card>
       </div>
 
-      <Button
-        className="w-70 cursor-pointer"
-        onClick={() =>
-          setDeleteAndModalState((prev) => ({ ...prev, openAddModal: true }))
-        }
-      >
-        <HiUserAdd size={24} className="me-2" />
-        Add new Member
-      </Button>
+      {user?.isRep && (
+        <Button
+          className="w-70 cursor-pointer"
+          onClick={() =>
+            setDeleteAndModalState((prev) => ({ ...prev, openAddModal: true }))
+          }
+        >
+          <HiUserAdd size={24} className="me-2" />
+          Add new Member
+        </Button>
+      )}
 
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Group Members

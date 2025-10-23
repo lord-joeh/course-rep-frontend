@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface CourseInterface {
   id: string;
   name: string;
@@ -63,8 +65,8 @@ export interface MessageInterface {
 
 export interface ToastType {
   message: string;
-  type: string;
-  onClose: () => void | null;
+  type: "error" | "success";
+  onClose: () => void;
 }
 
 export interface Event {
@@ -153,9 +155,9 @@ export type groupType = {
 };
 
 export type StudentGroupsProps = {
-  studentData: {
+  studentData?: {
     Groups: groupType[];
-  };
+  } | null;
   isLoading: boolean;
   error: string | null;
 };
@@ -170,8 +172,8 @@ export type studentDataHook = {
     id: string;
     status: string;
     isRep: boolean;
-    Groups: any[];
-  };
+    Groups: groupType[];
+  } | null;
 };
 
 export interface Student {
@@ -206,10 +208,6 @@ export interface GroupMembersInterface extends GroupInterface {
   }[];
 }
 
-export interface GroupMemberProp {
-  groupId: string;
-}
-
 export interface NewGroupMemberInterface {
   studentId: string;
   groupId: string;
@@ -218,4 +216,22 @@ export interface NewGroupMemberInterface {
 export interface NewGroupMemberProp {
   onSuccess: (message: string) => void;
   groupId: string;
+}
+
+export interface ViewFeedbackProps {
+  formData: Feedback;
+  setCurrentStudentId: (id: string) => void;
+  setModalState: (modalState: any) => void;
+
+}
+
+export interface CourseModalContentInterface {
+  modalState: ModalState;
+  setModalState: (modalState: any) => void;
+  handleCourseSubmit: () => void;
+  handleChange: () => void;
+  formData: CourseInterface
+  setFormData: (prevFormData: any) => void;
+  lecturers: Lecturer[];
+  setEditId: (id: string | null) => void;
 }

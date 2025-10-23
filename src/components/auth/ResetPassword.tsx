@@ -6,6 +6,7 @@ import ToastMessage from "../common/ToastMessage";
 import { TbLockPassword } from "react-icons/tb";
 import { LuSendHorizontal } from "react-icons/lu";
 import { Button, Label, TextInput, Spinner, Checkbox } from "flowbite-react";
+import { ToastInterface } from "../../utils/Interfaces.ts";
 
 interface ResetInterface {
   token: string | null;
@@ -28,9 +29,9 @@ const ResetPassword = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const [toast, setToast] = useState({
+  const [toast, setToast] = useState<ToastInterface>({
     message: "",
-    type: "",
+    type: "error",
     isVisible: false,
   });
 

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
-import { Card, Spinner } from "flowbite-react";
+import { Card, Spinner, Tooltip } from "flowbite-react";
 import { groupType, StudentGroupsProps } from "../../../utils/Interfaces";
+import { IoEyeOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 
 const StudentGroups = ({
   studentData,
@@ -17,6 +20,8 @@ const StudentGroups = ({
     type: "error",
     isVisible: false,
   });
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const closeToast = () => setToast((prev) => ({ ...prev, isVisible: false }));
 
@@ -39,7 +44,7 @@ const StudentGroups = ({
       )}
 
       {!error && !isLoading && studentData?.Groups && (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {studentData?.Groups.map((group: groupType) => (
             <Card key={group?.id} className="overscroll-x-auto">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -51,8 +56,30 @@ const StudentGroups = ({
               <p className="text-gray-900 dark:text-white">
                 {group?.GroupMember.isLeader ? "Leader" : "Member"}
               </p>
+
+              <Tooltip content="View group members">
+                <IoEyeOutline
+                  size={24}
+                  className="cursor-pointer place-self-end"
+                  onClick={() =>
+                    navigate(
+                      user?.isRep
+                        ? `/reps/groups/${group?.id}`
+                        : `/students/groups/${group?.id}`,
+                    )
+                  }
+                />
+              </Tooltip>
             </Card>
           ))}
+
+          {
+            studentData?.Groups.length === 0 && (
+              <Card className="p-4 text-center">
+                <p>You are not part of any group.</p>
+              </Card>
+            )
+          }
         </div>
       )}
 

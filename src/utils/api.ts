@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getSocketId } from "../context/socketContext";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
@@ -12,7 +13,7 @@ const api = axios.create({
 });
 const authRoutes = [
   "/auth/login",
-  "/student/register",
+  "/students/register",
   "/auth/refresh",
   "/auth/forgot",
   "/auth/reset",
@@ -26,6 +27,12 @@ api.interceptors.request.use(
     if (config.method === "get") {
       config.headers["Cache-Control"] = "no-cache";
       config.headers["Pragma"] = "no-cache";
+    }
+
+    // Add socket ID to headers for socket tracking
+    const socketId = getSocketId();
+    if (socketId) {
+      config.headers["X-Socket-ID"] = socketId;
     }
 
     try {

@@ -1,4 +1,4 @@
-import GroupMembers from "../../components/Groups Management/reps/GroupMembers"
+import GroupMembers from "../../components/Groups Management/GroupMembers.tsx"
 
 const GroupMembersPage = () => {
   return (

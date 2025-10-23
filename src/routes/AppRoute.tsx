@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../context/authContext";
 import { ThemeProvider } from "../context/themeContext";
+import { SocketProvider } from "../context/socketContext";
 import AppLayout from "../components/Layout/AppLayout";
 import LoginPage from "../pages/Auth Pages/LoginPage";
 import RegisterPage from "../pages/Auth Pages/RegisterPage";
@@ -18,42 +19,49 @@ import RepFeedbackPage from "../pages/Feedback Page/RepFeedbackPage";
 import StudentFeedbackPage from "../pages/Feedback Page/StudentFeedbackPage";
 import RepGroupPage from "../pages/Groups Page/RepGroupPage";
 import GroupMembersPage from "../pages/Groups Page/GroupMembersPage";
+import EventListener from "../components/common/EventListener";
+import Groups  from "../components/Groups Management/students/Group.tsx";
 
 const AppRoute = () => {
   return (
     <BrowserRouter>
+      <SocketProvider>
       <AuthProvider>
         <ThemeProvider>
-          <Routes>
-            {/* Public */}
-            <Route path="/" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset" element={<ResetPasswordPage />} />
+              <Routes>
+                {/* Public */}
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset" element={<ResetPasswordPage />} />
 
-            {/* Rep */}
-            <Route element={<AppLayout />}>
-              <Route path="reps/*" element={<RepRoute />}>
-                <Route path="students" element={<StudentsPage />} />
-                <Route path="students/:studentId" element={<StudentDetailsPage />} />
-                <Route path="lecturers" element={<LecturerPage />} />
-                <Route path="events" element={<RepEventPage />} />
-                <Route path="courses" element={<CourseRepPage/>} />
-                <Route path="feedbacks" element={<RepFeedbackPage/>} />
-                <Route path="groups" element={<RepGroupPage/>} />
-                <Route path="groups/:groupId" element={<GroupMembersPage/>} />
-              </Route>
+                {/* Rep */}
+                <Route element={<AppLayout />}>
+                  <Route path="reps/*" element={<RepRoute />}>
+                    <Route path="students" element={<StudentsPage />} />
+                    <Route path="students/:studentId" element={<StudentDetailsPage />} />
+                    <Route path="lecturers" element={<LecturerPage />} />
+                    <Route path="events" element={<RepEventPage />} />
+                    <Route path="courses" element={<CourseRepPage/>} />
+                    <Route path="feedbacks" element={<RepFeedbackPage/>} />
+                    <Route path="groups" element={<RepGroupPage/>} />
+                    <Route path="groups/:groupId" element={<GroupMembersPage/>} />
+                  </Route>
 
-              {/* Students */}
-              <Route path="students/*" element={<PrivateRoute />}>
-              <Route path="events" element={<RepEventPage />} />
-              <Route path="courses" element={<CourseStudentPage />} />
-              <Route path="feedbacks" element={<StudentFeedbackPage />} />
-              </Route>
-            </Route>
-          </Routes>
+                  {/* Students */}
+                  <Route path="students/*" element={<PrivateRoute />}>
+                    <Route path="events" element={<RepEventPage />} />
+                    <Route path="courses" element={<CourseStudentPage />} />
+                    <Route path="feedbacks" element={<StudentFeedbackPage />} />
+                    <Route path="groups" element={<Groups/>} />
+                    <Route path="groups/:groupId" element={<GroupMembersPage/>} />
+                  </Route>
+                </Route>
+              </Routes>
+              <EventListener />
         </ThemeProvider>
       </AuthProvider>
+      </SocketProvider>
     </BrowserRouter>
   );
 };

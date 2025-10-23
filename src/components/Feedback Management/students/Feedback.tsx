@@ -34,6 +34,7 @@ const Feedback = () => {
 
     try {
       setLoading(true);
+      console.log(feedback);
       const response = await submitFeedback(feedback);
       showToast(
         response?.data?.message || "Feedback submitted successfully",
@@ -95,11 +96,11 @@ const Feedback = () => {
             onChange={(e) => {
               setFeedback((prev) => ({
                 ...prev,
-                is_anonymous: e.target.checked,
+                is_anonymous: e.target?.checked,
               }));
             }}
           />
-          <Label htmlFor="isAnonymous">Anonymous</Label>
+          <Label htmlFor="anonymous">Anonymous</Label>
         </div>
 
         <Button

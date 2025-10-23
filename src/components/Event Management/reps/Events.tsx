@@ -101,7 +101,7 @@ const Events = () => {
   };
 
   const handleRefresh = () => {
-    fetchEventsData();
+    fetchEventsData().catch(err => console.log(err));
   };
 
   const filteredEvents = useMemo(() => {
@@ -115,7 +115,7 @@ const Events = () => {
   }, [events, searchQuery]);
 
   useEffect(() => {
-    fetchEventsData();
+    fetchEventsData().catch(err => console.log(err));
   }, []);
 
   const handleEventDelete = async (id: string) => {
@@ -126,7 +126,7 @@ const Events = () => {
         response?.data?.message || "Event deleted successfully",
         "success",
       );
-      fetchEventsData();
+      fetchEventsData().catch(err => console.log(err));
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(
@@ -164,7 +164,7 @@ const Events = () => {
             "Lecturer updated successfully",
           "success",
         );
-        fetchEventsData();
+        fetchEventsData().catch(err => console.log(err));
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(
@@ -201,7 +201,7 @@ const Events = () => {
           response?.data?.message || "Event added successfully",
           "success",
         );
-        fetchEventsData();
+        fetchEventsData().catch(err => console.log(err));
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(

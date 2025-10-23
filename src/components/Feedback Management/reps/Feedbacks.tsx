@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import * as FeedbackService from "../../../services/feedbackService";
 import { isAxiosError } from "axios";
-import { MdDeleteForever, MdRefresh } from "react-icons/md";
 import { Avatar, Button, Card, Pagination, Spinner } from "flowbite-react";
 import { VscFeedback } from "react-icons/vsc";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
@@ -15,6 +14,8 @@ import {
   ToastInterface,
   Feedback,
 } from "../../../utils/Interfaces";
+import { ViewFeedback } from "./ViewFeedback.tsx";
+import {MdRefresh} from "react-icons/md";
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -92,8 +93,9 @@ const Feedbacks = () => {
 
   const debouncedFetch = useCallback((page: number, perPage: number) => {
     const timeoutId = setTimeout(() => {
-      fetchFeedbacksData(page, perPage);
+      fetchFeedbacksData(page, perPage).catch(err => console.log(err));
     }, 300);
+
     return () => clearTimeout(timeoutId);
   }, []);
 
@@ -106,7 +108,7 @@ const Feedbacks = () => {
   }, [pagination.currentPage, pagination.itemsPerPage, debouncedFetch]);
 
   const handleRefresh = () => {
-    fetchFeedbacksData(pagination.currentPage, pagination.itemsPerPage);
+    fetchFeedbacksData(pagination.currentPage, pagination.itemsPerPage).catch(err => console.log(err));
   };
 
   const onPageChange = (pageNumber: number) => {
@@ -154,50 +156,6 @@ const Feedbacks = () => {
     }
   };
 
-  const viewModalContent = (
-    <div className="flex flex-col justify-center gap-5">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        {formData?.is_anonymous
-          ? "Anonymous Feedback"
-          : `${formData.Student.name}'s Feedback`}
-      </h1>
-
-      <div className="dark:text-white">{formData?.content}</div>
-      <div className="flex justify-center gap-4 p-2">
-        <Button
-          disabled={formData.is_anonymous}
-          onClick={() => {
-            setCurrentStudentId(formData.studentId);
-            setModalState((prev) => ({ ...prev, isModalOpen: true }));
-          }}
-        >
-          Respond to Feedback
-        </Button>
-        <Button
-          color="alternative"
-          onClick={() => {
-            setModalState((prev) => ({ ...prev, isEditing: false }));
-          }}
-        >
-          Close
-        </Button>
-
-        <span
-          onClick={() =>
-            setModalState((prev) => ({
-              ...prev,
-              isDeleteDialogueOpen: true,
-              itemToDelete: `${formData?.content.slice(0, 30)}...` || "",
-              idToDelete: formData?.id || "",
-            }))
-          }
-          className="mt-2 cursor-pointer px-8"
-        >
-          <MdDeleteForever size={24} color="red" />
-        </span>
-      </div>
-    </div>
-  );
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -257,9 +215,9 @@ const Feedbacks = () => {
               </div>
               <div className="flex justify-center gap-4 p-2">
                 <Button
-                  disabled={feedback.is_anonymous}
+                  disabled={feedback?.is_anonymous}
                   onClick={() => {
-                    setCurrentStudentId(feedback.studentId);
+                    setCurrentStudentId(feedback?.studentId);
                     setModalState((prev) => ({ ...prev, isModalOpen: true }));
                   }}
                 >
@@ -326,7 +284,13 @@ const Feedbacks = () => {
           }));
         }}
       >
-        {modalState.isEditing && viewModalContent}
+        {modalState.isEditing && (
+          <ViewFeedback
+            formData={formData}
+            setModalState={setModalState}
+            setCurrentStudentId={setCurrentStudentId}
+          />
+        )}
         {modalState.isAdding && <AddFeedback />}
       </CommonModal>
 

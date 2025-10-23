@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { studentById } from "../services/studentService";
+import { groupType } from "../utils/Interfaces";
 
 interface StudentInfoProps {
   name: string;
@@ -9,7 +10,7 @@ interface StudentInfoProps {
   id: string;
   status: string;
   isRep: boolean;
-  Groups: [];
+  Groups: groupType[];
 }
 
 const useStudentData = (studentId: string | undefined) => {
@@ -47,7 +48,7 @@ const useStudentData = (studentId: string | undefined) => {
         setLoading(false);
       }
     };
-    fetchStudent();
+    fetchStudent().catch((err) => {console.log(err)});
   }, [studentId]);
 
   return { studentData, isLoading, error };

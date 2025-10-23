@@ -5,21 +5,22 @@ import { Button, TextInput, Spinner, Label } from "flowbite-react";
 import { HiUser } from "react-icons/hi2";
 import { FaTelegramPlane } from "react-icons/fa";
 import ToastMessage from "../common/ToastMessage";
+import { ToastInterface } from "../../utils/Interfaces.ts";
 
 const ForgotPassword = () => {
-  const [studentId, setStudentId] = useState({ studentId: "" });
+  const [student, setStudent] = useState({ studentId: "" });
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState({
+  const [toast, setToast] = useState<ToastInterface>({
     message: "",
-    type: "",
+    type: "error",
     isVisible: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError("");
-    setStudentId((prev) => ({ ...prev, [name]: value }));
+    setStudent((prev) => ({ ...prev, [name]: value }));
   };
 
   const closeToast = () => {
@@ -29,13 +30,14 @@ const ForgotPassword = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!studentId.studentId || studentId.studentId.length < 1) {
+    if (!student.studentId || student.studentId.length < 1) {
       setError("Student ID is required for password reset");
       return;
     }
 
     try {
-      const response = await forgotPassword(studentId);
+      setLoading(true)
+      const response = await forgotPassword(student);
       if (!response)
         setError("Password reset request failed. Please try again");
       if (response && response.message) {
@@ -59,7 +61,7 @@ const ForgotPassword = () => {
         setError("An unexpected error occurred.");
       }
     } finally {
-      setStudentId((prev) => ({ ...prev, studentId: "" }));
+      setStudent((prev) => ({ ...prev, studentId: "" }));
       setLoading(false);
     }
   };
@@ -81,7 +83,7 @@ const ForgotPassword = () => {
             icon={HiUser}
             onChange={handleChange}
             disabled={isLoading}
-            value={studentId.studentId}
+            value={student.studentId}
             className="sm:text-sm md:text-base"
           />
         </div>
