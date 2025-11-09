@@ -1,7 +1,7 @@
 import React from "react";
 import { MdDeleteForever } from "react-icons/md";
 import { Button } from "flowbite-react";
-import { ModalState, ViewFeedbackProps } from "../../../utils/Interfaces.ts";
+import { ModalState, ViewFeedbackProps } from "../../../utils/Interfaces";
 
 export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
   formData,
@@ -13,11 +13,11 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
         {formData?.is_anonymous
           ? "Anonymous Feedback"
-          : `${formData.Student.name}'s Feedback`}
+          : `${formData?.Student?.name ?? "Student"}'s Feedback`}
       </h1>
 
       <div className="dark:text-white">{formData?.content}</div>
-      <div className="flex justify-center gap-4 p-2">
+      <div className="flex justify-end gap-2 p-2">
         <Button
           disabled={formData.is_anonymous}
           onClick={() => {
@@ -35,6 +35,7 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
           onClick={() => {
             setModalState((prev: ModalState) => ({
               ...prev,
+              isModalOpen: false,
               isEditing: false,
             }));
           }}
@@ -42,7 +43,8 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
           Close
         </Button>
 
-        <span
+        <Button
+          color="red"
           onClick={() =>
             setModalState((prev: ModalState) => ({
               ...prev,
@@ -51,10 +53,11 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
               idToDelete: formData?.id || "",
             }))
           }
-          className="mt-2 cursor-pointer px-8"
+          className=""
+          aria-label="Delete feedback"
         >
-          <MdDeleteForever size={24} color="red" />
-        </span>
+          <MdDeleteForever size={24} />
+        </Button>
       </div>
     </div>
   );

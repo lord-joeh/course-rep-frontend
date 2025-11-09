@@ -3,7 +3,7 @@ import {
   CourseModalContentInterface,
   Lecturer,
   ModalState,
-} from "../../../utils/Interfaces.ts";
+} from "../../../utils/Interfaces";
 import { Button, Label, Select, TextInput } from "flowbite-react";
 import { FaBook } from "react-icons/fa6";
 import { IoTimeOutline, IoTodayOutline } from "react-icons/io5";
@@ -21,7 +21,7 @@ export const CourseModalContent = ({
 
 
   return (
-    <div className="flex flex-col justify-center gap-5">
+    <div className="container flex flex-col justify-center gap-5">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
         {modalState.isEditing ? "Edit Course" : "New Course"}
       </h1>

@@ -6,7 +6,7 @@ import ToastMessage from "../common/ToastMessage";
 import { TbLockPassword } from "react-icons/tb";
 import { LuSendHorizontal } from "react-icons/lu";
 import { Button, Label, TextInput, Spinner, Checkbox } from "flowbite-react";
-import { ToastInterface } from "../../utils/Interfaces.ts";
+import { ToastInterface } from "../../utils/Interfaces";
 
 interface ResetInterface {
   token: string | null;

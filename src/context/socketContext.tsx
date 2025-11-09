@@ -10,10 +10,13 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<SocketContextType>(socketSingleton);
 
   useEffect(() => {
+      const { token } = JSON.parse(localStorage.getItem("user") || "{}");
     if (!socketSingleton) {
       const url = import.meta.env.VITE_ENV === "production" ? "/" : "http://localhost:5000";
       // prefer websocket transport to avoid polling fallbacks and related 400 errors
-      socketSingleton = io(url, { transports: ["websocket"], withCredentials: true });
+      socketSingleton = io(url, { transports: ["websocket"], withCredentials: true, auth: {
+        token: token
+        } });
       
       // Store socket ID when connected
       socketSingleton.on("connect", () => {

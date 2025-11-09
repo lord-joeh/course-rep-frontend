@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   GroupMembersInterface,
   ToastInterface,
-} from "../../utils/Interfaces.ts";
+} from "../../utils/Interfaces";
 import { isAxiosError } from "axios";
 import {
   getGroupMembers,
@@ -145,7 +145,7 @@ const GroupMembers = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6 p-3 font-sans md:p-1">
       <Button
         color="alternative"
         className="w-50 cursor-pointer"
@@ -159,17 +159,25 @@ const GroupMembers = () => {
         Group Members Management
       </h1>
 
-      <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search group members..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
-        <Button onClick={handleRefresh} className="w-50">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search group members..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search group members"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
+          aria-label="Refresh group members"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
 

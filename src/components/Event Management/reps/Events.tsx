@@ -101,7 +101,7 @@ const Events = () => {
   };
 
   const handleRefresh = () => {
-    fetchEventsData().catch(err => console.log(err));
+    fetchEventsData().catch((err) => console.log(err));
   };
 
   const filteredEvents = useMemo(() => {
@@ -115,7 +115,7 @@ const Events = () => {
   }, [events, searchQuery]);
 
   useEffect(() => {
-    fetchEventsData().catch(err => console.log(err));
+    fetchEventsData().catch((err) => console.log(err));
   }, []);
 
   const handleEventDelete = async (id: string) => {
@@ -126,7 +126,7 @@ const Events = () => {
         response?.data?.message || "Event deleted successfully",
         "success",
       );
-      fetchEventsData().catch(err => console.log(err));
+      fetchEventsData().catch((err) => console.log(err));
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(
@@ -164,7 +164,7 @@ const Events = () => {
             "Lecturer updated successfully",
           "success",
         );
-        fetchEventsData().catch(err => console.log(err));
+        fetchEventsData().catch((err) => console.log(err));
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(
@@ -201,16 +201,11 @@ const Events = () => {
           response?.data?.message || "Event added successfully",
           "success",
         );
-        fetchEventsData().catch(err => console.log(err));
+        fetchEventsData().catch((err) => console.log(err));
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(
             err.response?.data?.error || "Failed to add Event.",
-            "error",
-          );
-        } else {
-          showToast(
-            "An unexpected error occurred while adding Event.",
             "error",
           );
         }
@@ -361,19 +356,28 @@ const Events = () => {
         {user && user.isRep ? "Event Management" : "Events"}
       </h1>
 
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search event..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none"
-        />
-        <Button onClick={handleRefresh} className="w-[15%]">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search event..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search event"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
+          aria-label="Refresh event"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
+
       {user?.isRep && (
         <Button
           onClick={() => {

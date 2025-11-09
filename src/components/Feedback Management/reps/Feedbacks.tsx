@@ -15,7 +15,7 @@ import {
   Feedback,
 } from "../../../utils/Interfaces";
 import { ViewFeedback } from "./ViewFeedback.tsx";
-import {MdRefresh} from "react-icons/md";
+import { MdRefresh } from "react-icons/md";
 
 const Feedbacks = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -93,7 +93,7 @@ const Feedbacks = () => {
 
   const debouncedFetch = useCallback((page: number, perPage: number) => {
     const timeoutId = setTimeout(() => {
-      fetchFeedbacksData(page, perPage).catch(err => console.log(err));
+      fetchFeedbacksData(page, perPage)
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -108,7 +108,9 @@ const Feedbacks = () => {
   }, [pagination.currentPage, pagination.itemsPerPage, debouncedFetch]);
 
   const handleRefresh = () => {
-    fetchFeedbacksData(pagination.currentPage, pagination.itemsPerPage).catch(err => console.log(err));
+    fetchFeedbacksData(pagination.currentPage, pagination.itemsPerPage).catch(
+      (err) => console.log(err),
+    );
   };
 
   const onPageChange = (pageNumber: number) => {
@@ -161,17 +163,26 @@ const Feedbacks = () => {
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Feedbacks Management
       </h1>
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search feedback..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
-        <Button onClick={handleRefresh} className="w-50">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search feedback..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search feedback"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
+          aria-label="Refresh feedback"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
 

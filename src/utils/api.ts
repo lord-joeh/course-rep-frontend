@@ -2,7 +2,7 @@ import axios from "axios";
 import { getSocketId } from "../context/socketContext";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms/",
   withCredentials: true,
   timeout: 15000,
   headers: {
@@ -11,12 +11,13 @@ const api = axios.create({
   },
   decompress: true,
 });
+console.log("API Base URL:", import.meta.env.VITE_API_URL);
 const authRoutes = [
-  "/auth/login",
-  "/students/register",
-  "/auth/refresh",
-  "/auth/forgot",
-  "/auth/reset",
+  "/api/auth/login",
+  "/api/students/register",
+  "/api/auth/refresh",
+  "/api/auth/forgot",
+  "/api/auth/reset",
 ];
 api.interceptors.request.use(
   async (config) => {
@@ -70,7 +71,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );

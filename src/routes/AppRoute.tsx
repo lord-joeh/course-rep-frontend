@@ -21,6 +21,8 @@ import RepGroupPage from "../pages/Groups Page/RepGroupPage";
 import GroupMembersPage from "../pages/Groups Page/GroupMembersPage";
 import EventListener from "../components/common/EventListener";
 import Groups  from "../components/Groups Management/students/Group.tsx";
+import SlidePage from "../pages/Slides Page/SlidePage.tsx";
+
 
 const AppRoute = () => {
   return (
@@ -46,6 +48,7 @@ const AppRoute = () => {
                     <Route path="feedbacks" element={<RepFeedbackPage/>} />
                     <Route path="groups" element={<RepGroupPage/>} />
                     <Route path="groups/:groupId" element={<GroupMembersPage/>} />
+                    <Route path="slides" element={<SlidePage/>} />
                   </Route>
 
                   {/* Students */}

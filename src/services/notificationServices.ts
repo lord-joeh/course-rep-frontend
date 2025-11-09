@@ -5,7 +5,7 @@ interface MessageInterface {
   messageType: "SMS" | "email";
 }
 export const sendMessageToStudent = async (messageData: MessageInterface) => {
-  const response = await api.post("/notifications/send", messageData);
+  const response = await api.post("/api/notifications/send", messageData);
   if (!response.data) throw new Error("Failed sending message");
   return response.data;
 };

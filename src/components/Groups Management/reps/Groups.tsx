@@ -237,17 +237,25 @@ const Groups = () => {
         Groups Management
       </h1>
 
-      <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search groups..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
-        <Button onClick={handleRefresh} className="w-50">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search group..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search group"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
+          aria-label="Refresh group"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
 

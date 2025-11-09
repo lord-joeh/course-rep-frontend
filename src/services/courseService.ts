@@ -17,37 +17,37 @@ interface CourseStudentData {
 }
 
 export const courses = async () => {
-  const response = await api.get(`/courses/`);
+  const response = await api.get(`/api/courses/`);
   if (!response?.data) throw new Error("Failed fetching courses");
   return response.data;
 };
 
 export const courseByStudent = async (id: string) => {
-  const response = await api.get(`/courses/student/${id}`);
+  const response = await api.get(`/api/courses/student/${id}`);
   if (!response?.data) throw new Error("Failed fetching course by student");
   return response.data;
 };
 
 export const updateCourse = async (id: string, courseData: Course) => {
-  const response = await api.put(`/courses/${id}`, courseData);
+  const response = await api.put(`/api/courses/${id}`, courseData);
   if (!response?.data) throw new Error("Failed updating course");
   return response.data;
 };
 
 export const registerCourse = async (courseData: CourseStudentData) => {
-  const response = await api.post(`/courses/register`, courseData);
+  const response = await api.post(`/api/courses/register`, courseData);
   if (!response?.data) throw new Error("Failed registering course");
   return response.data;
 };
 
 export const addCourse = async (courseData: Course) => {
-  const response = await api.post(`/courses/`, courseData);
+  const response = await api.post(`/api/courses/`, courseData);
   if (!response?.data) throw new Error("Failed adding course");
   return response.data;
 };
 
 export const deleteCourse = async (id: string) => {
-  const response = await api.delete(`/courses/${id}`);
+  const response = await api.delete(`/api/courses/${id}`);
   if (!response?.data) throw new Error("Failed deleting course");
   return response.data;
 };

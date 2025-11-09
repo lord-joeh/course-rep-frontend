@@ -15,7 +15,7 @@ export const loginStudent = async ({
   studentId,
   password,
 }: loginStudentArgs) => {
-  const response = await api.post("/auth/login", { studentId, password });
+  const response = await api.post("/api/auth/login", { studentId, password });
   if (!response.data?.token) {
     throw new Error("Login failed");
   }
@@ -29,14 +29,14 @@ export const loginStudent = async ({
 };
 
 export const forgotPassword = async (forgotDetails: object) => {
-  const response = await api.post("/auth/forgot", forgotDetails);
+  const response = await api.post("/api/auth/forgot", forgotDetails);
   if (!response.data) throw new Error("Failed requesting password reset");
   return response.data;
 };
 
 export const resetPassword = async (resetData: ResetInterface) => {
   const response = await api.post(
-    `/auth/reset?token=${resetData?.token}`,
+    `/api/auth/reset?token=${resetData?.token}`,
     resetData,
   );
   if (!response.data) throw new Error("Failed resetting password");

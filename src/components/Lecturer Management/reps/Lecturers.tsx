@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import * as lecturerService from "../../../services/lecturerService";
 import { isAxiosError } from "axios";
@@ -339,19 +339,42 @@ const Lecturers = () => {
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Lecturers Management
       </h1>
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search lecturers..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
-        <Button onClick={handleRefresh} className="w-[15%]">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search lecturers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search lecturers"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
+          aria-label="Refresh lecturer"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
+
+      {/*<div className="flex flex-col items-center justify-between gap-4 md:flex-row">*/}
+      {/*  <input*/}
+      {/*    id="search"*/}
+      {/*    type="search"*/}
+      {/*    placeholder="Search lecturers..."*/}
+      {/*    value={searchQuery}*/}
+      {/*    onChange={(e) => setSearchQuery(e.target.value)}*/}
+      {/*    className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"*/}
+      {/*  />*/}
+      {/*  <Button onClick={handleRefresh} className="w-[15%]">*/}
+      {/*    <MdRefresh className="me-2 h-4 w-4" /> Refresh*/}
+      {/*  </Button>*/}
+      {/*</div>*/}
       <Button
         onClick={() => {
           setModalState((prev) => ({

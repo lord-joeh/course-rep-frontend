@@ -228,10 +228,28 @@ export interface ViewFeedbackProps {
 export interface CourseModalContentInterface {
   modalState: ModalState;
   setModalState: (modalState: any) => void;
-  handleCourseSubmit: () => void;
-  handleChange: () => void;
-  formData: CourseInterface
-  setFormData: (prevFormData: any) => void;
+  handleCourseSubmit: (e: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
+  handleChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => void;
+  formData: CourseInterface;
+  setFormData: React.Dispatch<React.SetStateAction<CourseInterface>>;
   lecturers: Lecturer[];
   setEditId: (id: string | null) => void;
+}
+
+export interface SlideUploadInterface {
+  folderId: string;
+  courseId: string,
+  files: File[];
+}
+
+export interface SlideInterface {
+  id: string,
+  driveFileID: string,
+  fileName: string,
+  courseId: string,
+  createdAt: string,
 }

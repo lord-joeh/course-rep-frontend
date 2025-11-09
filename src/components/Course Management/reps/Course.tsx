@@ -33,7 +33,7 @@ import {
   Lecturer,
   CourseStudentData,
 } from "../../../utils/Interfaces";
-import { CourseModalContent } from "./CourseModalContent.tsx";
+import { CourseModalContent } from "./CourseModalContent";
 
 const Course = () => {
   const [courses, setCourses] = useState<CourseInterface[]>([]);
@@ -311,20 +311,27 @@ const Course = () => {
         {user && user.isRep ? "Course Management" : "Courses"}
       </h1>
 
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search course..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
-        <Button onClick={handleRefresh} className="w-[15%]">
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
+      <div className="flex w-full items-center gap-3">
+        <div className="flex min-w-0 flex-1">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search course..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search courses"
+            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
+          />
+        </div>
+
+        <Button
+          onClick={handleRefresh}
+          className="shrink-0 flex items-center gap-2 px-3 py-2"
+          aria-label="Refresh courses"
+        >
+          <MdRefresh size={18} className="me-1" /> Refresh
         </Button>
       </div>
-
       {user?.isRep && (
         <Button
           onClick={() => {
@@ -339,7 +346,6 @@ const Course = () => {
           <MdOutlineBookmarkAdd className="me-2 h-4 w-4" /> Add New Course
         </Button>
       )}
-
       <div className="overflow-x-auto rounded-lg shadow-md">
         <Table striped>
           <TableHead>
@@ -440,9 +446,7 @@ const Course = () => {
           </TableBody>
         </Table>
       </div>
-
       {error && <p className="text-red-700">{error}</p>}
-
       {toast.isVisible && (
         <ToastMessage
           message={toast.message}
@@ -450,7 +454,6 @@ const Course = () => {
           onClose={closeToast}
         />
       )}
-
       <DeleteConfirmationDialogue
         isOpen={modalState.isDeleteDialogueOpen}
         isDeleting={modalState.isDeleting}
@@ -458,7 +461,6 @@ const Course = () => {
         onClose={closeDialogue}
         itemToDelete={modalState.itemToDelete}
       />
-
       <CommonModal
         open={modalState.isModalOpen}
         onClose={() => {
@@ -485,10 +487,10 @@ const Course = () => {
           <CourseModalContent
             modalState={modalState}
             setModalState={setModalState}
-            handleCourseSubmit={() => handleCourseSubmit}
+            handleCourseSubmit={handleCourseSubmit}
             formData={formData}
             setFormData={setFormData}
-            handleChange={() => handleChange}
+            handleChange={handleChange}
             setEditId={setEditId}
             lecturers={lecturers}
           />
