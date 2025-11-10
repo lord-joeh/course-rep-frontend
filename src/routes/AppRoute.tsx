@@ -58,6 +58,7 @@ const AppRoute = () => {
                     <Route path="feedbacks" element={<StudentFeedbackPage />} />
                     <Route path="groups" element={<Groups/>} />
                     <Route path="groups/:groupId" element={<GroupMembersPage/>} />
+                    <Route path="slides" element={<SlidePage/>} />
                   </Route>
                 </Route>
               </Routes>

@@ -82,10 +82,10 @@ const Slides = () => {
 
   const fetchSlidesData = async (
     page = 1,
-    itemsPerPage = pagination.itemsPerPage,
+    itemsPerPage = pagination.itemsPerPage || 10,
     courseId = currentCourse,
   ) => {
-    if (!courseId) return;
+    if (!courseId || !page || !itemsPerPage) return;
     try {
       setLoading(true);
 
@@ -93,9 +93,9 @@ const Slides = () => {
       if (response) {
         setSlides(response.data?.slides || []);
         setPagination({
-          currentPage: response.data?.pagination?.currentPage,
+          currentPage: response.data?.pagination?.currentPage || 1,
           totalPages: response.data?.pagination?.totalPages,
-          itemsPerPage: response.data?.pagination?.itemsPerPage,
+          itemsPerPage: response.data?.pagination?.itemsPerPage || 10,
           totalItems: response.data?.pagination?.totalItems,
         });
       }
@@ -188,14 +188,14 @@ const Slides = () => {
   useEffect(() => {
     fetchCourses();
     const cleanup = debouncedFetch(
-      pagination.currentPage,
-      pagination.itemsPerPage,
+      pagination?.currentPage,
+      pagination?.itemsPerPage,
       currentCourse,
     );
     return () => cleanup();
   }, [
-    pagination.currentPage,
-    pagination.itemsPerPage,
+    pagination?.currentPage,
+    pagination?.itemsPerPage,
     debouncedFetch,
     currentCourse,
   ]);
@@ -258,20 +258,19 @@ const Slides = () => {
         </Select>
       </div>
 
-      {loading && <Spinner size="lg" className="mr-4 place-self-center" />}
-
-      {!loading && filteredSlides.length > 0 ? (
+      {loading ? (
+        <Spinner size="lg" className="mr-4 place-self-center" />
+      ) : (filteredSlides?.length ?? 0) > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filteredSlides.map((slide: SlideInterface) => (
-            <Card key={slide?.id}>
+            <Card key={slide?.id} className="flex flex-col justify-between wrap-break-word">
               <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 {slide.fileName || "Untitled Slide"}
               </h5>
 
               <div className="flex items-center gap-3">
                 <Button
-                  className="mt-4 flex-1"
-                  // href={`https://drive.google.com/uc?export=download&id=${slide?.driveFileID}`}
+                  className="mt-4 flex-1 cursor-pointer"
                   rel="noopener noreferrer"
                   onClick={() => handleFileDownload(slide.driveFileID)}
                 >
@@ -301,19 +300,17 @@ const Slides = () => {
           ))}
         </div>
       ) : (
-        !loading && (
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            No slides found.
-          </div>
-        )
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          No slides found, Select a course.
+        </div>
       )}
 
       <div className="m-2 flex place-self-center sm:justify-center">
         <Pagination
           layout="table"
-          currentPage={pagination.currentPage}
-          itemsPerPage={pagination.itemsPerPage}
-          totalItems={pagination.totalItems}
+          currentPage={pagination?.currentPage || 1}
+          itemsPerPage={pagination?.itemsPerPage || 10}
+          totalItems={pagination?.totalItems || 0}
           onPageChange={onPageChange}
           showIcons
         />
@@ -348,7 +345,7 @@ const Slides = () => {
           isDeleting={modalState.isDeleting}
           isOpen={modalState.isDeleteDialogueOpen}
           handleDelete={() => handleSlideDelete(modalState.idToDelete)}
-          itemToDelete={modalState.itemToDelete}
+          itemToDelete={modalState.itemToDelete || "this slide"}
           onClose={() =>
             setModalState((prev) => ({ ...prev, isDeleteDialogueOpen: false }))
           }

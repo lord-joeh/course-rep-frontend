@@ -13,6 +13,7 @@ import {
   Spinner,
   Label,
   Tooltip,
+  Select,
 } from "flowbite-react";
 import { FaEdit, FaMagic } from "react-icons/fa";
 import AddNewGroup from "./AddNewGroup";
@@ -276,7 +277,7 @@ const Groups = () => {
 
         <div className="flex items-center gap-2">
           <Label htmlFor="course-filter">Select course to get groups</Label>
-          <select
+          <Select
             id="course-filter"
             className="rounded text-gray-900 dark:text-white"
             value={filterQuery}
@@ -294,13 +295,13 @@ const Groups = () => {
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         <Label htmlFor="entries">Show</Label>
-        <select
+        <Select
           id="entries"
           className="rounded border-none text-gray-900 dark:text-white"
           value={pagination.itemsPerPage}
@@ -316,7 +317,7 @@ const Groups = () => {
           <option value="25">25</option>
           <option value="50">50</option>
           <option value={pagination.totalItems}>All</option>
-        </select>
+        </Select>
         Entries
       </div>
 
@@ -388,7 +389,7 @@ const Groups = () => {
             </Card>
           ))
         ) : (
-          <p>No Groups found. Try selecting a course </p>
+          <p className="dark:text-white">No Groups found. Try selecting a course </p>
         )}
       </div>
 

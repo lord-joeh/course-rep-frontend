@@ -94,7 +94,6 @@ const Events = () => {
           isVisible: true,
         });
       }
-      setError("An unexpected error occurred while fetching data.");
     } finally {
       setLoading(false);
     }

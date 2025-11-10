@@ -91,14 +91,7 @@ const Lecturers = () => {
           type: "error",
           isVisible: true,
         });
-      } else {
-        setToast({
-          message: "An unexpected error occurred.",
-          type: "error",
-          isVisible: true,
-        });
       }
-      setError("An unexpected error occurred while fetching data.");
     } finally {
       setLoading(false);
     }
@@ -117,11 +110,6 @@ const Lecturers = () => {
       if (isAxiosError(err)) {
         showToast(
           err.response?.data?.error || "Failed to delete Lecturer.",
-          "error",
-        );
-      } else {
-        showToast(
-          "An unexpected error occurred while deleting Lecturer.",
           "error",
         );
       }
@@ -163,11 +151,6 @@ const Lecturers = () => {
             err.response?.data?.error || "Failed to update Lecturer.",
             "error",
           );
-        } else {
-          showToast(
-            "An unexpected error occurred while updating Lecturer.",
-            "error",
-          );
         }
       } finally {
         setModalState((prev) => ({
@@ -192,11 +175,6 @@ const Lecturers = () => {
         if (isAxiosError(err)) {
           showToast(
             err.response?.data?.error || "Failed to add Lecturer.",
-            "error",
-          );
-        } else {
-          showToast(
-            "An unexpected error occurred while adding Lecturer.",
             "error",
           );
         }
@@ -362,19 +340,6 @@ const Lecturers = () => {
         </Button>
       </div>
 
-      {/*<div className="flex flex-col items-center justify-between gap-4 md:flex-row">*/}
-      {/*  <input*/}
-      {/*    id="search"*/}
-      {/*    type="search"*/}
-      {/*    placeholder="Search lecturers..."*/}
-      {/*    value={searchQuery}*/}
-      {/*    onChange={(e) => setSearchQuery(e.target.value)}*/}
-      {/*    className="w-[90%] flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"*/}
-      {/*  />*/}
-      {/*  <Button onClick={handleRefresh} className="w-[15%]">*/}
-      {/*    <MdRefresh className="me-2 h-4 w-4" /> Refresh*/}
-      {/*  </Button>*/}
-      {/*</div>*/}
       <Button
         onClick={() => {
           setModalState((prev) => ({

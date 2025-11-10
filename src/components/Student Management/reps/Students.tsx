@@ -12,6 +12,7 @@ import {
   Pagination,
   Tooltip,
   Label,
+  Select,
 } from "flowbite-react";
 import { SiGooglemessages } from "react-icons/si";
 import { FaFileExport } from "react-icons/fa6";
@@ -87,7 +88,6 @@ const Students = () => {
           isVisible: true,
         });
       }
-      setError("An unexpected error occurred while fetching data.");
     } finally {
       setLoading(false);
     }
@@ -212,7 +212,7 @@ const Students = () => {
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <Label htmlFor="entries">Show</Label>
-          <select
+          <Select
             id="entries"
             className="rounded text-gray-900 dark:text-white"
             value={pagination.itemsPerPage}
@@ -228,7 +228,7 @@ const Students = () => {
             <option value="25">25</option>
             <option value="50">50</option>
             <option value={pagination.totalItems}>All</option>
-          </select>
+          </Select>
           Entries
         </div>
         <Button onClick={handleRefresh}>

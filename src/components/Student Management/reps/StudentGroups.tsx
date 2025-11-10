@@ -44,7 +44,7 @@ const StudentGroups = ({
       )}
 
       {!error && !isLoading && studentData?.Groups && (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
           {studentData?.Groups.map((group: groupType) => (
             <Card key={group?.id} className="overscroll-x-auto">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -73,13 +73,11 @@ const StudentGroups = ({
             </Card>
           ))}
 
-          {
-            studentData?.Groups.length === 0 && (
-              <Card className="p-4 text-center">
-                <p>You are not part of any group.</p>
-              </Card>
-            )
-          }
+          {studentData?.Groups.length === 0 && (
+            <Card className="p-4 text-center">
+              <p>You are not part of any group.</p>
+            </Card>
+          )}
         </div>
       )}
 

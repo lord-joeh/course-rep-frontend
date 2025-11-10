@@ -12,7 +12,7 @@ import { uploadSlides } from "../../../services/slidesServices.ts";
 import { isAxiosError } from "axios";
 import {
   CourseInterface,
-   SlideUploadInterface,
+  SlideUploadInterface,
   ToastInterface,
 } from "../../../utils/Interfaces.ts";
 import ToastMessage from "../../common/ToastMessage.tsx";
@@ -69,7 +69,7 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       const response = await uploadSlides(fd);
       if (response) {
         showToast(response.message || "Upload complete", "success");
-        if(typeof onSuccess === 'function'){
+        if (typeof onSuccess === "function") {
           onSuccess();
         }
       }
@@ -96,7 +96,6 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
     setFormData((prev) => ({ ...prev, folderId }));
     return folderId;
   };
-
 
   return (
     <div className="container mx-auto flex flex-col justify-center gap-5 p-4 dark:text-white">
@@ -136,7 +135,7 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
           name="files"
           multiple
           onChange={handleChange}
-          accept=".pdf,.ppt,.pptx,.docx,.doc"
+          accept=".pdf,.ppt,.pptx,.docx,.doc, .jpg, .png"
           className="max-w-md"
         />
         <HelperText>10 files Max</HelperText>
