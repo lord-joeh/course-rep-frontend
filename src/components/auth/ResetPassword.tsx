@@ -69,13 +69,11 @@ const ResetPassword = () => {
     let validationError = "";
     if (
       !resetData.token ||
-      typeof resetData.token !== "string" ||
       resetData.token.trim().length < 1
     ) {
       validationError = "Token not provided";
     } else if (
       !resetData.newPassword ||
-      typeof resetData.newPassword !== "string" ||
       resetData.newPassword.length < 8
     ) {
       validationError = "Your password should be at least 8 characters";
@@ -118,7 +116,7 @@ const ResetPassword = () => {
         }, 3000);
         return;
       } else {
-        throw new Error("Invalid response from server");
+        console.log("Invalid response from server");
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

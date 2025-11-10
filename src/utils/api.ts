@@ -71,7 +71,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms"}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );
@@ -95,6 +95,7 @@ api.interceptors.response.use(
     }
     if (error.response) {
       const status = error.response.status;
+      console.log(error.response)
       switch (status) {
         case 429:
           console.error("Rate limit exceeded");

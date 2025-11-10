@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from "react";
+import React, { useState, useEffect  } from "react";
 import { Avatar, Card, Spinner, Tooltip, Button, Label } from "flowbite-react";
 import { SiGooglemessages } from "react-icons/si";
 import { FaUserEdit } from "react-icons/fa";
@@ -95,7 +95,7 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
     }
   }, [studentData]);
 
-  const handleUserEdit = async (e: ChangeEvent<HTMLFormElement>) => {
+  const handleUserEdit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!studentId) return;
     try {

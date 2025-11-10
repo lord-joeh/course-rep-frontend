@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/auth/logout`,
+        `${import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms"}/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",
@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }
     } catch (error) {
       console.error("Error parsing user from localStorage:", error);
-      logout();
+      logout().then(r => console.log(r));
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     (loginResponse: UserType) => {
       try {
         if (!isTokenValid(loginResponse.token)) {
-          throw new Error("Token is invalid or expired.");
+          console.log("Token is invalid or expired.");
         }
 
         setUser(loginResponse);

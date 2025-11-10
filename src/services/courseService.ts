@@ -22,11 +22,11 @@ export const courses = async () => {
   return response.data;
 };
 
-export const courseByStudent = async (id: string) => {
-  const response = await api.get(`/api/courses/student/${id}`);
-  if (!response?.data) throw new Error("Failed fetching course by student");
-  return response.data;
-};
+// export const courseByStudent = async (id: string) => {
+//   const response = await api.get(`/api/courses/student/${id}`);
+//   if (!response?.data) throw new Error("Failed fetching course by student");
+//   return response.data;
+// };
 
 export const updateCourse = async (id: string, courseData: Course) => {
   const response = await api.put(`/api/courses/${id}`, courseData);

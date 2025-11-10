@@ -185,7 +185,7 @@ const Groups = () => {
         response?.data?.message || "Group deleted successfully",
         "success",
       );
-      fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
+      await fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(

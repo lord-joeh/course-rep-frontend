@@ -105,7 +105,7 @@ const Lecturers = () => {
         response?.data?.message || "Lecturer deleted successfully",
         "success",
       );
-      fetchLecturersData();
+      await fetchLecturersData();
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(
@@ -144,7 +144,7 @@ const Lecturers = () => {
             "Lecturer updated successfully",
           "success",
         );
-        fetchLecturersData();
+        await fetchLecturersData();
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(
@@ -170,7 +170,7 @@ const Lecturers = () => {
           response?.data?.message || "Lecturer added successfully",
           "success",
         );
-        fetchLecturersData();
+        await fetchLecturersData();
       } catch (err) {
         if (isAxiosError(err)) {
           showToast(

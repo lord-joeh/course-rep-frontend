@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 
-export const downloadFile = async (res: AxiosResponse<any>) => {
+export const downloadFile = async (res: AxiosResponse) => {
   try {
     // Axios may provide headers as a plain object or as an AxiosHeaders instance
     const headers: any = (res && res.headers) || {};
