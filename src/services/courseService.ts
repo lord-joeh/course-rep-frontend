@@ -18,15 +18,10 @@ interface CourseStudentData {
 
 export const courses = async () => {
   const response = await api.get(`/api/courses/`);
-  if (!response?.data) throw new Error("Failed fetching courses");
+  if (!response?.data?.success)
+    throw new Error(response?.data?.message || "Failed fetching courses");
   return response.data;
 };
-
-// export const courseByStudent = async (id: string) => {
-//   const response = await api.get(`/api/courses/student/${id}`);
-//   if (!response?.data) throw new Error("Failed fetching course by student");
-//   return response.data;
-// };
 
 export const updateCourse = async (id: string, courseData: Course) => {
   const response = await api.put(`/api/courses/${id}`, courseData);

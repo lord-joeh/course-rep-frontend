@@ -2,7 +2,7 @@ import axios from "axios";
 import { getSocketId } from "../context/socketContext";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms/",
+  baseURL: import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev/",
   withCredentials: true,
   timeout: 15000,
   headers: {
@@ -71,7 +71,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms"}/api/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev/"}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );
@@ -89,6 +89,10 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
+        // Show user notification before clearing auth data
+        console.error("Session expired. Please log in again.");
+        // Note: Toast notifications would need to be handled at component level
+        // For now, we'll rely on auth context logout handling
         localStorage.removeItem("user");
         return Promise.reject(refreshError);
       }

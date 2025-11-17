@@ -110,7 +110,7 @@ const Course = () => {
     try {
       setLoading(true);
       setError(null);
-      const apiCalls = [await courseService.courses(), await getLecturers()];
+      const apiCalls = [courseService.courses(), getLecturers()];
 
       const [courseResponse, lecturerResponse] = await Promise.all(apiCalls);
 
@@ -119,13 +119,12 @@ const Course = () => {
     } catch (error) {
       if (isAxiosError(error)) {
         showToast(
-          error.response?.data?.error || "Error fetching courses",
+          error.response?.data?.message?.error || "Error fetching courses",
           "error",
         );
       } else {
         showToast("An unexpected error occurred.", "error");
       }
-      setError("An unexpected error occurred while fetching data.");
     } finally {
       setLoading(false);
     }
@@ -194,8 +193,8 @@ const Course = () => {
         const response = await courseService.updateCourse(editId, courseData);
         showToast(
           response?.message ||
-            response?.data?.message ||
-            "Course updated successfully",
+          response?.data?.message ||
+          "Course updated successfully",
           "success",
         );
         fetchCoursesData().catch((err) => console.log(err));

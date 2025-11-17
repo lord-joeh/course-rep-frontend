@@ -396,9 +396,9 @@ const Groups = () => {
       <div className="m-2 flex place-self-center sm:justify-center">
         <Pagination
           layout="table"
-          currentPage={Number(pagination.currentPage)}
-          itemsPerPage={Number(pagination.itemsPerPage)}
-          totalItems={Number(pagination.totalItems)}
+          currentPage={Number(pagination.currentPage) || 1}
+          itemsPerPage={Number(pagination.itemsPerPage) || 12}
+          totalItems={Number(pagination.totalItems) || 0}
           onPageChange={onPageChange}
           showIcons
         />

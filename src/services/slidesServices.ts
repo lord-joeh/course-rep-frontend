@@ -1,7 +1,3 @@
-// Explanation: Switch uploadSlides to use fetch instead of axios (api instance) so the browser sets
-// the multipart boundary automatically. We still include credentials and Authorization header
-// (from localStorage) and optional socket ID if available. Do NOT set Content-Type so boundary is added.
-
 import api from "../utils/api";
 
 export const uploadSlides = async (formData: FormData) => {
@@ -66,7 +62,7 @@ export const deleteSlide = async (slideId: string) => {
 };
 
 export const downloadSlide = async (slideId: string) => {
-  return await api.get(`/google/download?fileId=${slideId}`, {
+  return await api.get(`/api/google/download?fileId=${slideId}`, {
     responseType: "blob",
   });
 };

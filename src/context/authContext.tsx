@@ -40,7 +40,7 @@ const isTokenValid = (token: string | null): boolean => {
     const decodedToken = jwtDecode(token);
 
     if (decodedToken.exp) {
-      return decodedToken.exp * 1000 > Date.now();
+      return decodedToken.exp * 1000 > Date.now() + 30000;
     }
     return false;
   } catch (error) {
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       await fetch(
-        `${import.meta.env.VITE_API_URL || "https://d8ppps52-5000.uks1.devtunnels.ms"}/api/auth/logout`,
+        `${import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev"}/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",

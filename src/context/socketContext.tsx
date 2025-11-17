@@ -5,24 +5,31 @@ import { io } from "socket.io-client";
 // module-scoped singleton socket to avoid multiple connections (React StrictMode/HMR)
 let socketSingleton: SocketContextType = null;
 let socketId: string | null = null;
+let currentToken: string | null = null;
 
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<SocketContextType>(socketSingleton);
 
   useEffect(() => {
-      const { token } = JSON.parse(localStorage.getItem("user") || "{}");
+    const { token } = JSON.parse(localStorage.getItem("user") || "{}");
+    currentToken = token;
+
     if (!socketSingleton) {
-      const url = import.meta.env.VITE_ENV === "production" ? "/" : "http://localhost:5000";
-      // prefer websocket transport to avoid polling fallbacks and related 400 errors
-      socketSingleton = io(url, { transports: ["websocket"], withCredentials: true, auth: {
-        token: token
-        } });
-      
+      const url = import.meta.env.VITE_API_URL || (import.meta.env.VITE_ENV === "production" ? "/" : "http://localhost:5000");
+
+      const secure = typeof url === "string" && url.startsWith("https");
+      socketSingleton = io(url, {
+        path: "/api/socket.io",
+        withCredentials: true,
+        secure,
+        auth: { token },
+      });
+
       // Store socket ID when connected
       socketSingleton.on("connect", () => {
         socketId = socketSingleton?.id || null;
       });
-      
+
       // Clear socket ID when disconnected
       socketSingleton.on("disconnect", () => {
         socketId = null;
@@ -45,6 +52,27 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         // leave socket connected; it will be cleaned up on full page unload
       }
     };
+  }, []);
+
+  // Listen for token changes and re-authenticate socket
+  useEffect(() => {
+    const checkTokenChange = () => {
+      const { token } = JSON.parse(localStorage.getItem("user") || "{}");
+      if (token !== currentToken && socketSingleton) {
+        currentToken = token;
+        // Update socket authentication with new token
+        socketSingleton.auth = { token };
+        // Reconnect with new token
+        socketSingleton.disconnect();
+        socketSingleton.connect();
+        console.log("🔄 Socket re-authenticated with new token");
+      }
+    };
+
+    // Check for token changes every 5 seconds
+    const interval = setInterval(checkTokenChange, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

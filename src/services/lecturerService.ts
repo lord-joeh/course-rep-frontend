@@ -8,7 +8,8 @@ type formaDataType = {
 
 export const getLecturers = async () => {
   const response = await api.get(`/api/lecturers/`);
-  if (!response?.data) throw new Error("Failed fetching lecturers");
+  if (!response?.data?.success)
+    throw new Error(response?.data?.message || "Failed fetching lecturers");
   return response.data;
 };
 
