@@ -194,7 +194,7 @@ const GroupMembers = () => {
             {groupData?.name || ""}
           </p>
           <small>{groupData?.description || ""}</small>
-          <small>{groupData?.Course.name || ""}</small>
+          <small>{groupData?.Course?.name || "General Group"}</small>
         </Card>
         <Card className="border-l-4 border-l-blue-600">
           <h5 className="text-xl font-bold">Group Lead</h5>

@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import * as courseService from "../../../services/courseService";
 import useAuth from "../../../hooks/useAuth";
+import { useCrud } from "../../../hooks/useCrud";
+import { useSearch } from "../../../hooks/useSearch";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
@@ -29,24 +31,20 @@ import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import {
   CourseInterface,
   ModalState,
-  ToastInterface,
   Lecturer,
   CourseStudentData,
 } from "../../../utils/Interfaces";
 import { CourseModalContent } from "./CourseModalContent";
 
 const Course = () => {
-  const [courses, setCourses] = useState<CourseInterface[]>([]);
-  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
   const { user } = useAuth();
   const [courseStudent, setCourseStudent] = useState<CourseStudentData>({
     courseId: "",
     studentId: user ? user?.data?.id : "",
   });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [editId, setEditId] = useState<string | null>(null);
+  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
 
   const [formData, setFormData] = useState<CourseInterface>({
     id: "",
@@ -60,11 +58,6 @@ const Course = () => {
     createdAt: "",
   });
 
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
-  });
   const [modalState, setModalState] = useState<ModalState>({
     isDeleteDialogueOpen: false,
     isModalOpen: false,
@@ -75,6 +68,26 @@ const Course = () => {
     isAdding: false,
   });
 
+  const courseCrudService = {
+    list: courseService.courses,
+    add: courseService.addCourse,
+    update: courseService.updateCourse,
+    remove: courseService.deleteCourse,
+  };
+
+  const {
+    items: courses,
+    loading: isLoading,
+    error,
+    toast,
+    showToast,
+    closeToast,
+    refresh,
+    add,
+    update,
+    remove,
+  } = useCrud<CourseInterface>(courseCrudService);
+
   const courseTableHeader = [
     "#",
     "COURSE CODE",
@@ -83,6 +96,8 @@ const Course = () => {
     "TIME",
     "ACTIONS",
   ];
+
+  const filteredCourses = useSearch<CourseInterface>(courses, searchQuery)
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -93,48 +108,30 @@ const Course = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type, isVisible: true });
-
-  const closeToast = () => {
-    setToast((prev) => ({ ...prev, isVisible: false }));
-  };
-
   const closeDialogue = () =>
     setModalState((prev) => ({ ...prev, isDeleteDialogueOpen: false }));
 
   const closeModal = () =>
     setModalState((prev) => ({ ...prev, isModalOpen: false }));
 
-  const fetchCoursesData = async () => {
+  const fetchLecturers = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const apiCalls = [courseService.courses(), getLecturers()];
-
-      const [courseResponse, lecturerResponse] = await Promise.all(apiCalls);
-
-      setCourses(courseResponse.data || []);
+      const lecturerResponse = await getLecturers();
       setLecturers(lecturerResponse?.data || []);
     } catch (error) {
       if (isAxiosError(error)) {
         showToast(
-          error.response?.data?.message?.error || "Error fetching courses",
+          error.response?.data?.message?.error || "Error fetching lecturers",
           "error",
         );
       } else {
         showToast("An unexpected error occurred.", "error");
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleCourseRegister = async (courseId: string) => {
     try {
-      setLoading(true);
-      setError(null);
-
       const registerData = { ...courseStudent, courseId: courseId };
 
       const response = await courseService.registerCourse(registerData);
@@ -153,27 +150,17 @@ const Course = () => {
           "error",
         );
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleRefresh = () => {
-    fetchCoursesData().catch((err) => console.log(err));
+    refresh();
   };
 
-  const filteredCourses = useMemo(() => {
-    if (!searchQuery) return courses;
-    const lowerQuery = searchQuery.toLowerCase();
-    return courses.filter((course) =>
-      Object.values(course).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [courses, searchQuery]);
+
 
   useEffect(() => {
-    fetchCoursesData().catch((err) => console.log(err));
+    fetchLecturers().catch((err) => console.log(err));
     setCourseStudent((prev) => ({
       ...prev,
       studentId: user ? user?.data?.id : "",
@@ -187,114 +174,43 @@ const Course = () => {
       start_time: `${formData.start_time}:00+01`,
       end_time: `${formData.end_time}:00+01`,
     };
-    if (modalState.isEditing && editId) {
-      try {
-        setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await courseService.updateCourse(editId, courseData);
-        showToast(
-          response?.message ||
-          response?.data?.message ||
-          "Course updated successfully",
-          "success",
-        );
-        fetchCoursesData().catch((err) => console.log(err));
-      } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to update Course.",
-            "error",
-          );
-        } else {
-          showToast(
-            "An unexpected error occurred while updating Course.",
-            "error",
-          );
-        }
-      } finally {
-        setModalState((prev) => ({
-          ...prev,
-          isAdding: false,
-          isModalOpen: false,
-          isEditing: false,
-        }));
-        setEditId(null);
-        setFormData((prev) => ({
-          ...prev,
-          id: "",
-          name: "",
-          day: "",
-          start_time: "",
-          end_time: "",
-          semester: "",
-          slidesFolderID: "",
-          lecturerId: "",
-        }));
+    try {
+      setModalState((prev) => ({ ...prev, isAdding: true }));
+      if (modalState.isEditing && editId) {
+        await update(editId, courseData);
+      } else {
+        await add(courseData);
       }
-    } else {
-      try {
-        setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await courseService.addCourse(courseData);
-        showToast(
-          response?.data?.message || "Course added successfully",
-          "success",
-        );
-        fetchCoursesData().catch((err) => console.log(err));
-      } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to add Course.",
-            "error",
-          );
-        } else {
-          showToast(
-            "An unexpected error occurred while adding Event.",
-            "error",
-          );
-        }
-      } finally {
-        setModalState((prev) => ({
-          ...prev,
-          isAdding: false,
-          isModalOpen: false,
-          isEditing: false,
-        }));
-        setFormData((prev) => ({
-          ...prev,
-          id: "",
-          name: "",
-          day: "",
-          start_time: "",
-          end_time: "",
-          semester: "",
-          slidesFolderID: "",
-          lecturerId: "",
-        }));
-        setEditId(null);
-      }
+    } catch (err) {
+      // Error handling is done in useCrud
+    } finally {
+      setModalState((prev) => ({
+        ...prev,
+        isAdding: false,
+        isModalOpen: false,
+        isEditing: false,
+      }));
+      setEditId(null);
+      setFormData((prev) => ({
+        ...prev,
+        id: "",
+        name: "",
+        day: "",
+        start_time: "",
+        end_time: "",
+        semester: "",
+        slidesFolderID: "",
+        lecturerId: "",
+      }));
     }
   };
 
   const handleCourseDelete = async (id: string) => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
-      const response = await courseService.deleteCourse(id);
-      showToast(
-        response?.data?.message || "Event deleted successfully",
-        "success",
-      );
-      fetchCoursesData().catch((err) => console.log(err));
+      await remove(id);
     } catch (err) {
-      if (isAxiosError(err)) {
-        showToast(
-          err.response?.data?.error || "Failed to delete Event.",
-          "error",
-        );
-      } else {
-        showToast(
-          "An unexpected error occurred while deleting Event.",
-          "error",
-        );
-      }
+      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -446,10 +362,10 @@ const Course = () => {
         </Table>
       </div>
       {error && <p className="text-red-700">{error}</p>}
-      {toast.isVisible && (
+      {toast.visible && (
         <ToastMessage
           message={toast.message}
-          type={toast.type}
+          type={!toast.type ? "error" : toast.type}
           onClose={closeToast}
         />
       )}

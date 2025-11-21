@@ -253,3 +253,11 @@ export interface SlideInterface {
   courseId: string,
   createdAt: string,
 }
+
+export interface AssignmentCreationInterface {
+  title: string,
+  description: string,
+  courseId: string,
+  deadline: string,
+  file?: File
+}

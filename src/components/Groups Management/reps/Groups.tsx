@@ -27,6 +27,7 @@ import {
 import EditGroup from "./EditGroup";
 import CreateMagicGroups from "./CreateMagicGroups";
 import { useNavigate } from "react-router-dom";
+import { useSearch } from "../../../hooks/useSearch";
 
 export interface ModalState {
   isAdding: boolean;
@@ -167,15 +168,7 @@ const Groups = () => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
-  const filteredGroup = useMemo(() => {
-    if (!searchQuery) return groups;
-    const lowerQuery = searchQuery.toLowerCase();
-    return groups.filter((group) =>
-      Object.values(group).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [groups, searchQuery]);
+  const filteredGroup = useSearch<GroupInterface>(groups, searchQuery)
 
   const handleGroupDelete = async () => {
     try {
@@ -364,7 +357,7 @@ const Groups = () => {
                       setModalState((prev) => ({
                         ...prev,
                         isDeleteDialogueOpen: true,
-                        itemToDelete: `${group.name} from ${group.Course.name}`,
+                        itemToDelete: `${group.name} from ${group?.Course?.name || "General Groups"}`,
                         idToDelete: group.id,
                       }))
                     }

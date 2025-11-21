@@ -2,7 +2,7 @@ import axios from "axios";
 import { getSocketId } from "../context/socketContext";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev/",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   withCredentials: true,
   timeout: 15000,
   headers: {
@@ -71,7 +71,7 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev/"}/api/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );

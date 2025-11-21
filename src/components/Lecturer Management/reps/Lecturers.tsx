@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import * as lecturerService from "../../../services/lecturerService";
-import { isAxiosError } from "axios";
 import { MdEmail, MdRefresh } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
 import { FaPhone } from "react-icons/fa6";
@@ -25,21 +24,14 @@ import { HiUser } from "react-icons/hi";
 import {
   ModalState,
   Lecturer,
-  ToastInterface,
   courseType,
 } from "../../../utils/Interfaces";
+import { useCrud } from "../../../hooks/useCrud";
+import { useSearch } from "../../../hooks/useSearch";
+import LecturerModalContent from "./LecturerModalContent";
 
 const Lecturers = () => {
-  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
-  });
 
   const [modalState, setModalState] = useState<ModalState>({
     isDeleteDialogueOpen: false,
@@ -58,16 +50,30 @@ const Lecturers = () => {
   });
   const [editId, setEditId] = useState<string | null>(null);
 
+  const lecturerCrudService = {
+    list: lecturerService.getLecturers,
+    add: lecturerService.addLecturer,
+    update: lecturerService.updateLecturer,
+    remove: lecturerService.deleteLecturers,
+  };
+
+  const {
+    items: lecturers,
+    loading: isLoading,
+    error,
+    toast,
+    closeToast,
+    refresh,
+    add,
+    update,
+    remove,
+  } = useCrud<Lecturer>(lecturerCrudService);
+
+  const filteredLecturers = useSearch<Lecturer>(lecturers, searchQuery);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type, isVisible: true });
-
-  const closeToast = () => {
-    setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
   const closeDialogue = () =>
@@ -76,43 +82,12 @@ const Lecturers = () => {
   const closeModal = () =>
     setModalState((prev) => ({ ...prev, isModalOpen: false }));
 
-  const fetchLecturersData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await lecturerService.getLecturers();
-
-      setLecturers(response.data || []);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        setToast({
-          message: error.response?.data?.error || "Error fetching lecturers",
-          type: "error",
-          isVisible: true,
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleUserDelete = async (id: string) => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
-      const response = await lecturerService.deleteLecturers(id);
-      showToast(
-        response?.data?.message || "Lecturer deleted successfully",
-        "success",
-      );
-      await fetchLecturersData();
+      await remove(id);
     } catch (err) {
-      if (isAxiosError(err)) {
-        showToast(
-          err.response?.data?.error || "Failed to delete Lecturer.",
-          "error",
-        );
-      }
+      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -132,26 +107,14 @@ const Lecturers = () => {
     if (formData.phone.length < 1)
       userErrorMessage = "Lecturer's phone cannot be empty";
 
-    if (userErrorMessage) return showToast(userErrorMessage, "error");
+    if (userErrorMessage) return alert(userErrorMessage);
 
     if (modalState.isEditing && editId) {
       try {
         setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await lecturerService.updateLecturer(editId, formData);
-        showToast(
-          response?.message ||
-            response?.data?.message ||
-            "Lecturer updated successfully",
-          "success",
-        );
-        await fetchLecturersData();
+        await update(editId, formData);
       } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to update Lecturer.",
-            "error",
-          );
-        }
+        // Error handling is done in useCrud
       } finally {
         setModalState((prev) => ({
           ...prev,
@@ -165,19 +128,9 @@ const Lecturers = () => {
     } else {
       try {
         setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await lecturerService.addLecturer(formData);
-        showToast(
-          response?.data?.message || "Lecturer added successfully",
-          "success",
-        );
-        await fetchLecturersData();
+        await add(formData);
       } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to add Lecturer.",
-            "error",
-          );
-        }
+        // Error handling is done in useCrud
       } finally {
         setModalState((prev) => ({
           ...prev,
@@ -192,22 +145,8 @@ const Lecturers = () => {
   };
 
   const handleRefresh = () => {
-    fetchLecturersData();
+    refresh();
   };
-
-  const filteredLecturers = useMemo(() => {
-    if (!searchQuery) return lecturers;
-    const lowerQuery = searchQuery.toLowerCase();
-    return lecturers.filter((lecturer) =>
-      Object.values(lecturer).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [lecturers, searchQuery]);
-
-  useEffect(() => {
-    fetchLecturersData();
-  }, []);
 
   const lecturersTableHeader = [
     "#",
@@ -217,101 +156,6 @@ const Lecturers = () => {
     "Course",
     "Actions",
   ];
-
-  const lecturerModalContent = (
-    <div className="flex flex-col justify-center gap-5">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        {modalState.isEditing ? "Edit Lecturer" : "New Lecturer"}
-      </h1>
-
-      <form onSubmit={handleLecturerSubmit} className="flex flex-col gap-4">
-        <>
-          <div>
-            <div className="md-4 mt-2 block">
-              <Label htmlFor="Lecturer Name"> Name</Label>
-            </div>
-            <TextInput
-              type="text"
-              id="lecturer-name"
-              placeholder="Lecturer's Name"
-              name="name"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              disabled={modalState.isAdding}
-              icon={HiUser}
-              className="sm:text-sm md:text-base"
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div className="md-4 mt-2 block">
-              <Label htmlFor="Lecturer Email"> Email</Label>
-            </div>
-            <TextInput
-              type="text"
-              id="lecturer-email"
-              placeholder="Lecturer's Email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              disabled={modalState.isAdding}
-              icon={MdEmail}
-              className="sm:text-sm md:text-base"
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <div className="md-4 mt-2 block">
-              <Label htmlFor="Lecturer phone"> Phone</Label>
-            </div>
-            <TextInput
-              type="tel"
-              id="lecturer-phone"
-              placeholder="Lecturer's Phone Number"
-              name="phone"
-              required
-              value={formData.phone}
-              onChange={handleChange}
-              disabled={modalState.isAdding}
-              icon={FaPhone}
-              className="sm:text-sm md:text-base"
-              autoComplete="off"
-              max={10}
-            />
-          </div>
-        </>
-        <div className="flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isAdding} color="green">
-            {modalState.isAdding
-              ? modalState.isEditing
-                ? "Updating Lecturer..."
-                : "Adding Lecturer..."
-              : modalState.isEditing
-                ? "Update Lecturer"
-                : "Add Lecturer"}
-          </Button>
-
-          <Button
-            color="alternative"
-            type="button"
-            onClick={() => {
-              setModalState((prev) => ({
-                ...prev,
-                isModalOpen: false,
-                isEditing: false,
-              }));
-              setEditId(null);
-              setFormData({ name: "", email: "", phone: "" });
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -443,7 +287,7 @@ const Lecturers = () => {
       {error && (
         <ToastMessage message={error} type="error" onClose={closeToast} />
       )}
-      {toast.isVisible && (
+      {toast.visible && (
         <ToastMessage
           message={toast.message}
           type={toast.type}
@@ -472,7 +316,15 @@ const Lecturers = () => {
           setFormData({ name: "", email: "", phone: "" });
         }}
       >
-        {lecturerModalContent}
+        <LecturerModalContent
+          modalState={modalState}
+          setModalState={setModalState}
+          handleLecturerSubmit={handleLecturerSubmit}
+          formData={formData}
+          setFormData={setFormData}
+          handleChange={handleChange}
+          setEditId={setEditId}
+        />
       </CommonModal>
     </div>
   );

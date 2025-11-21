@@ -40,7 +40,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
           <h1 className="flex flex-wrap text-xl font-bold text-gray-900 dark:text-white">
             {user && user?.name}
           </h1>
-          <button
+          <button aria-label="toggle-sidebar"
             onClick={toggleSidebar}
             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700"
           >
@@ -61,7 +61,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             <SidebarItem
               className="cursor-pointer"
               onClick={() =>
-                handleRedirect("/reps/assignment", "/students/assignment")
+                handleRedirect("/reps/assignments", "/students/assignments")
               }
               icon={MdAssignment}
             >

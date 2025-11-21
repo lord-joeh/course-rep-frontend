@@ -1,13 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { isAxiosError } from "axios";
+import React, { useState } from "react";
 import * as eventService from "../../../services/eventService";
 import {
   Button,
   Card,
   Spinner,
-  Textarea,
-  Label,
-  TextInput,
 } from "flowbite-react";
 import { MdDeleteForever, MdRefresh } from "react-icons/md";
 import { IoLocationOutline, IoTimeOutline } from "react-icons/io5";
@@ -17,14 +13,13 @@ import { TbTimelineEventPlus } from "react-icons/tb";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
-import { HiCalendarDateRange } from "react-icons/hi2";
 import { formatTimeWithOffset } from "../../../helpers/formatTime";
-import { ModalState, ToastInterface, Event } from "../../../utils/Interfaces";
+import { ModalState, Event } from "../../../utils/Interfaces";
+import { useCrud } from "../../../hooks/useCrud";
+import { useSearch } from "../../../hooks/useSearch";
+import EventModalContent from "./EventModalContent";
 
 const Events = () => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [formData, setFormData] = useState<Event>({
     id: "",
@@ -35,11 +30,6 @@ const Events = () => {
   });
   const [editId, setEditId] = useState<string | null>(null);
 
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
-  });
   const { user } = useAuth();
 
   const [modalState, setModalState] = useState<ModalState>({
@@ -52,18 +42,32 @@ const Events = () => {
     isAdding: false,
   });
 
+  const eventCrudService = {
+    list: eventService.getEvents,
+    add: eventService.addEvent,
+    update: eventService.updateEvent,
+    remove: eventService.deleteEvent,
+  };
+
+  const {
+    items: events,
+    loading: isLoading,
+    error,
+    toast,
+    closeToast,
+    refresh,
+    add,
+    update,
+    remove,
+  } = useCrud<Event>(eventCrudService);
+
+  const filteredEvents = useSearch<Event>(events, searchQuery);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type, isVisible: true });
-
-  const closeToast = () => {
-    setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
   const closeDialogue = () =>
@@ -72,72 +76,16 @@ const Events = () => {
   const closeModal = () =>
     setModalState((prev) => ({ ...prev, isModalOpen: false }));
 
-  const fetchEventsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await eventService.getEvents();
-
-      setEvents(response.data || []);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        setToast({
-          message: error.response?.data?.error || "Error fetching events",
-          type: "error",
-          isVisible: true,
-        });
-      } else {
-        setToast({
-          message: "An unexpected error occurred.",
-          type: "error",
-          isVisible: true,
-        });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleRefresh = () => {
-    fetchEventsData().catch((err) => console.log(err));
+    refresh();
   };
-
-  const filteredEvents = useMemo(() => {
-    if (!searchQuery) return events;
-    const lowerQuery = searchQuery.toLowerCase();
-    return events.filter((event) =>
-      Object.values(event).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [events, searchQuery]);
-
-  useEffect(() => {
-    fetchEventsData().catch((err) => console.log(err));
-  }, []);
 
   const handleEventDelete = async (id: string) => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
-      const response = await eventService.deleteEvent(id);
-      showToast(
-        response?.data?.message || "Event deleted successfully",
-        "success",
-      );
-      fetchEventsData().catch((err) => console.log(err));
+      await remove(id);
     } catch (err) {
-      if (isAxiosError(err)) {
-        showToast(
-          err.response?.data?.error || "Failed to delete Event.",
-          "error",
-        );
-      } else {
-        showToast(
-          "An unexpected error occurred while deleting Event.",
-          "error",
-        );
-      }
+      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -153,77 +101,30 @@ const Events = () => {
       ...formData,
       time: `${formData.time}:00+01`,
     };
-    if (modalState.isEditing && editId) {
-      try {
-        setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await eventService.updateEvent(editId, eventData);
-        showToast(
-          response?.message ||
-            response?.data?.message ||
-            "Lecturer updated successfully",
-          "success",
-        );
-        fetchEventsData().catch((err) => console.log(err));
-      } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to update Event.",
-            "error",
-          );
-        } else {
-          showToast(
-            "An unexpected error occurred while updating Event.",
-            "error",
-          );
-        }
-      } finally {
-        setModalState((prev) => ({
-          ...prev,
-          isAdding: false,
-          isModalOpen: false,
-          isEditing: false,
-        }));
-        setEditId(null);
-        setFormData({
-          id: "",
-          description: "",
-          date: "",
-          time: "",
-          venue: "",
-        });
+    try {
+      setModalState((prev) => ({ ...prev, isAdding: true }));
+      if (modalState.isEditing && editId) {
+        await update(editId, eventData);
+      } else {
+        await add(eventData);
       }
-    } else {
-      try {
-        setModalState((prev) => ({ ...prev, isAdding: true }));
-        const response = await eventService.addEvent(eventData);
-        showToast(
-          response?.data?.message || "Event added successfully",
-          "success",
-        );
-        fetchEventsData().catch((err) => console.log(err));
-      } catch (err) {
-        if (isAxiosError(err)) {
-          showToast(
-            err.response?.data?.error || "Failed to add Event.",
-            "error",
-          );
-        }
-      } finally {
-        setModalState((prev) => ({
-          ...prev,
-          isAdding: false,
-          isModalOpen: false,
-          isEditing: false,
-        }));
-        setFormData({
-          id: "",
-          description: "",
-          date: formData?.date,
-          time: "",
-          venue: "",
-        });
-        setEditId(null);
-      }
+    } catch (err) {
+      // Error handling is done in useCrud
+    } finally {
+      setModalState((prev) => ({
+        ...prev,
+        isAdding: false,
+        isModalOpen: false,
+        isEditing: false,
+      }));
+      setEditId(null);
+      setFormData({
+        id: "",
+        description: "",
+        date: "",
+        time: "",
+        venue: "",
+      });
     }
   };
 
@@ -241,114 +142,6 @@ const Events = () => {
     "NOV",
     "DEC",
   ];
-
-  const eventModalContent = (
-    <div className="flex flex-col justify-center gap-5">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        {modalState.isEditing ? "Edit Event" : "New Event"}
-      </h1>
-
-      <form onSubmit={handleEventFormSubmit}>
-        <>
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="description">Content</Label>
-            </div>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              placeholder="Event Content..."
-              required
-              onChange={handleChange}
-              autoComplete="off"
-            />
-          </div>
-
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="date">Date</Label>
-            </div>
-            <TextInput
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date ? formData.date.split("T")[0] : ""}
-              required
-              onChange={handleChange}
-              autoComplete="off"
-              icon={HiCalendarDateRange}
-            />
-          </div>
-
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="time">Time</Label>
-            </div>
-            <TextInput
-              id="time"
-              name="time"
-              type="time"
-              value={formData.time ? formData.time.slice(0, 5) : ""}
-              required
-              onChange={handleChange}
-              autoComplete="off"
-              icon={IoTimeOutline}
-            />
-          </div>
-
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="venue">Venue</Label>
-            </div>
-            <TextInput
-              id="venue"
-              name="venue"
-              placeholder="Venue "
-              value={formData?.venue}
-              required
-              onChange={handleChange}
-              autoComplete="off"
-              icon={IoLocationOutline}
-            />
-          </div>
-        </>
-        <div className="mt-4 flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isAdding} color="green">
-            {modalState.isAdding
-              ? modalState.isEditing
-                ? "Updating Event..."
-                : "Adding Event..."
-              : modalState.isEditing
-                ? "Update Event"
-                : "Add Event"}
-          </Button>
-
-          <Button
-            color="alternative"
-            type="button"
-            onClick={() => {
-              setModalState((prev) => ({
-                ...prev,
-                isModalOpen: false,
-                isEditing: false,
-              }));
-              setEditId(null);
-              setFormData({
-                id: "",
-                description: "",
-                date: "",
-                time: "",
-                venue: "",
-              });
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
   return (
     <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -475,7 +268,7 @@ const Events = () => {
       {error && (
         <ToastMessage message={error} type="error" onClose={closeToast} />
       )}
-      {toast.isVisible && (
+      {toast.visible && (
         <ToastMessage
           message={toast.message}
           type={toast.type}
@@ -499,18 +292,25 @@ const Events = () => {
           setModalState((prev) => ({
             ...prev,
             isEditing: false,
-            currentModal: null,
           }));
           setFormData({
             id: "",
             description: "",
-            date: formData?.date,
+            date: "",
             time: "",
             venue: "",
           });
         }}
       >
-        {eventModalContent}
+        <EventModalContent
+          modalState={modalState}
+          setModalState={setModalState}
+          handleEventFormSubmit={handleEventFormSubmit}
+          formData={formData}
+          setFormData={setFormData}
+          handleChange={handleChange}
+          setEditId={setEditId}
+        />
       </CommonModal>
     </div>
   );

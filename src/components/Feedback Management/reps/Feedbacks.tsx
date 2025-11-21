@@ -16,10 +16,9 @@ import {
 } from "../../../utils/Interfaces";
 import { ViewFeedback } from "./ViewFeedback.tsx";
 import { MdRefresh } from "react-icons/md";
+import { useSearch } from "../../../hooks/useSearch";
 
 const Feedbacks = () => {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [formData, setFormData] = useState<Feedback>({
     id: "",
@@ -27,12 +26,6 @@ const Feedbacks = () => {
     content: "",
     is_anonymous: false,
     Student: { name: "" },
-  });
-
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
   });
 
   const [modalState, setModalState] = useState<ModalState>({
@@ -45,13 +38,15 @@ const Feedbacks = () => {
     isAdding: false,
   });
 
-  const [pagination, setPagination] = useState<PaginationType>({
-    currentPage: 1,
-    totalPages: 0,
-    itemsPerPage: 9,
-    totalItems: 0,
-  });
   const [currentStudentId, setCurrentStudentId] = useState<string>("");
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastInterface>({
+    message: "",
+    type: "error",
+    isVisible: false,
+  });
 
   const showToast = (message: string, type: "success" | "error") =>
     setToast({ message, type, isVisible: true });
@@ -60,12 +55,20 @@ const Feedbacks = () => {
     setToast((prev) => ({ ...prev, isVisible: false }));
   };
 
+  const [pagination, setPagination] = useState<PaginationType>({
+    currentPage: 1,
+    totalPages: 0,
+    itemsPerPage: 9,
+    totalItems: 0,
+  });
+
   const fetchFeedbacksData = async (
     page = 1,
     itemsPerPage = pagination.itemsPerPage,
   ) => {
     try {
       setLoading(true);
+      setError(null);
 
       const response = await FeedbackService.getFeedbacks(page, itemsPerPage);
 
@@ -117,15 +120,7 @@ const Feedbacks = () => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
-  const filteredFeedbacks = useMemo(() => {
-    if (!searchQuery) return feedbacks;
-    const lowerQuery = searchQuery.toLowerCase();
-    return feedbacks.filter((feedback) =>
-      Object.values(feedback).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [feedbacks, searchQuery]);
+  const filteredFeedbacks = useSearch<Feedback>(feedbacks, searchQuery)
 
   const handleFeedbackDelete = async (id: string) => {
     try {
@@ -277,6 +272,9 @@ const Feedbacks = () => {
         }
       />
 
+      {error && (
+        <ToastMessage message={error} type="error" onClose={closeToast} />
+      )}
       {toast.isVisible && (
         <ToastMessage
           message={toast.message}
