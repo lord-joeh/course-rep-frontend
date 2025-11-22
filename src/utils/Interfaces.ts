@@ -222,13 +222,14 @@ export interface ViewFeedbackProps {
   formData: Feedback;
   setCurrentStudentId: (id: string) => void;
   setModalState: (modalState: any) => void;
-
 }
 
 export interface CourseModalContentInterface {
   modalState: ModalState;
   setModalState: (modalState: any) => void;
-  handleCourseSubmit: (e: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
+  handleCourseSubmit: (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => void | Promise<void>;
   handleChange: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -242,22 +243,55 @@ export interface CourseModalContentInterface {
 
 export interface SlideUploadInterface {
   folderId: string;
-  courseId: string,
+  courseId: string;
   files: File[];
 }
 
 export interface SlideInterface {
-  id: string,
-  driveFileID: string,
-  fileName: string,
-  courseId: string,
-  createdAt: string,
+  id: string;
+  driveFileID: string;
+  fileName: string;
+  courseId: string;
+  createdAt: string;
 }
 
 export interface AssignmentCreationInterface {
-  title: string,
-  description: string,
-  courseId: string,
-  deadline: string,
-  file?: File
+  title: string;
+  description: string;
+  courseId: string;
+  deadline: string;
+  file?: File;
+}
+
+export interface AssignmentsInterface extends AssignmentCreationInterface {
+  id: string;
+  submissionFolderID: string;
+  fileId: string;
+  fileName: string;
+}
+
+export interface AssignmentSubmissionInterface {
+  folderId: string;
+  assignmentId: string;
+  studentId: string;
+  file?: File;
+}
+
+export interface SubmittedAssignment {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  fileId: string;
+  fileName: string;
+  submittedAt: string;
+  Assignment: {
+    id: string;
+    title: string;
+    description: string;
+    deadline: string;
+    courseId: string;
+    Course: {
+      name: string;
+    };
+  };
 }

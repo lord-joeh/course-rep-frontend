@@ -67,7 +67,7 @@ const Feedback = () => {
   }, []);
 
   return (
-    <div className="container flex flex-col justify-center gap-6 p-6 font-sans md:p-1">
+    <div className="container flex flex-col justify-center gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         {" "}
         Submit a Feedback

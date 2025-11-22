@@ -28,7 +28,7 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
             }));
           }}
         >
-          Respond to Feedback
+          Respond
         </Button>
         <Button
           color="alternative"

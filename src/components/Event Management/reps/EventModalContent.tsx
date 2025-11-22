@@ -52,7 +52,7 @@ const EventModalContent: React.FC<EventModalContentProps> = ({
           </div>
 
           <div>
-            <div className="mb-2 block">
+            <div className="mb-2 block max-w-md">
               <Label htmlFor="date">Date</Label>
             </div>
             <TextInput
@@ -68,7 +68,7 @@ const EventModalContent: React.FC<EventModalContentProps> = ({
           </div>
 
           <div>
-            <div className="mb-2 block">
+            <div className="mb-2 block max-w-md">
               <Label htmlFor="time">Time</Label>
             </div>
             <TextInput

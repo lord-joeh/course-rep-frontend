@@ -169,7 +169,7 @@ const Students = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6  font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Students Management
       </h1>
@@ -181,9 +181,9 @@ const Students = () => {
           placeholder="Search students..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex-grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
+          className="w-full flex grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
-        <Button onClick={handleExport}>
+        <Button onClick={handleExport} className="w-full md:w-50 justify-center">
           <FaFileExport className="me-2 h-4 w-4" /> Export Students
         </Button>
       </div>

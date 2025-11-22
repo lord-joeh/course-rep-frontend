@@ -67,8 +67,8 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       if (formData.folderId) fd.append("folderId", formData.folderId);
 
       const response = await uploadSlides(fd);
+      showToast(response.message || "Upload complete", "success");
       if (response) {
-        showToast(response.message || "Upload complete", "success");
         if (typeof onSuccess === "function") {
           onSuccess();
         }
@@ -135,7 +135,8 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
           name="files"
           multiple
           onChange={handleChange}
-          accept=".pdf,.ppt,.pptx,.docx,.doc, .jpg, .png"
+          accept=".pdf,.ppt,.pptx,.docx,.doc, .jpg, .png, .csv, .txt, .mp4, .xlsx, .xls"
+          size={10}
           className="max-w-md"
         />
         <HelperText>10 files Max</HelperText>

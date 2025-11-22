@@ -1,9 +1,9 @@
-import AddNewAssignment from "../../components/Assignment Management/reps/AddNewAssignment";
+import Assignments from "../../components/Assignment Management/reps/Assignments";
 
 const AssignmentPage = () => {
-       return (
+  return (
     <div className="container min-h-screen text-gray-900 dark:text-white">
-      <AddNewAssignment />
+      <Assignments />
     </div>
   );
 }

@@ -1,29 +1,7 @@
 /** @type {import('prettier').Config} */
 export default {
-  plugins: ["prettier-plugin-tailwindcss", "prettier-plugin-jsdoc"],
-  semi: true,
-  singleQuote: true,
-  printWidth: 80,
-  tabWidth: 2,
-  trailingComma: "es5",
-  bracketSpacing: true,
-  arrowParens: "always",
-  proseWrap: "always",
-  jsdocSpaces: 1,
-  jsdocDescriptionWithDot: true,
-  jsdocUseInlineTag: true,
-  jsdocPreferType: {
-    String: "string",
-    Number: "number",
-    Boolean: "boolean",
-    Object: "object",
-    Array: "array",
-    Function: "function",
-    Undefined: "undefined",
-    Null: "null",
-    Symbol: "symbol",
-    BigInt: "bigint",
-  },
+  plugins: ["prettier-plugin-tailwindcss"],
+
   // tailwindcss
   tailwindAttributes: ["theme"],
   tailwindFunctions: ["twMerge", "createTheme"],

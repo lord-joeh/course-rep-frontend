@@ -145,7 +145,7 @@ const GroupMembers = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-3 font-sans md:p-1">
+    <div className="flex flex-col gap-6 font-sans">
       <Button
         color="alternative"
         className="w-50 cursor-pointer"

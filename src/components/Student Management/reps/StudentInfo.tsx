@@ -13,6 +13,7 @@ import useAuth from "../../../hooks/useAuth";
 import CommonModal from "../../common/CommonModal";
 import { updateStudent } from "../../../services/studentService";
 import { studentDataHook } from "../../../utils/Interfaces";
+import EditStudent from "./EditStudent";
 
 type ModalState = {
   isDeleteDialogueOpen: boolean;
@@ -157,63 +158,7 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
     }
   };
 
-  const editBody = (
-    <div className="flex flex-col justify-center gap-5">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Edit Student
-      </h1>
 
-      <form onSubmit={handleUserEdit} className="flex flex-col gap-4">
-        <>
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-md border p-2 dark:text-white"
-              required
-            >
-              <option value="">Select Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
-              <option value="withdrawn">Withdrawn</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              id="isRep"
-              name="isRep"
-              type="checkbox"
-              checked={formData.isRep}
-              onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <Label htmlFor="isRep">
-              {studentData?.isRep ? "Change to student" : "Change to Rep"}
-            </Label>
-          </div>
-        </>
-        <div className="flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isEditing} color="green">
-            {modalState.isEditing ? "Saving..." : "Save Changes"}
-          </Button>
-
-          <Button
-            color="alternative"
-            onClick={() =>
-              setModalState((prev) => ({ ...prev, isEditModalOpen: false }))
-            }
-          >
-            Cancel
-          </Button>
-        </div>
-      </form>
-    </div>
-  );
   return (
     <div className="flex flex-col justify-start gap-5">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -343,7 +288,16 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
       <CommonModal
         open={modalState.isEditModalOpen}
         onClose={closeEditModal}
-        children={editBody}
+        children={
+          <EditStudent
+            formData={formData}
+            handleChange={handleChange}
+            handleUserEdit={handleUserEdit}
+            isEditing={modalState.isEditing}
+            onClose={closeEditModal}
+            studentData={studentData}
+          />
+        }
       />
     </div>
   );

@@ -78,7 +78,6 @@ const Course = () => {
   const {
     items: courses,
     loading: isLoading,
-    error,
     toast,
     showToast,
     closeToast,
@@ -221,7 +220,7 @@ const Course = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         {user && user.isRep ? "Course Management" : "Courses"}
       </h1>
@@ -256,7 +255,7 @@ const Course = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-50 justify-start"
+          className="flex w-full md:w-50 justify-center"
         >
           <MdOutlineBookmarkAdd className="me-2 h-4 w-4" /> Add New Course
         </Button>
@@ -361,7 +360,6 @@ const Course = () => {
           </TableBody>
         </Table>
       </div>
-      {error && <p className="text-red-700">{error}</p>}
       {toast.visible && (
         <ToastMessage
           message={toast.message}

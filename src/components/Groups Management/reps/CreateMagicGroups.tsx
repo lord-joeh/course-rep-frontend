@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Label, TextInput, Button, Checkbox } from "flowbite-react";
+import { Label, TextInput, Button, Checkbox, Select } from "flowbite-react";
 import { FaMagic } from "react-icons/fa";
 import {
   MagicInterface,
@@ -65,9 +65,9 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
       <h2 className="mb-4 text-2xl font-bold">Create Magic Groups</h2>
       <form onSubmit={handleMagicSubmit}>
         <div className="flex flex-col gap-3">
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 block items-center gap-2">
             <Label htmlFor="courseId">Select course to create groups</Label>
-            <select
+            <Select
               id="courseId"
               className="rounded text-gray-900 dark:text-white"
               value={magicData.courseId}
@@ -88,7 +88,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
                   {c.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="mt-2 block">

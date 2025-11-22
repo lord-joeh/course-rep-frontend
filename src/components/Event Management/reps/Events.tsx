@@ -143,7 +143,7 @@ const Events = () => {
     "DEC",
   ];
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         {user && user.isRep ? "Event Management" : "Events"}
       </h1>
@@ -179,7 +179,7 @@ const Events = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-50 justify-start"
+          className="flex w-full md:w-50 justify-center"
         >
           <TbTimelineEventPlus className="me-2 h-4 w-4" /> Add New Event
         </Button>

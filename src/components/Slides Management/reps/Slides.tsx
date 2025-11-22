@@ -3,13 +3,13 @@ import {
   ModalState,
   PaginationType,
   SlideInterface,
-  ToastInterface,
 } from "../../../utils/Interfaces.ts";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useAuth from "../../../hooks/useAuth.ts";
 import {
   Button,
   Card,
+  Label,
   Pagination,
   Select,
   Spinner,
@@ -21,7 +21,7 @@ import {
   downloadSlide,
   getSlidesByCourse,
 } from "../../../services/slidesServices.ts";
-import { AxiosResponse, isAxiosError } from "axios";
+import {  isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage.tsx";
 import { courses as getCourses } from "../../../services/courseService.ts";
 import { IoCloudUploadOutline } from "react-icons/io5";
@@ -29,23 +29,19 @@ import { FiDownload } from "react-icons/fi";
 import CommonModal from "../../common/CommonModal.tsx";
 import UploadSlide from "./UploadSlide.tsx";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue.tsx";
-import { downloadFile } from "../../../helpers/downloadGoogleDriveFile.ts";
+import { useSearch } from "../../../hooks/useSearch.ts";
+import { useCrud } from "../../../hooks/useCrud.ts";
 
 const Slides = () => {
   const [slides, setSlides] = useState<SlideInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [courses, setCourses] = useState<CourseInterface[]>([]);
   const [currentCourse, setCurrentCourse] = useState<string>("");
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
-  });
+
   const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
     totalPages: 0,
-    itemsPerPage: 10,
+    itemsPerPage: 12,
     totalItems: 0,
   });
   const [modalState, setModalState] = useState<ModalState>({
@@ -59,26 +55,20 @@ const Slides = () => {
   });
   const { user } = useAuth();
 
-  const showToast = (message: string, type: "success" | "error") =>
-    setToast({ message, type, isVisible: true });
+  const crudServices = {
+    list: getCourses,
+    download: downloadSlide,
+    remove: deleteSlide
+  }
+  const {
+    items: courses,
+    showToast,
+    remove,
+    download,
+    toast,
+    closeToast
+  } = useCrud<CourseInterface>(crudServices)
 
-  const fetchCourses = useCallback(async () => {
-    try {
-      const courseData = await getCourses();
-      if (courseData) {
-        setCourses(courseData?.data || []);
-      }
-    } catch (err) {
-      if (isAxiosError(err)) {
-        showToast(
-          err?.response?.data.message || "Error fetching courses",
-          "error",
-        );
-      } else {
-        showToast("Error fetching courses", "error");
-      }
-    }
-  }, []);
 
   const fetchSlidesData = async (
     page = 1,
@@ -140,18 +130,10 @@ const Slides = () => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
 
-      const response = await deleteSlide(slideId);
-      if (response) {
-        showToast(response.message || "Slide deleted successfully", "success");
-        handleRefresh();
-      }
+      await remove(slideId);
+
     } catch (error) {
-      if (isAxiosError(error)) {
-        showToast(
-          error.response?.data?.error || "Failed to delete slide.",
-          "error",
-        );
-      }
+
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -164,29 +146,15 @@ const Slides = () => {
   const handleFileDownload = async (slideId: string) => {
     if (!slideId) return;
     try {
-      showToast("Starting slide download...", "success");
-      const fileRes: AxiosResponse = await downloadSlide(slideId);
-      if (fileRes) {
-        showToast("Slide download started.", "success");
-        await downloadFile(fileRes);
-      }
+      await download(slideId);
+
     } catch (error) {
-      showToast("Failed to download slide.", "error");
     }
   };
 
-  const filteredSlides = useMemo(() => {
-    if (!searchQuery) return slides;
-    const lowerQuery = searchQuery.toLowerCase();
-    return slides.filter((slide) =>
-      Object.values(slide).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [slides, searchQuery]);
+  const filteredSlides = useSearch<SlideInterface>(slides, searchQuery)
 
   useEffect(() => {
-    fetchCourses();
     const cleanup = debouncedFetch(
       pagination?.currentPage,
       pagination?.itemsPerPage,
@@ -201,7 +169,7 @@ const Slides = () => {
   ]);
 
   return (
-    <div className="flex flex-col gap-6 p-1 font-sans">
+    <div className="flex flex-col gap-6 font-sans dark:text-white">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         {user && user.isRep ? "Slides Management" : "Slides"}
       </h1>
@@ -231,7 +199,7 @@ const Slides = () => {
       <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
         {user && user.isRep && (
           <Button
-            className="w-50 min-w-0"
+            className="w-full md:w-50 justify-center"
             onClick={() =>
               setModalState((prev) => ({ ...prev, isAdding: true }))
             }
@@ -244,7 +212,7 @@ const Slides = () => {
         <Select
           id="courses"
           name="courseId"
-          className="min-w-0"
+          className="w-full md:w-60 justify-center"
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             setCurrentCourse(e.target.value);
           }}
@@ -256,6 +224,28 @@ const Slides = () => {
             </option>
           ))}
         </Select>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Label htmlFor="entries">Show</Label>
+        <Select
+          id="entries"
+          className="rounded border-none text-gray-900 dark:text-white"
+          value={pagination.itemsPerPage}
+          onChange={(e) =>
+            setPagination((prev) => ({
+              ...prev,
+              itemsPerPage: parseInt(e.target.value),
+              currentPage: 1,
+            }))
+          }
+        >
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={pagination?.totalItems}>All</option>
+        </Select>
+        Entries
       </div>
 
       {loading ? (
@@ -305,22 +295,27 @@ const Slides = () => {
         </div>
       )}
 
-      <div className="m-2 flex place-self-center sm:justify-center">
-        <Pagination
-          layout="table"
-          currentPage={pagination?.currentPage || 1}
-          itemsPerPage={pagination?.itemsPerPage || 10}
-          totalItems={pagination?.totalItems || 0}
-          onPageChange={onPageChange}
-          showIcons
-        />
-      </div>
+      {
+        filteredSlides.length > 0 && (
+          <div className="m-2 flex place-self-center sm:justify-center">
+            <Pagination
+              layout="table"
+              currentPage={pagination?.currentPage || 1}
+              itemsPerPage={pagination?.itemsPerPage || 10}
+              totalItems={pagination?.totalItems || 0}
+              onPageChange={onPageChange}
+              showIcons
+            />
+          </div>
+        )
+      }
 
-      {toast.isVisible && (
+
+      {toast.visible && (
         <ToastMessage
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
+          onClose={closeToast}
         />
       )}
 
@@ -333,7 +328,7 @@ const Slides = () => {
         >
           <UploadSlide
             courses={courses}
-            onSucces={() =>
+            onSuccess={() =>
               setModalState((prev) => ({ ...prev, isAdding: false }))
             }
           />

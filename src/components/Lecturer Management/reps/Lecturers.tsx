@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import * as lecturerService from "../../../services/lecturerService";
-import { MdEmail, MdRefresh } from "react-icons/md";
+import { MdRefresh } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
-import { FaPhone } from "react-icons/fa6";
 import { MdDeleteForever } from "react-icons/md";
 import CommonModal from "../../common/CommonModal";
 import {
@@ -16,8 +15,6 @@ import {
   TableRow,
   Spinner,
   Tooltip,
-  Label,
-  TextInput,
 } from "flowbite-react";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import { HiUser } from "react-icons/hi";
@@ -157,7 +154,7 @@ const Lecturers = () => {
     "Actions",
   ];
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Lecturers Management
       </h1>
@@ -192,7 +189,7 @@ const Lecturers = () => {
             isEditing: false,
           }));
         }}
-        className="flex w-50 justify-start"
+        className="flex w-full md:w-50 justify-center"
       >
         <HiUser className="me-2 h-4 w-4" /> Add New Lecturer
       </Button>

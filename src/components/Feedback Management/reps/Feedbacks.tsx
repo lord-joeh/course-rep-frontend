@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as FeedbackService from "../../../services/feedbackService";
 import { isAxiosError } from "axios";
 import { Avatar, Button, Card, Pagination, Spinner } from "flowbite-react";
@@ -154,7 +154,7 @@ const Feedbacks = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Feedbacks Management
       </h1>
@@ -188,12 +188,12 @@ const Feedbacks = () => {
             isAdding: true,
           }));
         }}
-        className="flex w-50 justify-start"
+        className="flex w-full md:w-50 mt-3 justify-center"
       >
         <VscFeedback className="me-2 h-4 w-4" /> Submit a Feedback
       </Button>
 
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <h1 className="text-3xl mt-3 font-bold text-gray-900 dark:text-white">
         Recent Feedbacks
       </h1>
 
@@ -227,7 +227,7 @@ const Feedbacks = () => {
                     setModalState((prev) => ({ ...prev, isModalOpen: true }));
                   }}
                 >
-                  Respond to Feedback
+                  Respond
                 </Button>
                 <Button
                   color="alternative"

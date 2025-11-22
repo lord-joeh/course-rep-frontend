@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from "react";
 import {
   AssignmentCreationInterface,
   CourseInterface,
-  ToastInterface,
 } from "../../../utils/Interfaces";
 import {
   Button,
@@ -16,24 +15,31 @@ import {
 } from "flowbite-react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { uploadNewAssignment } from "../../../services/assignmentService";
-import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
+import { useCrud } from "../../../hooks/useCrud";
+import { courses as getCourses } from "../../../services/courseService";
 
 const AddNewAssignment = () => {
   const [assignmentData, setAssignmentData] =
     useState<AssignmentCreationInterface>({
       title: "",
       description: "",
-      courseId: "IT 323",
+      courseId: "",
       deadline: "",
     });
-  const [courses, setCourses] = useState<CourseInterface[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<ToastInterface>({
-    message: "",
-    type: "error",
-    isVisible: false,
-  });
+
+  const crudServices = {
+    list: getCourses,
+    add: uploadNewAssignment
+  }
+  const {
+    items: courses,
+    loading,
+    toast,
+    showToast,
+    closeToast,
+    add
+  } = useCrud<CourseInterface>(crudServices)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,27 +53,22 @@ const AddNewAssignment = () => {
     }
   };
 
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast((prev) => ({ ...prev, message, type, isVisible: true }));
-  };
-
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-        setLoading(true)
-        if (
-            !assignmentData?.courseId ||
-            !assignmentData?.title ||
-            !assignmentData?.description ||
-            !assignmentData?.deadline
-        ) {
-            return showToast(
-                "All fields are required. Except the file field",
-                "error",
-            );
-        }
+      if (
+        !assignmentData?.courseId ||
+        !assignmentData?.title ||
+        !assignmentData?.description ||
+        !assignmentData?.deadline
+      ) {
+        return showToast(
+          "All fields are required. Except the file field",
+          "error",
+        );
+      }
 
-        const transformedFormData = new FormData();
+      const transformedFormData = new FormData();
       if (assignmentData?.file)
         transformedFormData.append("file", assignmentData?.file);
       transformedFormData.append("title", assignmentData?.title);
@@ -75,19 +76,9 @@ const AddNewAssignment = () => {
       transformedFormData.append("deadline", assignmentData?.deadline);
       transformedFormData.append("courseId", assignmentData?.courseId);
 
-      const response = await uploadNewAssignment(transformedFormData);
-      if (response) return showToast(response?.message, "success");
-    } catch (error) {
-      if (isAxiosError(error)) {
-        showToast(
-          error?.response?.data?.message || "Error uploading assignment",
-          "error",
-        );
-      } else {
-        showToast("Failed to upload assignment", "error");
-      }
-    } finally {
-      setLoading(false);
+      await add(transformedFormData);
+
+    } catch (error) { } finally {
       setAssignmentData({
         title: "",
         deadline: "",
@@ -100,7 +91,7 @@ const AddNewAssignment = () => {
   return (
     <div className="container flex flex-col justify-center gap-5 dark:text-white">
       <h1 className="text-3xl">Upload Assignment</h1>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className="container">
         <div className="mb-3 max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="courses">Select Course</Label>
@@ -109,6 +100,7 @@ const AddNewAssignment = () => {
             id="courses"
             name="courseId"
             value={assignmentData?.courseId}
+            required
             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
               setAssignmentData((prev) => ({
                 ...prev,
@@ -159,7 +151,7 @@ const AddNewAssignment = () => {
 
         <div className="mb-2 block max-w-md">
           <Label className="mb-2 block" htmlFor="assignment-upload">
-            Select Files to Upload
+            Select Assignment File to Upload
           </Label>
           <FileInput
             id="assignment-upload"
@@ -183,6 +175,7 @@ const AddNewAssignment = () => {
             value={assignmentData?.deadline}
             onChange={handleChange}
             required
+            className="max-w-md"
           />
         </div>
 
@@ -217,11 +210,11 @@ const AddNewAssignment = () => {
         </Button>
       </form>
 
-       {toast.isVisible && (
+      {toast.visible && (
         <ToastMessage
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
+          onClose={closeToast}
         />
       )}
     </div>

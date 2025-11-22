@@ -26,17 +26,20 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
   const navigate = useNavigate();
 
   const handleRedirect = (repPath: string, studentPath: string) => {
+     if (window.innerWidth <= 768) {
+      toggleSidebar()
+    }
     navigate(user?.isRep ? repPath : studentPath);
+   
   };
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-50 transform bg-gray-700 shadow-lg transition-transform duration-300 ease-in-out md:transform-none dark:bg-gray-900 ${
-        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      } md:static`}
+      className={`fixed inset-y-0 left-0 z-50 transform bg-gray-700 shadow-lg transition-transform duration-300 ease-in-out md:transform-none dark:bg-gray-900 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:static`}
     >
       <FlowbiteSidebar className="custom-scrollbar-hide h-full overflow-y-auto">
-        <div className="flex items-center justify-between border-b-1 border-gray-700 p-4 dark:border-gray-700">
+        <div className="flex items-center justify-between border-b border-gray-700 p-4 dark:border-gray-700">
           <h1 className="flex flex-wrap text-xl font-bold text-gray-900 dark:text-white">
             {user && user?.name}
           </h1>

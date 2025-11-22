@@ -1,18 +1,28 @@
 import { useEffect, useState } from "react";
 import { isAxiosError } from "axios";
+import { downloadFile } from "../helpers/downloadGoogleDriveFile";
 
 type Service<T, Create = any, Update = any> = {
   list: () => Promise<{ data: T[] }>;
+  getListById?: (id: string) => Promise<{ data: T[] }>;
   add?: (payload: Create) => Promise<any>;
   update?: (id: string, payload: Update) => Promise<any>;
   remove?: (id: string) => Promise<any>;
+  download?: (id: string) => Promise<any>;
 };
 
-export function useCrud<T, Create = any, Update = any>(service: Service<T, Create, Update>) {
+export function useCrud<T, Create = any, Update = any>(
+  service: Service<T, Create, Update>,
+) {
   const [items, setItems] = useState<T[]>([]);
+  const [itemsById, setItemsById] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error"; visible: boolean }>({
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+    visible: boolean;
+  }>({
     message: "",
     type: "error",
     visible: false,
@@ -29,6 +39,28 @@ export function useCrud<T, Create = any, Update = any>(service: Service<T, Creat
     try {
       const res = await service.list();
       setItems(res.data || []);
+    } catch (err) {
+      if (isAxiosError(err)) {
+        setError(err.response?.data?.error || err.message);
+        showToast(err.response?.data?.error || "Error fetching data", "error");
+      } else {
+        setError("Unexpected error");
+        showToast("Unexpected error", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getListById = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    if (!service?.getListById) {
+      throw new Error("List by Id not implemented");
+    }
+    try {
+      const res = await service.getListById(id);
+      setItemsById(res.data || []);
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data?.error || err.message);
@@ -108,9 +140,34 @@ export function useCrud<T, Create = any, Update = any>(service: Service<T, Creat
     }
   };
 
+  const download = async (id: string) => {
+    if (!service.download) throw new Error("download not implemented");
+    setLoading(true);
+
+    try {
+      showToast("Starting file download...", "success");
+      const res = await service.download(id);
+      if (res) {
+        showToast("File download started.", "success");
+        await downloadFile(res);
+      }
+    } catch (err) {
+      if (isAxiosError(err)) {
+        showToast(err.response?.data?.error || "Failed to download", "error");
+      } else {
+        showToast("Failed to download", "error");
+      }
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     items,
     setItems,
+    itemsById,
+    setItemsById,
     loading,
     error,
     toast,
@@ -120,5 +177,7 @@ export function useCrud<T, Create = any, Update = any>(service: Service<T, Creat
     add,
     update,
     remove,
+    download,
+    getListById,
   };
 }

@@ -226,7 +226,7 @@ const Groups = () => {
     }
   };
   return (
-    <div className="flex flex-col gap-6 p-6 font-sans md:p-1">
+    <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Groups Management
       </h1>
@@ -256,19 +256,19 @@ const Groups = () => {
       <div className="flex flex-wrap items-center gap-3">
         <Button
           onClick={() => setModalState((prev) => ({ ...prev, isAdding: true }))}
-          className="w-60"
+          className="w-full md:w-60"
         >
           <MdGroupAdd className="me-2 h-4 w-4" /> Add New Group
         </Button>
 
         <Button
-          className="w-60"
+          className="w-full md:w-60"
           onClick={() => setModalState((prev) => ({ ...prev, doMagic: true }))}
         >
           <FaMagic className="me-2 h-4 w-4" /> Magic Groups
         </Button>
 
-        <div className="flex items-center gap-2">
+        <div className="block items-center gap-2">
           <Label htmlFor="course-filter">Select course to get groups</Label>
           <Select
             id="course-filter"
@@ -306,10 +306,10 @@ const Groups = () => {
             }))
           }
         >
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value={pagination.totalItems}>All</option>
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={pagination?.totalItems}>All</option>
         </Select>
         Entries
       </div>

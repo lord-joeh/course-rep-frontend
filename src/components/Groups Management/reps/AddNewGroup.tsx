@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextInput, Label, Checkbox, Button } from "flowbite-react";
+import { TextInput, Label, Checkbox, Button, Select } from "flowbite-react";
 import { FaMagic } from "react-icons/fa";
 import { addGroup } from "../../../services/groupsService";
 import { isAxiosError } from "axios";
@@ -112,9 +112,9 @@ const AddNewGroup: React.FC<AddNewGroupProps> = ({
           />
         </div>
 
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-2 block items-center gap-2">
           <Label htmlFor="entries">Select course to create group</Label>
-          <select
+          <Select
             id="entries"
             className="rounded text-gray-900 dark:text-white"
             value={formData.courseId}
@@ -130,7 +130,7 @@ const AddNewGroup: React.FC<AddNewGroupProps> = ({
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="mt-4 flex items-center gap-2">
