@@ -24,7 +24,24 @@ export const submitAssignment = async (submissionData: FormData) => {
   return response?.data;
 };
 
-export const getStudentSubmittedAssignment = async (id: string, page: number, limit: number) => {
-  const response = await api.get(`/api/assignments/student/${id}?page=${page}&limit=${limit}`);
+export const getStudentSubmittedAssignment = async (
+  id: string,
+  page: number,
+  limit: number,
+) => {
+  const response = await api.get(
+    `/api/assignments/student/${id}?page=${page}&limit=${limit}`,
+  );
+  return response?.data;
+};
+
+export const getAssignmentDetailsById = async (
+  id: string,
+  page: number,
+  limit: number,
+) => {
+  const response = await api.get(
+    `/api/assignments/${id}?page=${page}&limit=${limit}`,
+  );
   return response?.data;
 };

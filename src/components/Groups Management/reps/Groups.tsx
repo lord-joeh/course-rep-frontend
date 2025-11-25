@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import * as groupService from "../../../services/groupsService";
 import { courses as fetchCoursesList } from "../../../services/courseService";
 import { isAxiosError } from "axios";

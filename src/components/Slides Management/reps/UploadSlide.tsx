@@ -44,6 +44,7 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       const files = Array.from(e.target.files);
       setFormData((prev) => ({ ...prev, files }));
     }
+
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,6 +62,7 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       setLoading(true);
 
       const fd = new FormData();
+
       formData.files.forEach((file) => fd.append("files", file));
 
       fd.append("courseId", formData.courseId);
@@ -84,7 +86,11 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       }
     } finally {
       setLoading(false);
-      setFormData((prev) => ({ ...prev, files: [] }));
+      setFormData({
+        folderId: "",
+        courseId: "",
+        files: []
+      });
     }
   };
 

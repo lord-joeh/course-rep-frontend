@@ -1,12 +1,7 @@
 import api from "../utils/api";
 
 export const uploadSlides = async (formData: FormData) => {
-  const courseId = formData.get("courseId") as string;
-  const folderId = formData.get("folderId") as string;
-  
-  const response = await api.postForm(
-    `/api/slides/upload?courseId=${courseId}&folderId=${folderId}`,
-  );
+  const response = await api.postForm(`/api/slides/upload`, formData);
   return await response?.data;
 };
 

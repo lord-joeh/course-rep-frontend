@@ -281,6 +281,8 @@ export interface SubmittedAssignment {
   id: string;
   assignmentId: string;
   studentId: string;
+  title: string;
+  deadline: string;
   fileId: string;
   fileName: string;
   submittedAt: string;
@@ -293,5 +295,24 @@ export interface SubmittedAssignment {
     Course: {
       name: string;
     };
+  };
+  Course: {
+    name: string;
+  };
+}
+
+export interface AssignmentDetailsInterface extends SubmittedAssignment {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  fileId: string;
+  fileName: string;
+  submittedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  Student: {
+    id: string;
+    name: string;
+    email: string;
   };
 }

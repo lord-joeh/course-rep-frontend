@@ -24,6 +24,7 @@ import Groups  from "../components/Groups Management/students/Group.tsx";
 import SlidePage from "../pages/Slides Page/SlidePage.tsx";
 import AssignmentPage from "../pages/Assignment Page/AssignmentPage.tsx";
 import StudentSubmittedAssignmentPage from "../pages/Assignment Page/StudentSubmittedAssignmentPage.tsx";
+import AssignmentDetailsPage from "../pages/Assignment Page/AssignmentDetailsPage.tsx";
 
 const AppRoute = () => {
   return (
@@ -52,6 +53,7 @@ const AppRoute = () => {
                     <Route path="slides" element={<SlidePage/>} />
                     <Route path="assignments" element={<AssignmentPage/>} />
                     <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage/>} />
+                    <Route path="assignments/:assignmentId/submissions/details" element={<AssignmentDetailsPage/>} />
                   </Route>
 
                   {/* Students */}

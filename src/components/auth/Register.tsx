@@ -26,6 +26,7 @@ const Register = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError("");
+    handleShowPassword
     setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 

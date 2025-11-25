@@ -95,9 +95,12 @@ const Assignments = () => {
                 setLoading(false)
             }
         }
-        if (course_Id.length > 0) {
+
+        if (course_Id?.length > 0) {
             fetchAssignments()
         }
+
+
 
     }, [pagination?.currentPage, pagination?.itemsPerPage, course_Id])
 
@@ -153,7 +156,7 @@ const Assignments = () => {
                 <Select
                     id="courses"
                     name="courseId"
-                    className="w-full md:w-60 justify-center"
+                    className="w-full md:w-auto justify-center"
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                         setCourse_Id(e.target.value)
                         setPagination(prev => ({ ...prev, currentPage: 1 }))
@@ -240,7 +243,7 @@ const Assignments = () => {
                                                 <AiOutlineFolderView
                                                     size={30}
                                                     className="me-2 mt-4 cursor-pointer"
-
+                                                    onClick={() => navigate(`${assignment?.id}/submissions/details`)}
                                                 />
                                             </Tooltip>
                                         )}
