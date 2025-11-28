@@ -1,9 +1,9 @@
 import { Button, Card, Pagination, Spinner, Tooltip } from "flowbite-react"
 import { useEffect, useState } from "react"
-import { MdRefresh } from "react-icons/md"
-import { PaginationType, SubmittedAssignment } from "../../../utils/Interfaces"
+import { MdDeleteForever, MdRefresh } from "react-icons/md"
+import { PaginationType, SubmittedAssignment, ModalState } from "../../../utils/Interfaces"
 import { useSearch } from "../../../hooks/useSearch"
-import { getStudentSubmittedAssignment } from "../../../services/assignmentService"
+import { deleteSubmittedAssignment, getStudentSubmittedAssignment } from "../../../services/assignmentService"
 import { useCrud } from "../../../hooks/useCrud"
 import ToastMessage from "../../common/ToastMessage"
 import { isAxiosError } from "axios"
@@ -13,11 +13,13 @@ import { useNavigate } from "react-router-dom"
 import { FaRegCalendarXmark } from "react-icons/fa6"
 import { FiDownload } from "react-icons/fi"
 import { downloadSlide as downloadSubmittedAssignment } from "../../../services/slidesServices"
+import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue"
 
 
 const StudentSubmittedAssignment = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [submissions, setSubmissions] = useState<SubmittedAssignment[]>([])
+    const [submissionToDelete, setSubmissionToDelete] = useState<SubmittedAssignment>()
     const [loading, setLoading] = useState(false)
     const filteredSubmissions = useSearch<SubmittedAssignment>(submissions, searchQuery)
     const [pagination, setPagination] = useState<PaginationType>({
@@ -26,19 +28,28 @@ const StudentSubmittedAssignment = () => {
         currentPage: 1,
         totalPages: 0
     })
+    const [modalState, setModalState] = useState<ModalState>({
+        isAdding: false,
+        isEditing: false,
+        isDeleting: false,
+        isDeleteDialogueOpen: false,
+        isModalOpen: false,
+        idToDelete: "",
+        itemToDelete: ""
+    })
     const { user } = useAuth()
     const navigate = useNavigate()
 
     const crudServices = {
         list: async () => ({ data: [] as SubmittedAssignment[] }),
-        download: downloadSubmittedAssignment
+        download: downloadSubmittedAssignment,
     }
 
     const {
         toast,
         showToast,
         closeToast,
-        download
+        download,
     } = useCrud<SubmittedAssignment>(crudServices)
 
     const fetchSubmissions = async () => {
@@ -67,6 +78,24 @@ const StudentSubmittedAssignment = () => {
             await download(fileId);
 
         } catch (error) {
+        }
+    };
+
+    const handleFileDelete = async (submission: SubmittedAssignment | undefined) => {
+        setModalState((prev) => ({ ...prev, isDeleting: true }))
+        if (!submission?.id) return showToast("Submission ID missing", "error");
+        try {
+            const response = await deleteSubmittedAssignment(submission);
+            showToast(response?.message || "Submission deleted successfully", "success");
+        } catch (error) {
+            if (isAxiosError(error)) {
+                showToast(error?.response?.data?.message || "Failed deleting submission", "error")
+            } else {
+                showToast("Failed deleting submission", "error")
+            }
+        } finally {
+            setModalState((prev) => ({ ...prev, isDeleting: false, isDeleteDialogueOpen: false }))
+            fetchSubmissions()
         }
     };
 
@@ -114,7 +143,7 @@ const StudentSubmittedAssignment = () => {
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                         {
                             filteredSubmissions.map((submission, idx) => (
-                                <Card key={idx}>
+                                <Card key={idx} >
 
                                     <div className="flex flex-col gap-3 flex-wrap">
                                         <h5 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">{submission?.fileName ?? "Untitled"}</h5>
@@ -134,11 +163,23 @@ const StudentSubmittedAssignment = () => {
                                         </span>
                                     </div>
 
+                                    <div className="flex justify-between ">
 
-                                    <Tooltip content="Download">
-                                        <FiDownload size={30} className="me-2 cursor-pointer"
-                                            onClick={() => handleFileDownload(submission?.fileId)} />
-                                    </Tooltip>
+                                        <Tooltip content="Download">
+                                            <FiDownload size={30} className="me-2 cursor-pointer"
+                                                onClick={() => handleFileDownload(submission?.fileId)} />
+                                        </Tooltip>
+
+                                        <Tooltip content="Delete">
+                                            <MdDeleteForever size={30} color="red" className="me-2 cursor-pointer"
+                                                onClick={() => {
+                                                    setSubmissionToDelete(submission);
+                                                    setModalState((prev) => ({ ...prev, itemToDelete: submission?.fileName, idToDelete: submission?.id, isDeleteDialogueOpen: true }))
+                                                }} />
+                                        </Tooltip>
+                                    </div>
+
+
 
 
 
@@ -172,6 +213,13 @@ const StudentSubmittedAssignment = () => {
                 toast.visible && (
                     <ToastMessage message={toast?.message} type={toast?.type} onClose={closeToast} />
                 )
+            }
+
+            {
+                <DeleteConfirmationDialogue
+                    isDeleting={modalState?.isDeleting} isOpen={modalState?.isDeleteDialogueOpen}
+                    itemToDelete={submissionToDelete?.fileName ?? ""} onClose={() => setModalState((prev) => ({ ...prev, isDeleteDialogueOpen: false }))}
+                    handleDelete={() => handleFileDelete(submissionToDelete)} />
             }
         </div>
     )

@@ -1,4 +1,5 @@
 import api from "../utils/api";
+import type { SubmittedAssignment } from "../utils/Interfaces";
 
 export const uploadNewAssignment = async (formData: FormData) => {
   const response = await api.postForm(`/api/assignments/`, formData);
@@ -42,6 +43,18 @@ export const getAssignmentDetailsById = async (
 ) => {
   const response = await api.get(
     `/api/assignments/${id}?page=${page}&limit=${limit}`,
+  );
+  return response?.data;
+};
+
+export const deleteAssignmentById = async (id: string) => {
+  const response = await api.delete(`/api/assignments/${id}`);
+  return response?.data;
+};
+
+export const deleteSubmittedAssignment = async (data: SubmittedAssignment) => {
+  const response = await api.delete(
+    `/api/assignments/delete/${data?.id}?studentId=${data?.studentId}&assignmentId=${data?.assignmentId}&submittedAt=${data?.submittedAt}`,
   );
   return response?.data;
 };

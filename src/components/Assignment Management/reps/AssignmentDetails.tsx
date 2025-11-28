@@ -3,14 +3,15 @@ import { useEffect, useState } from "react";
 import { FaArrowLeft, FaEdit, FaRegCalendarCheck } from "react-icons/fa"
 import { MdDeleteForever, MdRefresh } from "react-icons/md"
 import { useNavigate, useParams } from "react-router-dom";
-import { AssignmentDetailsInterface, SubmittedAssignment, type PaginationType } from "../../../utils/Interfaces";
+import { AssignmentDetailsInterface, SubmittedAssignment, type ModalState, type PaginationType } from "../../../utils/Interfaces";
 import { useSearch } from "../../../hooks/useSearch";
 import { TbCalendarDue } from "react-icons/tb";
 import { useCrud } from "../../../hooks/useCrud";
-import { getAssignmentDetailsById } from "../../../services/assignmentService";
+import { deleteAssignmentById, getAssignmentDetailsById } from "../../../services/assignmentService";
 import { isAxiosError } from "axios";
 import useAuth from "../../../hooks/useAuth";
 import ToastMessage from "../../common/ToastMessage";
+import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 
 
 const AssignmentDetails = () => {
@@ -26,18 +27,29 @@ const AssignmentDetails = () => {
         currentPage: 1,
         totalPages: 0
     })
+    const [modalState, setModalState] = useState<ModalState>({
+        isAdding: false,
+        isEditing: false,
+        isDeleting: false,
+        isDeleteDialogueOpen: false,
+        isModalOpen: false,
+        idToDelete: "",
+        itemToDelete: ""
+    })
     const params = useParams()
     const assignmentId = params?.assignmentId
     const { user } = useAuth()
 
     const crudServices = {
-        list: async () => ({ data: [] as AssignmentDetailsInterface[] })
+        list: async () => ({ data: [] as AssignmentDetailsInterface[] }),
+        remove: deleteAssignmentById
     }
 
     const {
         showToast,
         closeToast,
-        toast
+        toast,
+        remove
     } = useCrud<AssignmentDetailsInterface>(crudServices)
 
     const fetchAssignmentSubmissions = async () => {
@@ -59,6 +71,20 @@ const AssignmentDetails = () => {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleDelete = async () => {
+        if (!assignmentId) return showToast("Assignment ID not provided", "error")
+        setModalState((prev) => ({ ...prev, isDeleting: true }))
+        try {
+            await remove(assignmentId)
+        } catch (error) { } finally {
+            setModalState((prev) => ({ ...prev, isDeleting: false, isDeleteDialogueOpen: false }))
+        }
+    }
+
+    const handleRefresh = () => {
+        fetchAssignmentSubmissions()
     }
 
     useEffect(() => {
@@ -102,6 +128,7 @@ const AssignmentDetails = () => {
                 <Button
                     className="shrink-0 flex items-center gap-2 px-3 py-2"
                     aria-label="Refresh Submitted Assignments"
+                    onClick={handleRefresh}
                 >
                     <MdRefresh size={18} className="me-1" /> Refresh
                 </Button>
@@ -144,7 +171,7 @@ const AssignmentDetails = () => {
                                 className="cursor-pointer"
 
                             >
-                                <MdDeleteForever size={30} color="red" />{" "}
+                                <MdDeleteForever size={30} color="red" onClick={() => setModalState((prev) => ({ ...prev, itemToDelete: assignmentInfo?.title ?? "", idToDelete: assignmentInfo?.id ?? "", isDeleteDialogueOpen: true }))} />{" "}
                             </span>
                         </Tooltip>
                     </Card>
@@ -226,6 +253,15 @@ const AssignmentDetails = () => {
                     onClose={closeToast}
                 />
             )}
+
+            {
+                <DeleteConfirmationDialogue
+                    isOpen={modalState?.isDeleteDialogueOpen}
+                    itemToDelete={modalState?.itemToDelete}
+                    isDeleting={modalState?.isDeleting}
+                    handleDelete={handleDelete}
+                    onClose={() => setModalState((prev) => ({ ...prev, isDeleteDialogueOpen: false }))} />
+            }
         </div>
     )
 }

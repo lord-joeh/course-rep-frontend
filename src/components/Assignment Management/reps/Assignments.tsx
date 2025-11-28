@@ -222,7 +222,9 @@ const Assignments = () => {
                                                 setAssignmentTrack((prev) => ({ ...prev, folderId: assignment?.submissionFolderID, assignmentId: assignment?.id }))
                                                 setModalState((prev) => ({ ...prev, isModalOpen: true }))
                                             }
+
                                             }
+                                            disabled={new Date().toDateString() < assignment?.deadline}
                                         >
                                             <IoCloudUploadOutline
                                                 size={24}
