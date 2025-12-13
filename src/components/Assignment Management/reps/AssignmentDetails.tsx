@@ -12,6 +12,8 @@ import { isAxiosError } from "axios";
 import useAuth from "../../../hooks/useAuth";
 import ToastMessage from "../../common/ToastMessage";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
+import CommonModal from "../../common/CommonModal";
+import AddNewAssignment from "./AddNewAssignment";
 
 
 const AssignmentDetails = () => {
@@ -160,7 +162,7 @@ const AssignmentDetails = () => {
                         <Tooltip content="Update Assignment Info">
                             <span
                                 className="cursor-pointer"
-
+                                onClick={() => setModalState((prev) => ({ ...prev, isModalOpen: true, isEditing: true }))}
                             >
                                 <FaEdit size={30} color="green" />{" "}
                             </span>
@@ -169,9 +171,9 @@ const AssignmentDetails = () => {
                         <Tooltip content="Delete Assignment and all Data">
                             <span
                                 className="cursor-pointer"
-
+                                onClick={() => setModalState((prev) => ({ ...prev, itemToDelete: assignmentInfo?.title ?? "", idToDelete: assignmentInfo?.id ?? "", isDeleteDialogueOpen: true }))}
                             >
-                                <MdDeleteForever size={30} color="red" onClick={() => setModalState((prev) => ({ ...prev, itemToDelete: assignmentInfo?.title ?? "", idToDelete: assignmentInfo?.id ?? "", isDeleteDialogueOpen: true }))} />{" "}
+                                <MdDeleteForever size={30} color="red" />{" "}
                             </span>
                         </Tooltip>
                     </Card>
@@ -253,6 +255,16 @@ const AssignmentDetails = () => {
                     onClose={closeToast}
                 />
             )}
+
+            {
+                <CommonModal open={modalState?.isModalOpen} onClose={() => setModalState((prev) => ({ ...prev, isModalOpen: false }))} >
+                    <AddNewAssignment
+                        assignment={assignmentInfo as any}
+                        isEditing={modalState?.isEditing || true}
+                        onClose={() => setModalState((prev) => ({ ...prev, isModalOpen: false }))}
+                    />
+                </CommonModal>
+            }
 
             {
                 <DeleteConfirmationDialogue

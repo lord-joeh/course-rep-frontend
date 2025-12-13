@@ -212,7 +212,7 @@ const Slides = () => {
         <Select
           id="courses"
           name="courseId"
-          className="w-full md:w-60 justify-center"
+          className="w-full md:w-auto justify-center"
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             setCurrentCourse(e.target.value);
           }}

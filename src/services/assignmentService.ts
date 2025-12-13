@@ -58,3 +58,11 @@ export const deleteSubmittedAssignment = async (data: SubmittedAssignment) => {
   );
   return response?.data;
 };
+
+export const updateAssignmentDetails = async (
+  id: string,
+  updatedData: FormData,
+) => {
+  const response = await api.putForm(`/api/assignments/${id}`, updatedData);
+  return response?.data;
+};

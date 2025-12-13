@@ -14,7 +14,7 @@ const EventListener = () => {
   const closeToast = () => {
     setToast((prev) => ({ ...prev, isVisible: false }));
   };
-  
+
   const showToast = (message: string, type: "success" | "error") =>
     setToast((prev) => ({ ...prev, message, type, isVisible: true }));
 
@@ -30,7 +30,7 @@ const EventListener = () => {
       showToast("Socket connected", "success");
       console.log("🔌 Socket connected with ID:", socket.id);
     };
-    
+
     const onWorkerStarted = (payload: any) => {
       console.log("🎉 Received workerStarted event:", payload);
       showToast(payload?.message || "Worker started", "success");
@@ -54,26 +54,43 @@ const EventListener = () => {
     socket.on("connect", onConnect);
     socket.on("workerStarted", onWorkerStarted);
     socket.on("test", onTest);
-    socket.on("notification", onNotification)
+    socket.on("notification", onNotification);
+
+    socket.on("jobCompleted", (data: any) => {
+      console.log("Job Completed", data);
+      if (data.fileName) {
+        showToast(`Processing complete for ${data.fileName}`, "success");
+      } else {
+        showToast("Background job completed successfully", "success");
+      }
+    });
+
+    socket.on("jobFailed", (data: any) => {
+      console.error("Job Failed", data);
+      showToast(`Job failed: ${data.error || "Unknown error"}`, "error");
+    });
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("workerStarted", onWorkerStarted);
       socket.off("test", onTest);
-      socket.off("notification", onNotification)
+      socket.off("test", onTest);
+      socket.off("notification", onNotification);
+      socket.off("jobCompleted");
+      socket.off("jobFailed");
       socket.offAny();
     };
   }, [socket]);
 
   return (
     <div>
-    {toast.isVisible && (
-      <ToastMessage
-        message={toast.message}
-        type={toast.type}
-        onClose={closeToast}
-      />
-    )}
+      {toast.isVisible && (
+        <ToastMessage
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
     </div>
   );
 };

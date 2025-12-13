@@ -5,8 +5,9 @@ import {
   Button,
   Spinner,
   Select,
+  Progress,
 } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { uploadSlides } from "../../../services/slidesServices.ts";
 import { isAxiosError } from "axios";
@@ -16,6 +17,7 @@ import {
   ToastInterface,
 } from "../../../utils/Interfaces.ts";
 import ToastMessage from "../../common/ToastMessage.tsx";
+import { useSocket } from "../../../hooks/useSocket.ts";
 
 const UploadSlide = ({ courses, onSuccess }: any) => {
   const [formData, setFormData] = useState<SlideUploadInterface>({
@@ -29,6 +31,55 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
     type: "error",
     isVisible: false,
   });
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("");
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onProgress = (data: any) => {
+      // data: { status: "start"|"progress", current, total, slide, socketId }
+      if (data.status === "start") {
+        setProgress(0);
+        setStatusText(`Starting upload of ${data.total} files...`);
+      } else if (data.status === "progress") {
+        const percent = Math.round((data.current / data.total) * 100);
+        setProgress(percent);
+        setStatusText(`Processing ${data.current} of ${data.total} files...`);
+      }
+    };
+
+    const onComplete = (data: any) => {
+      // data: { successful, failed, failedItems, socketId }
+      setLoading(false);
+      setProgress(100);
+      setStatusText("Upload complete!");
+      if (data.failed > 0) {
+        showToast(`Uploaded ${data.successful} slides. ${data.failed} failed.`, "error");
+      } else {
+        showToast("All slides uploaded successfully", "success");
+      }
+      if (data.successful > 0 && typeof onSuccess === "function") {
+        onSuccess();
+      }
+      // Reset form
+      setFormData({
+        folderId: "",
+        courseId: "",
+        files: []
+      });
+      setTimeout(() => setProgress(0), 3000);
+    };
+
+    socket.on("uploadProgress", onProgress);
+    socket.on("uploadComplete", onComplete);
+
+    return () => {
+      socket.off("uploadProgress", onProgress);
+      socket.off("uploadComplete", onComplete);
+    };
+  }, [socket, onSuccess]);
 
   const showToast = (message: string, type: "error" | "success") => {
     setToast((prev) => ({ ...prev, isVisible: true, message, type }));
@@ -67,15 +118,19 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
 
       fd.append("courseId", formData.courseId);
       if (formData.folderId) fd.append("folderId", formData.folderId);
+      if (socket && socket.id) fd.append("socketId", socket.id);
 
       const response = await uploadSlides(fd);
-      showToast(response.message || "Upload complete", "success");
-      if (response) {
-        if (typeof onSuccess === "function") {
-          onSuccess();
-        }
+      // Response is 202 Accepted. We wait for socket events.
+      // We don't turn off loading here.
+      // showToast(response.message || "Upload started", "success"); 
+      // Actually, let's show a "started" toast? Or just progress.
+      // The socket events will drive the UI.
+      if (!response) {
+        setLoading(false); // In case of weird error
       }
     } catch (err) {
+      setLoading(false);
       if (isAxiosError(err)) {
         showToast(
           err.response?.data?.message || "Error uploading slides",
@@ -84,14 +139,11 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
       } else {
         showToast("Error uploading slides", "error");
       }
-    } finally {
-      setLoading(false);
-      setFormData({
-        folderId: "",
-        courseId: "",
-        files: []
-      });
     }
+    // finally {
+    //   setLoading(false); // Removed: loading logic moved to socket listeners
+    //   setFormData({...}); // Moved to socket listeners
+    // }
   };
 
   const findSlideFolderId = (courseId: string): string => {
@@ -167,7 +219,13 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
           disabled={loading}
         >
           {loading ? (
-            <Spinner />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-center gap-2">
+                <Spinner aria-label="Uploading" />
+                <span className="text-sm">{statusText || "Uploading..."}</span>
+              </div>
+              {progress > 0 && <Progress progress={progress} size="sm" color="blue" />}
+            </div>
           ) : (
             <>
               <IoCloudUploadOutline className="me-2 h-5 w-5" />

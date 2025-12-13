@@ -174,7 +174,7 @@ const Assignments = () => {
                     <Label htmlFor="entries">Show</Label>
                     <Select
                         id="entries"
-                        className="rounded border-none text-gray-900 dark:text-white"
+                        className="rounded border-none text-gray-900 dark:text-white w-auto"
                         value={pagination.itemsPerPage}
                         onChange={(e) =>
                             setPagination((prev) => ({

@@ -1,9 +1,10 @@
-import { FileInput, Label, HelperText, Button, Spinner } from "flowbite-react"
+import { FileInput, Label, HelperText, Button, Spinner, Progress } from "flowbite-react"
 import { IoCloudUploadOutline } from "react-icons/io5"
 import { submitAssignment } from "../../../services/assignmentService"
 import { useCrud } from "../../../hooks/useCrud"
+import { useSocket } from "../../../hooks/useSocket"
 import { AssignmentSubmissionInterface } from "../../../utils/Interfaces"
-import { ChangeEvent } from "react"
+import { ChangeEvent, useState, useEffect } from "react"
 import ToastMessage from "../../common/ToastMessage"
 
 
@@ -21,14 +22,53 @@ const SubmitAssignment = ({ folderId, assignmentId, studentId }: AssignmentSubmi
         closeToast
     } = useCrud<AssignmentSubmissionInterface>(crudServices)
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target)
+    const socket = useSocket();
+    const [processing, setProcessing] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [statusText, setStatusText] = useState("");
 
+    useEffect(() => {
+        if (!socket) return;
+
+        const onProgress = (data: any) => {
+            // Check if this event belongs to us? 
+            // In a real app we might correlate job IDs. 
+            // For now rely on socketId isolation (one client usually does one thing).
+            if (data.status === "start") {
+                setProcessing(true);
+                setProgress(0);
+                setStatusText("Starting submission...");
+            } else if (data.status === "progress") {
+                setProgress(Math.round((data.current / data.total) * 100));
+                setStatusText("Uploading file...");
+            }
+        };
+
+        const onComplete = () => {
+            setProcessing(false);
+            setProgress(100);
+            setStatusText("Submission complete!");
+            // Toast handled by global listener or we can show here too?
+            // Global listener handles jobCompleted.
+        };
+
+        socket.on("uploadProgress", onProgress);
+        socket.on("uploadComplete", onComplete);
+
+        return () => {
+            socket.off("uploadProgress", onProgress);
+            socket.off("uploadComplete", onComplete);
+        };
+    }, [socket]);
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             formData.append("file", e.target.files[0])
             formData.append("folderId", folderId)
             formData.append("assignmentId", assignmentId)
+            formData.append("assignmentId", assignmentId)
             formData.append("studentId", studentId)
+            if (socket && socket.id) formData.append("socketId", socket.id);
         }
         console.log(e.target.files)
     }
@@ -37,6 +77,8 @@ const SubmitAssignment = ({ folderId, assignmentId, studentId }: AssignmentSubmi
         e.preventDefault()
         try {
             await add(formData)
+            setProcessing(true);
+            setStatusText("Queued...");
         } catch (error) { }
     }
 
@@ -75,6 +117,16 @@ const SubmitAssignment = ({ folderId, assignmentId, studentId }: AssignmentSubmi
                         </>
                     )}
                 </Button>
+
+                {processing && (
+                    <div className="mt-4 flex flex-col gap-2 max-w-md place-self-center w-full">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">{statusText}</span>
+                            <span className="text-sm">{progress}%</span>
+                        </div>
+                        <Progress progress={progress} size="sm" color="blue" />
+                    </div>
+                )}
             </form>
 
             {
