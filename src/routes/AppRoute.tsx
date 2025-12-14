@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../context/authContext";
 import { ThemeProvider } from "../context/themeContext";
 import { SocketProvider } from "../context/socketContext";
+import { ProgressProvider } from "../context/ProgressContext";
+import GlobalProgressTracker from "../components/common/GlobalProgressTracker";
 import AppLayout from "../components/Layout/AppLayout";
 import LoginPage from "../pages/Auth Pages/LoginPage";
 import RegisterPage from "../pages/Auth Pages/RegisterPage";
@@ -20,7 +22,7 @@ import StudentFeedbackPage from "../pages/Feedback Page/StudentFeedbackPage";
 import RepGroupPage from "../pages/Groups Page/RepGroupPage";
 import GroupMembersPage from "../pages/Groups Page/GroupMembersPage";
 import EventListener from "../components/common/EventListener";
-import Groups  from "../components/Groups Management/students/Group.tsx";
+import Groups from "../components/Groups Management/students/Group.tsx";
 import SlidePage from "../pages/Slides Page/SlidePage.tsx";
 import AssignmentPage from "../pages/Assignment Page/AssignmentPage.tsx";
 import StudentSubmittedAssignmentPage from "../pages/Assignment Page/StudentSubmittedAssignmentPage.tsx";
@@ -30,8 +32,9 @@ const AppRoute = () => {
   return (
     <BrowserRouter>
       <SocketProvider>
-      <AuthProvider>
-        <ThemeProvider>
+        <ProgressProvider>
+          <AuthProvider>
+            <ThemeProvider>
               <Routes>
                 {/* Public */}
                 <Route path="/" element={<LoginPage />} />
@@ -46,14 +49,14 @@ const AppRoute = () => {
                     <Route path="students/:studentId" element={<StudentDetailsPage />} />
                     <Route path="lecturers" element={<LecturerPage />} />
                     <Route path="events" element={<RepEventPage />} />
-                    <Route path="courses" element={<CourseRepPage/>} />
-                    <Route path="feedbacks" element={<RepFeedbackPage/>} />
-                    <Route path="groups" element={<RepGroupPage/>} />
-                    <Route path="groups/:groupId" element={<GroupMembersPage/>} />
-                    <Route path="slides" element={<SlidePage/>} />
-                    <Route path="assignments" element={<AssignmentPage/>} />
-                    <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage/>} />
-                    <Route path="assignments/:assignmentId/submissions/details" element={<AssignmentDetailsPage/>} />
+                    <Route path="courses" element={<CourseRepPage />} />
+                    <Route path="feedbacks" element={<RepFeedbackPage />} />
+                    <Route path="groups" element={<RepGroupPage />} />
+                    <Route path="groups/:groupId" element={<GroupMembersPage />} />
+                    <Route path="slides" element={<SlidePage />} />
+                    <Route path="assignments" element={<AssignmentPage />} />
+                    <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage />} />
+                    <Route path="assignments/:assignmentId/submissions/details" element={<AssignmentDetailsPage />} />
                   </Route>
 
                   {/* Students */}
@@ -61,16 +64,18 @@ const AppRoute = () => {
                     <Route path="events" element={<RepEventPage />} />
                     <Route path="courses" element={<CourseStudentPage />} />
                     <Route path="feedbacks" element={<StudentFeedbackPage />} />
-                    <Route path="groups" element={<Groups/>} />
-                    <Route path="groups/:groupId" element={<GroupMembersPage/>} />
-                    <Route path="slides" element={<SlidePage/>} />
-                    <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage/>} />
+                    <Route path="groups" element={<Groups />} />
+                    <Route path="groups/:groupId" element={<GroupMembersPage />} />
+                    <Route path="slides" element={<SlidePage />} />
+                    <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage />} />
                   </Route>
                 </Route>
               </Routes>
               <EventListener />
-        </ThemeProvider>
-      </AuthProvider>
+              <GlobalProgressTracker />
+            </ThemeProvider>
+          </AuthProvider>
+        </ProgressProvider>
       </SocketProvider>
     </BrowserRouter>
   );

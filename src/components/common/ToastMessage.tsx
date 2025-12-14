@@ -34,7 +34,7 @@ const ToastMessage = ({ message, type, onClose }: ToastType) => {
     <div className="fixed top-4 right-4 z-50">
       <Toast>
         <div
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${bgColor} ${textColor} ${darkBgColor} ${darkTextColor}`}
+          className={`inline-flex h-8 w-auto shrink-0 items-center justify-center rounded-lg ${bgColor} ${textColor} ${darkBgColor} ${darkTextColor}`}
         >
           {icon}
         </div>

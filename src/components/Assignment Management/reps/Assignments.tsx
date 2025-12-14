@@ -113,6 +113,10 @@ const Assignments = () => {
         }
     };
 
+    const handleRefresh = () => {
+        setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    };
+
     return (
         <div className="flex flex-col gap-5">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{user && user.isRep ? "Assignment Management" : "Assignments"}</h1>
@@ -131,6 +135,7 @@ const Assignments = () => {
                 </div>
 
                 <Button
+                    onClick={handleRefresh}
                     className="shrink-0 flex items-center gap-2 px-3 py-2"
                     aria-label="Refresh Assignment"
                 >

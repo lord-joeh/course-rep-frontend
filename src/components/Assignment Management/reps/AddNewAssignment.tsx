@@ -16,11 +16,15 @@ import {
   Progress,
 } from "flowbite-react";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { uploadNewAssignment, updateAssignmentDetails } from "../../../services/assignmentService";
+import {
+  uploadNewAssignment,
+  updateAssignmentDetails,
+} from "../../../services/assignmentService";
 import ToastMessage from "../../common/ToastMessage";
 import { useCrud } from "../../../hooks/useCrud";
 import { courses as getCourses } from "../../../services/courseService";
 import { useSocket } from "../../../hooks/useSocket";
+import { useJobProgress } from "../../../hooks/useJobProgress";
 
 interface AddNewAssignmentProps {
   assignment?: AssignmentsInterface;
@@ -28,7 +32,11 @@ interface AddNewAssignmentProps {
   isEditing?: boolean;
 }
 
-const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentProps) => {
+const AddNewAssignment = ({
+  assignment,
+  onClose,
+  isEditing,
+}: AddNewAssignmentProps) => {
   const [assignmentData, setAssignmentData] =
     useState<AssignmentCreationInterface>({
       title: "",
@@ -40,8 +48,8 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
   const crudServices = {
     list: getCourses,
     add: uploadNewAssignment,
-    update: updateAssignmentDetails
-  }
+    update: updateAssignmentDetails,
+  };
   const {
     items: courses,
     loading,
@@ -49,57 +57,25 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
     showToast,
     closeToast,
     add,
-    update
-  } = useCrud<CourseInterface>(crudServices)
+    update,
+  } = useCrud<CourseInterface>(crudServices);
 
   const socket = useSocket();
-  const [processing, setProcessing] = useState(false); // Local loading for socket ops
-  const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState("");
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const onProgress = (data: any) => {
-      if (data.status === "start") {
-        setProcessing(true);
-        setProgress(0);
-        setStatusText("Starting upload...");
-      } else if (data.status === "progress") {
-        const percent = data.total ? Math.round((data.current / data.total) * 100) : 0;
-        setProgress(percent);
-        setStatusText("Uploading file...");
-      }
-    };
-
-    const onComplete = (data: any) => {
-      setProcessing(false);
-      setProgress(100);
-      setStatusText("Upload complete!");
-      if (data.successful) {
+  const { isProcessing, progress, statusText, resetJob } = useJobProgress({
+    jobType: "uploadAssignment",
+    title: "Uploading assignment",
+    onComplete: (success) => {
+      if (success) {
         showToast("Assignment added successfully", "success");
         onClose?.();
       }
-      // If failed, jobFailed usually fires.
-    };
+    },
+    onError: (error) => {
+      showToast(error, "error");
+    },
+  });
 
-    const onJobFailed = (data: any) => {
-      if (processing) { // Only if we are waiting
-        setProcessing(false);
-        showToast(data.error || "Upload failed", "error");
-      }
-    }
-
-    socket.on("uploadProgress", onProgress);
-    socket.on("uploadComplete", onComplete);
-    socket.on("jobFailed", onJobFailed);
-
-    return () => {
-      socket.off("uploadProgress", onProgress);
-      socket.off("uploadComplete", onComplete);
-      socket.off("jobFailed", onJobFailed);
-    };
-  }, [socket, processing]);
+  // Job tracking now handled by EventListener + useJobProgress
 
   useEffect(() => {
     if (assignment) {
@@ -146,7 +122,8 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
       transformedFormData.append("description", assignmentData?.description);
       transformedFormData.append("deadline", assignmentData?.deadline);
       transformedFormData.append("courseId", assignmentData?.courseId);
-      if (socket && socket.id) transformedFormData.append("socketId", socket.id);
+      if (socket && socket.id)
+        transformedFormData.append("socketId", socket.id);
 
       if (isEditing) {
         if (!assignment?.id) return showToast("Invalid Assignment ID", "error");
@@ -154,12 +131,11 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
         onClose?.();
       } else {
         await add(transformedFormData);
-        // If file is present, we wait for socket. If no file, it might be instant or also queued (logic in backend says Case 2 isNewAssignment always queued? yes).
-        setProcessing(true);
-        setStatusText("Request queued...");
+        // Job tracking is now handled automatically via EventListener
       }
-
-    } catch (error) { } finally {
+    } catch (error) {
+      resetJob();
+    } finally {
       setAssignmentData({
         title: "",
         deadline: "",
@@ -171,8 +147,14 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
 
   return (
     <div className="container flex flex-col justify-center gap-5 dark:text-white">
-      <h1 className="text-3xl">{isEditing ? "Edit Assignment" : "Upload Assignment"}</h1>
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="container">
+      <h1 className="text-3xl">
+        {isEditing ? "Edit Assignment" : "Upload Assignment"}
+      </h1>
+      <form
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+        className="container"
+      >
         <div className="mb-3 max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="courses">Select Course</Label>
@@ -220,6 +202,7 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
             name="description"
             required
             rows={3}
+            value={assignmentData?.description}
             placeholder="Information about the assignment"
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
               setAssignmentData((prev) => ({
@@ -243,8 +226,8 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
               className="max-w-md"
             />
             <HelperText>
-              Supported Files: pdf, ppt, pptx, docx, doc, jpg, png. Max File Size:
-              10MB
+              Supported Files: pdf, ppt, pptx, docx, doc, jpg, png. Max File
+              Size: 10MB
             </HelperText>
           </div>
         )}
@@ -287,9 +270,9 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
         <Button
           className="mt-4 w-full max-w-md cursor-pointer place-self-center"
           type="submit"
-          disabled={loading}
+          disabled={loading || isProcessing}
         >
-          {loading ? (
+          {loading || isProcessing ? (
             <Spinner />
           ) : (
             <>
@@ -299,8 +282,8 @@ const AddNewAssignment = ({ assignment, onClose, isEditing }: AddNewAssignmentPr
           )}
         </Button>
 
-        {processing && (
-          <div className="mt-4 flex flex-col gap-2 max-w-md place-self-center w-full">
+        {isProcessing && (
+          <div className="mt-4 flex w-full max-w-md flex-col gap-2 place-self-center">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{statusText}</span>
               <span className="text-sm">{progress}%</span>
