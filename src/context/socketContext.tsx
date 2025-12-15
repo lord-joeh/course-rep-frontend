@@ -15,7 +15,11 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     currentToken = token;
 
     if (!socketSingleton) {
-      const url = import.meta.env.VITE_API_URL || (import.meta.env.VITE_ENV === "production" ? "/" : "http://localhost:5000");
+      const url =
+        import.meta.env.VITE_API_URL ||
+        (import.meta.env.VITE_ENV === "production"
+          ? "/"
+          : "http://localhost:5000");
 
       const secure = typeof url === "string" && url.startsWith("https");
       socketSingleton = io(url, {
@@ -70,7 +74,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // Check for token changes every 5 seconds
-    const interval = setInterval(checkTokenChange, 5000);
+    const interval = setInterval(checkTokenChange, 30000);
 
     return () => clearInterval(interval);
   }, []);

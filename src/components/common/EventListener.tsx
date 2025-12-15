@@ -43,6 +43,94 @@ const EventListener = () => {
       console.log("🔔 Received notification event:", payload);
     };
 
+    const onJobStart = (payload: any) => {
+      const id = payload.socketId;
+      if (id && id === socket.id) {
+        console.log("🚀 Job started:", payload);
+        const jobTitle = payload.message
+            ? `${payload?.message}...`
+            : "Starting job...";
+        addProgress(id, jobTitle);
+      }
+    }
+
+    const onJobProgress = (payload: any) => {
+      const id = payload.socketId;
+      if (id && id === socket.id) {
+        console.log("⏳ Job progress:", payload);
+        updateProgress(id, payload.progress || 0, payload.message || "Processing...");
+      }
+    }
+
+    const onEmailSent = (payload: any) => {
+      if (payload.socketId && payload.socketId === socket.id) {
+        console.log("📧 Email sent:", payload);
+        showToast(`Email sent to ${payload?.to ?? payload?.email}`, "success");
+        completeProgress(payload.socketId, true, "Email sent successfully");
+      }
+    }
+    
+    const onSMSSent = (payload: any) => {
+      if (payload.socketId && payload.socketId === socket.id) {
+      console.log("📱 SMS sent:", payload);
+      showToast(`SMS sent to ${payload?.to ?? payload?.phone}`, "success");
+      completeProgress(payload.socketId, true, "SMS sent successfully");
+    }}
+    
+    const onUploadProgress = (payload: any) => {
+      const id = payload.socketId;
+      if (!id || id !== socket.id) return;
+
+      if (payload.status === "start") {
+        addProgress(id, `Uploading ${payload.total} file(s)`);
+      } else if (payload.status === "progress") {
+        const percent = Math.round((payload.current / payload.total) * 100);
+        updateProgress(
+            id,
+            percent,
+            `Processing ${payload.current} of ${payload.total}...`,
+        );
+      }
+    }
+    
+    const onJobComplete = (payload: any) => {
+      console.log("Job Completed", payload);
+      if (
+          payload.socketId &&
+          payload.socketId === socket.id
+      ) {
+        showToast(payload?.message || "Job completed", "success")
+        completeProgress(payload.socketId, true, payload?.message || "Background job finished.");
+      }
+
+
+      if (payload.socketId === socket.id && payload.jobType == "processSlides") {
+        if (payload.fileName) {
+          showToast(
+              `Processing complete for ${payload?.fileName ?? payload?.jobType.split(" ")}`,
+              "success",
+          );
+        } else {
+          showToast("Background job completed successfully", "success");
+        }
+      }
+    }
+    
+    const onUploadComplete = (payload: any) => {
+      const id = payload.socketId;
+      if (id && id === socket.id) {
+        completeProgress(id, true, `Completed: ${payload.successful} sent.`);
+      }    
+    }
+    
+    const onJobFailed = (payload: any) => {
+      if (payload.socketId && payload.socketId === socket.id) {
+        completeProgress(payload.socketId, false, payload.error || "Failed");
+        console.error("Job Failed", payload);
+        showToast(`Job failed: ${payload.error || "Unknown error"}`, "error");
+      }
+    }
+
     // Listen for all events to debug
     socket.onAny((eventName, ...args) => {
       console.log(`📡 Received event: ${eventName}`, args);
@@ -52,121 +140,28 @@ const EventListener = () => {
     socket.on("workerStarted", onWorkerStarted);
     socket.on("test", onTest);
     socket.on("notification", onNotification);
-
-    // Job lifecycle events
-    socket.on("jobStarted", (data: any) => {
-      const id = data.socketId;
-      if (id && id === socket.id) {
-        console.log("🚀 Job started:", data);
-        const jobTitle = data.jobType
-          ? `Starting ${data.jobType}...`
-          : "Starting job...";
-        addProgress(id, jobTitle);
-      }
-    });
-
-    socket.on("jobProgress", (data: any) => {
-      const id = data.socketId;
-      if (id && id === socket.id) {
-        console.log("⏳ Job progress:", data);
-        updateProgress(id, data.progress || 0, data.message || "Processing...");
-      }
-    });
-
-    socket.on("emailSent", (data: any) => {
-      if (data.socketId && data.socketId === socket.id) {
-        console.log("📧 Email sent:", data);
-        showToast(`Email sent to ${data.to}`, "success");
-        completeProgress(data.socketId, true, "Email sent successfully");
-      }
-    });
-
-    socket.on("smsSent", (data: any) => {
-      if (data.socketId && data.socketId === socket.id) {
-        console.log("📱 SMS sent:", data);
-        showToast(`SMS sent to ${data.to}`, "success");
-        completeProgress(data.socketId, true, "SMS sent successfully");
-      }
-    });
-
-    // Handled by global progress tracker now
-    socket.on("uploadProgress", (data: any) => {
-      // data: { status: "start"|"progress", current, total, socketId, socketId }
-      // We use socketId (or a job Id if we had one) as the unique key
-      // Ideally we need a unique operation ID, but using socketId + type is okay for simple single-user ops
-      // Actually, uploadHandlers sends `socketId` in payload.
-      // Let's assume one active upload per user/socket for now, or we can improve ID generation later.
-
-      const id = data.socketId;
-      if (!id || id !== socket.id) return; // Filter by current socketId
-
-      if (data.status === "start") {
-        addProgress(id, `Uploading ${data.total} file(s)`);
-      } else if (data.status === "progress") {
-        const percent = Math.round((data.current / data.total) * 100);
-        updateProgress(
-          id,
-          percent,
-          `Processing ${data.current} of ${data.total}...`,
-        );
-      }
-    });
-
-    socket.on("uploadComplete", (data: any) => {
-      const id = data.socketId;
-      if (id && id === socket.id) {
-        // Filter by current socketId
-        completeProgress(id, true, `Completed: ${data.successful} sent.`);
-      }
-    });
-
-    socket.on("jobCompleted", (data: any) => {
-      // Generic job completion
-      if (
-        data.socketId &&
-        data.socketId === socket.id &&
-        data.jobType !== "processSlides" // ← Fixed: check jobType instead of type
-      ) {
-        // Filter by current socketId
-        // processSlides often happens after upload, we might want to track it too?
-        // If we tracked it, we would need to know its ID.
-        // For now, keep toast for generic jobs, but maybe update progress if it matches?
-        completeProgress(data.socketId, true, "Background job finished.");
-      }
-
-      console.log("Job Completed", data);
-      if (data.socketId === socket.id) {
-        // Filter by current socketId for toast
-        if (data.fileName) {
-          showToast(`Processing complete for ${data.fileName}`, "success");
-        } else {
-          showToast("Background job completed successfully", "success");
-        }
-      }
-    });
-
-    socket.on("jobFailed", (data: any) => {
-      if (data.socketId && data.socketId === socket.id) {
-        // Filter by current socketId
-        completeProgress(data.socketId, false, data.error || "Failed");
-        console.error("Job Failed", data);
-        showToast(`Job failed: ${data.error || "Unknown error"}`, "error");
-      }
-    });
+    socket.on("jobStarted", onJobStart);
+    socket.on("jobProgress", onJobProgress);
+    socket.on("emailSent", onEmailSent);
+    socket.on("smsSent", onSMSSent);
+    socket.on("uploadProgress", onUploadProgress);
+    socket.on("uploadComplete",onUploadComplete);
+    socket.on("jobComplete", onJobComplete);
+    socket.on("jobFailed", onJobFailed);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("workerStarted", onWorkerStarted);
       socket.off("test", onTest);
       socket.off("notification", onNotification);
-      socket.off("jobStarted");
-      socket.off("jobProgress");
-      socket.off("jobCompleted");
-      socket.off("jobFailed");
-      socket.off("uploadProgress");
-      socket.off("uploadComplete");
-      socket.off("emailSent");
-      socket.off("smsSent");
+      socket.off("jobStarted", onJobStart);
+      socket.off("jobProgress", onJobProgress);
+      socket.off("jobComplete", onJobComplete);
+      socket.off("jobFailed", onJobFailed);
+      socket.off("uploadProgress", onUploadProgress);
+      socket.off("uploadComplete", onUploadComplete);
+      socket.off("emailSent", onEmailSent);
+      socket.off("smsSent", onSMSSent);
       socket.offAny();
     };
   }, [socket]);

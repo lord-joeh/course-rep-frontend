@@ -57,8 +57,6 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
     },
   });
 
-  // Note: Job tracking is now handled by EventListener + useJobProgress
-  // No need for duplicate socket listeners here
 
   const showToast = (message: string, type: "error" | "success") => {
     setToast((prev) => ({ ...prev, isVisible: true, message, type }));
@@ -100,8 +98,6 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
 
       const response = await uploadSlides(fd);
 
-      // Job is now tracked via EventListener + GlobalProgressTracker
-      // The inline progress will be updated by useJobProgress hook
       if (!response) {
         setLoading(false);
         showToast("Upload failed to start", "error");

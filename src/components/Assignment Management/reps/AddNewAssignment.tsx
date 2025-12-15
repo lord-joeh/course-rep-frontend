@@ -75,8 +75,6 @@ const AddNewAssignment = ({
     },
   });
 
-  // Job tracking now handled by EventListener + useJobProgress
-
   useEffect(() => {
     if (assignment) {
       setAssignmentData({
@@ -131,7 +129,6 @@ const AddNewAssignment = ({
         onClose?.();
       } else {
         await add(transformedFormData);
-        // Job tracking is now handled automatically via EventListener
       }
     } catch (error) {
       resetJob();

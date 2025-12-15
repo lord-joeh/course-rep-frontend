@@ -44,7 +44,7 @@ const GlobalProgressTracker = () => {
 
     const badge = (jobType && badges[jobType]) || {
       color: "gray",
-      text: "Job",
+      text: "",
     };
     return (
       <Badge color={badge.color as any} size="xs">
@@ -65,7 +65,7 @@ const GlobalProgressTracker = () => {
   };
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex max-h-[80vh] w-80 flex-col gap-2 overflow-y-auto">
+    <div className="fixed right-4 bottom-4 z-50 flex max-h-[80vh] max-w-lg flex-col gap-2 overflow-y-auto">
       {items.map((item) => (
         <Card
           key={item.id}
@@ -91,7 +91,7 @@ const GlobalProgressTracker = () => {
               onClick={() => removeProgress(item.id)}
               className="ml-2 text-gray-400 hover:text-gray-900"
             >
-              <span className="text-xs">✕</span>
+              <span className="text-xl">X</span>
             </button>
           </div>
 
