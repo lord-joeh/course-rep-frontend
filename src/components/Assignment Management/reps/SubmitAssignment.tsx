@@ -4,13 +4,10 @@ import {
   HelperText,
   Button,
   Spinner,
-  Progress,
 } from "flowbite-react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { submitAssignment } from "../../../services/assignmentService";
 import { useCrud } from "../../../hooks/useCrud";
-import { useSocket } from "../../../hooks/useSocket";
-import { useJobProgress } from "../../../hooks/useJobProgress";
 import { AssignmentSubmissionInterface } from "../../../utils/Interfaces";
 import { ChangeEvent, useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
@@ -30,21 +27,6 @@ const SubmitAssignment = ({
   const { loading, add, toast, closeToast } =
     useCrud<AssignmentSubmissionInterface>(crudServices);
 
-  const socket = useSocket();
-  const { isProcessing, progress, statusText, resetJob } = useJobProgress({
-    jobType: "submitAssignment",
-    title: "Submitting assignment",
-    onComplete: (success) => {
-      if (success) {
-        setSelectedFile(null);
-      }
-    },
-    onError: (error) => {
-      console.error("Submission failed:", error);
-    },
-  });
-
-  // Job tracking now handled by EventListener + useJobProgress
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -59,19 +41,15 @@ const SubmitAssignment = ({
       return;
     }
 
-    // Create FormData here, fresh for each submission (fixes singleton bug)
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("folderId", folderId);
     formData.append("assignmentId", assignmentId);
     formData.append("studentId", studentId);
-    if (socket && socket.id) formData.append("socketId", socket.id);
 
     try {
       await add(formData);
-      // Job tracking is now handled automatically via EventListener
     } catch (error) {
-      resetJob();
     }
   };
 
@@ -112,9 +90,9 @@ const SubmitAssignment = ({
         <Button
           className="mt-4 w-full max-w-md cursor-pointer place-self-center"
           type="submit"
-          disabled={loading || isProcessing || !selectedFile}
+          disabled={loading || !selectedFile}
         >
-          {loading || isProcessing ? (
+          {loading ? (
             <Spinner />
           ) : (
             <>
@@ -124,15 +102,6 @@ const SubmitAssignment = ({
           )}
         </Button>
 
-        {isProcessing && (
-          <div className="mt-4 flex w-full max-w-md flex-col gap-2 place-self-center">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{statusText}</span>
-              <span className="text-sm">{progress}%</span>
-            </div>
-            <Progress progress={progress} size="sm" color="blue" />
-          </div>
-        )}
       </form>
 
       {toast.visible && (

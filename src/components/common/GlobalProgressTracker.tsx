@@ -65,7 +65,7 @@ const GlobalProgressTracker = () => {
   };
 
   return (
-    <div className="fixed right-4 bottom-4 z-50 flex max-h-[80vh] max-w-lg flex-col gap-2 overflow-y-auto">
+    <div className="fixed right-4 bottom-4 z-50 flex max-h-[80vh] w-lg flex-col gap-2 overflow-y-auto">
       {items.map((item) => (
         <Card
           key={item.id}

@@ -13,7 +13,6 @@ import {
   Spinner,
   Textarea,
   TextInput,
-  Progress,
 } from "flowbite-react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import {
@@ -23,8 +22,7 @@ import {
 import ToastMessage from "../../common/ToastMessage";
 import { useCrud } from "../../../hooks/useCrud";
 import { courses as getCourses } from "../../../services/courseService";
-import { useSocket } from "../../../hooks/useSocket";
-import { useJobProgress } from "../../../hooks/useJobProgress";
+
 
 interface AddNewAssignmentProps {
   assignment?: AssignmentsInterface;
@@ -59,21 +57,6 @@ const AddNewAssignment = ({
     add,
     update,
   } = useCrud<CourseInterface>(crudServices);
-
-  const socket = useSocket();
-  const { isProcessing, progress, statusText, resetJob } = useJobProgress({
-    jobType: "uploadAssignment",
-    title: "Uploading assignment",
-    onComplete: (success) => {
-      if (success) {
-        showToast("Assignment added successfully", "success");
-        onClose?.();
-      }
-    },
-    onError: (error) => {
-      showToast(error, "error");
-    },
-  });
 
   useEffect(() => {
     if (assignment) {
@@ -120,8 +103,6 @@ const AddNewAssignment = ({
       transformedFormData.append("description", assignmentData?.description);
       transformedFormData.append("deadline", assignmentData?.deadline);
       transformedFormData.append("courseId", assignmentData?.courseId);
-      if (socket && socket.id)
-        transformedFormData.append("socketId", socket.id);
 
       if (isEditing) {
         if (!assignment?.id) return showToast("Invalid Assignment ID", "error");
@@ -131,7 +112,6 @@ const AddNewAssignment = ({
         await add(transformedFormData);
       }
     } catch (error) {
-      resetJob();
     } finally {
       setAssignmentData({
         title: "",
@@ -267,9 +247,9 @@ const AddNewAssignment = ({
         <Button
           className="mt-4 w-full max-w-md cursor-pointer place-self-center"
           type="submit"
-          disabled={loading || isProcessing}
+          disabled={loading}
         >
-          {loading || isProcessing ? (
+          {loading ? (
             <Spinner />
           ) : (
             <>
@@ -279,15 +259,6 @@ const AddNewAssignment = ({
           )}
         </Button>
 
-        {isProcessing && (
-          <div className="mt-4 flex w-full max-w-md flex-col gap-2 place-self-center">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">{statusText}</span>
-              <span className="text-sm">{progress}%</span>
-            </div>
-            <Progress progress={progress} size="sm" color="blue" />
-          </div>
-        )}
       </form>
 
       {toast.visible && (

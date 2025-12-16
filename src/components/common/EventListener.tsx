@@ -48,19 +48,23 @@ const EventListener = () => {
       if (id && id === socket.id) {
         console.log("🚀 Job started:", payload);
         const jobTitle = payload.message
-            ? `${payload?.message}...`
-            : "Starting job...";
+          ? `${payload?.message}...`
+          : "Starting job...";
         addProgress(id, jobTitle);
       }
-    }
+    };
 
     const onJobProgress = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
         console.log("⏳ Job progress:", payload);
-        updateProgress(id, payload.progress || 0, payload.message || "Processing...");
+        updateProgress(
+          id,
+          payload.progress || 0,
+          payload.message || "Processing...",
+        );
       }
-    }
+    };
 
     const onEmailSent = (payload: any) => {
       if (payload.socketId && payload.socketId === socket.id) {
@@ -68,15 +72,16 @@ const EventListener = () => {
         showToast(`Email sent to ${payload?.to ?? payload?.email}`, "success");
         completeProgress(payload.socketId, true, "Email sent successfully");
       }
-    }
-    
+    };
+
     const onSMSSent = (payload: any) => {
       if (payload.socketId && payload.socketId === socket.id) {
-      console.log("📱 SMS sent:", payload);
-      showToast(`SMS sent to ${payload?.to ?? payload?.phone}`, "success");
-      completeProgress(payload.socketId, true, "SMS sent successfully");
-    }}
-    
+        console.log("📱 SMS sent:", payload);
+        showToast(`SMS sent to ${payload?.to ?? payload?.phone}`, "success");
+        completeProgress(payload.socketId, true, "SMS sent successfully");
+      }
+    };
+
     const onUploadProgress = (payload: any) => {
       const id = payload.socketId;
       if (!id || id !== socket.id) return;
@@ -86,50 +91,53 @@ const EventListener = () => {
       } else if (payload.status === "progress") {
         const percent = Math.round((payload.current / payload.total) * 100);
         updateProgress(
-            id,
-            percent,
-            `Processing ${payload.current} of ${payload.total}...`,
+          id,
+          percent,
+          `Processing ${payload.current} of ${payload.total}...`,
         );
       }
-    }
-    
+    };
+
     const onJobComplete = (payload: any) => {
       console.log("Job Completed", payload);
-      if (
-          payload.socketId &&
-          payload.socketId === socket.id
-      ) {
-        showToast(payload?.message || "Job completed", "success")
-        completeProgress(payload.socketId, true, payload?.message || "Background job finished.");
+      if (payload.socketId && payload.socketId === socket.id) {
+        showToast(payload?.message || "Job completed", "success");
+        completeProgress(
+          payload.socketId,
+          true,
+          payload?.message || "Background job finished.",
+        );
       }
 
-
-      if (payload.socketId === socket.id && payload.jobType == "processSlides") {
+      if (
+        payload.socketId === socket.id &&
+        payload.jobType == "processSlides"
+      ) {
         if (payload.fileName) {
           showToast(
-              `Processing complete for ${payload?.fileName ?? payload?.jobType.split(" ")}`,
-              "success",
+            `Processing complete for ${payload?.fileName ?? payload?.jobType}`,
+            "success",
           );
         } else {
           showToast("Background job completed successfully", "success");
         }
       }
-    }
-    
+    };
+
     const onUploadComplete = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
         completeProgress(id, true, `Completed: ${payload.successful} sent.`);
-      }    
-    }
-    
+      }
+    };
+
     const onJobFailed = (payload: any) => {
       if (payload.socketId && payload.socketId === socket.id) {
         completeProgress(payload.socketId, false, payload.error || "Failed");
         console.error("Job Failed", payload);
         showToast(`Job failed: ${payload.error || "Unknown error"}`, "error");
       }
-    }
+    };
 
     // Listen for all events to debug
     socket.onAny((eventName, ...args) => {
@@ -145,7 +153,7 @@ const EventListener = () => {
     socket.on("emailSent", onEmailSent);
     socket.on("smsSent", onSMSSent);
     socket.on("uploadProgress", onUploadProgress);
-    socket.on("uploadComplete",onUploadComplete);
+    socket.on("uploadComplete", onUploadComplete);
     socket.on("jobComplete", onJobComplete);
     socket.on("jobFailed", onJobFailed);
 
