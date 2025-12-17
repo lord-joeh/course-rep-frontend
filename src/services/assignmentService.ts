@@ -63,6 +63,6 @@ export const updateAssignmentDetails = async (
   id: string,
   updatedData: FormData,
 ) => {
-  const response = await api.putForm(`/api/assignments/${id}`, updatedData);
+  const response = await api.put(`/api/assignments/${id}`, updatedData);
   return response?.data;
 };

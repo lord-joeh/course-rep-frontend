@@ -23,7 +23,6 @@ import ToastMessage from "../../common/ToastMessage";
 import { useCrud } from "../../../hooks/useCrud";
 import { courses as getCourses } from "../../../services/courseService";
 
-
 interface AddNewAssignmentProps {
   assignment?: AssignmentsInterface;
   onClose?: () => void;
@@ -209,13 +208,6 @@ const AddNewAssignment = ({
           </div>
         )}
 
-        {isEditing && assignment?.fileName && (
-          <div className="mb-2 max-w-md">
-            <Label className="mb-2 block">Current File</Label>
-            <div className="text-sm">{assignment.fileName}</div>
-          </div>
-        )}
-
         <div className="mt-2 mb-2 block max-w-md">
           <Label htmlFor="assignment-deadline">Due Date</Label>
           <TextInput
@@ -258,7 +250,6 @@ const AddNewAssignment = ({
             </>
           )}
         </Button>
-
       </form>
 
       {toast.visible && (

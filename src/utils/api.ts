@@ -11,7 +11,7 @@ const api = axios.create({
   },
   decompress: true,
 });
-console.log("API Base URL:", import.meta.env.VITE_API_URL);
+
 const authRoutes = [
   "/api/auth/login",
   "/api/students/register",

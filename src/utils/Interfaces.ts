@@ -316,3 +316,11 @@ export interface AssignmentDetailsInterface extends SubmittedAssignment {
     email: string;
   };
 }
+
+export interface AddNewAttendanceInstanceInterface {
+  courseId: string;
+  date: string;
+  classType: "in-person" | "online";
+  latitude?: number;
+   longitude?: number;
+}
