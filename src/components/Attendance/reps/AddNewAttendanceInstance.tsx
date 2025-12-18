@@ -15,7 +15,6 @@ import {
 } from "../../../utils/Interfaces";
 import { addAttendanceInstance } from "../../../services/attendanceService";
 import { useCrud } from "../../../hooks/useCrud";
-import { isAxiosError } from "axios";
 import { FaSearchLocation } from "react-icons/fa";
 interface Props {
   courses: Course[];
