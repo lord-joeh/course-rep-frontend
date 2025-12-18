@@ -181,7 +181,6 @@ const Course = () => {
         await add(courseData);
       }
     } catch (err) {
-      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -209,7 +208,6 @@ const Course = () => {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
       await remove(id);
     } catch (err) {
-      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,

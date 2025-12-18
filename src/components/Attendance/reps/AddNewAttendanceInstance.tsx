@@ -1,4 +1,11 @@
-import { Button, Label, Radio, Select, TextInput } from "flowbite-react";
+import {
+  Button,
+  Label,
+  Radio,
+  Select,
+  Spinner,
+  TextInput,
+} from "flowbite-react";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { MdBookmarkAdd } from "react-icons/md";
 import { RiUserLocationFill } from "react-icons/ri";
@@ -10,16 +17,19 @@ import { addAttendanceInstance } from "../../../services/attendanceService";
 import { useCrud } from "../../../hooks/useCrud";
 import { isAxiosError } from "axios";
 import { FaSearchLocation } from "react-icons/fa";
+interface Props {
+  courses: Course[];
+  onSuccess?: () => void;
+}
 
-const AddNewAttendanceInstance = (courses: Course[]) => {
-  const [location, setLocation] = useState<{ lat: number; lon: number } | null>(
-    null,
-  );
+const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
   const [instanceData, setInstanceData] =
     useState<AddNewAttendanceInstanceInterface>({
-      courseId: "IT 323",
+      courseId: "",
       date: new Date().toISOString().split("T")[0],
       classType: "in-person",
+      latitude: 0,
+      longitude: 0,
     });
   const crudServices = {
     list: async () => {
@@ -28,7 +38,7 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
     add: addAttendanceInstance,
   };
 
-  const { add, showToast } =
+  const { add, showToast, loading } =
     useCrud<AddNewAttendanceInstanceInterface>(crudServices);
 
   const handleTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -56,24 +66,9 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
     }
 
     try {
-      const response = await add(instanceData);
-      if (response) {
-        showToast(
-          response.message || "Attendance instance created successfully.",
-          "success",
-        );
-      }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        showToast(
-          error.response?.data?.message ||
-            "An error occurred while creating the attendance instance.",
-          "error",
-        );
-      } else {
-        showToast("An unexpected error occurred.", "error");
-      }
-    }
+      await add(instanceData);
+      onSuccess?.();
+    } catch (error) {}
   };
 
   const getLocation = useCallback(() => {
@@ -84,10 +79,11 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLocation({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-        });
+        setInstanceData((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
       },
       (error) => {
         showToast(error?.message || "Error obtaining location", "error");
@@ -118,11 +114,6 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
 
   useEffect(() => {
     getLocationPermission();
-    setInstanceData((prev) => ({
-      ...prev,
-      latitude: location?.lat,
-      longitude: location?.lon,
-    }));
   }, [getLocationPermission]);
 
   return (
@@ -140,15 +131,27 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
             Course
           </Label>
 
-          <Select id="course" name="courseId" defaultValue="">
+          <Select
+            id="course"
+            name="courseId"
+            defaultValue=""
+            required
+            value={instanceData.courseId}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              setInstanceData((prev) => ({
+                ...prev,
+                courseId: e.target.value,
+              }))
+            }
+          >
             <option value="" disabled>
               Select Course
             </option>
-            {/* {courses?.map((course) => (
+            {courses?.map((course: Course) => (
               <option key={course?.id} value={course?.id}>
                 {course?.name}
               </option>
-            ))} */}
+            ))}
           </Select>
         </div>
 
@@ -210,14 +213,15 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
           </small>
         </span>
 
-        {location ? (
+        {instanceData?.latitude && instanceData?.longitude ? (
           <div className="text-white-600 flex text-sm">
             <span>
               <RiUserLocationFill size={24} color="red" className="me-2" />
             </span>
             <span>
               {" "}
-              Latitude: {location.lat}, Longitude: {location.lon}
+              Latitude: {instanceData.latitude}, Longitude:{" "}
+              {instanceData.longitude}
             </span>
           </div>
         ) : (
@@ -234,7 +238,8 @@ const AddNewAttendanceInstance = (courses: Course[]) => {
           </div>
         )}
 
-        <Button type="submit" className="cursor-pointer">
+        <Button type="submit" className="cursor-pointer" disabled={loading}>
+          {loading && <Spinner size="lg" />}
           <MdBookmarkAdd size={24} className="me-2" />
           Create Attendance Instance{" "}
         </Button>

@@ -320,7 +320,29 @@ export interface AssignmentDetailsInterface extends SubmittedAssignment {
 export interface AddNewAttendanceInstanceInterface {
   courseId: string;
   date: string;
-  classType: "in-person" | "online";
+  classType: "in-person" | "online" | "";
   latitude?: number;
-   longitude?: number;
+  longitude?: number;
+}
+
+export interface AttendanceInstanceInterface {
+  id: string;
+  courseId: string;
+  date: string;
+  qr_image: string;
+  qr_token: string;
+  expires_at: string;
+  class_type: "in-person" | "online" | "";
+  latitude?: number;
+  longitude?: number;
+  createdAt: string;
+  is_closed: boolean;
+}
+
+export interface AttendanceFilterInterface {
+  page: number;
+  limit: number;
+  courseId: string;
+  date: string;
+  class_type: "in-person" | "online" | "";
 }

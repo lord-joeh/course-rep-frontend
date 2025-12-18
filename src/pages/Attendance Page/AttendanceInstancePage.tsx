@@ -1,11 +1,11 @@
-import AddNewAttendanceInstance from "../../components/Attendance/reps/AddNewAttendanceInstance";
+import AttendanceInstances from "../../components/Attendance/reps/AttendanceInstances";
 
 const AttendanceInstancePage = () => {
-     return (
+  return (
     <div className="container min-h-screen text-gray-900 dark:text-white">
-      <AddNewAttendanceInstance />
+      <AttendanceInstances />
     </div>
   );
-}
+};
 
-export default AttendanceInstancePage
+export default AttendanceInstancePage;
