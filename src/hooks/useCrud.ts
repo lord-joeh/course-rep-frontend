@@ -61,6 +61,7 @@ export function useCrud<T, Create = any, Update = any>(
     try {
       const res = await service.getListById(id);
       setItemsById(res.data || []);
+      return res
     } catch (err) {
       if (isAxiosError(err)) {
         setError(err.response?.data?.error || err.message);
@@ -169,6 +170,7 @@ export function useCrud<T, Create = any, Update = any>(
     itemsById,
     setItemsById,
     loading,
+    setLoading,
     error,
     toast,
     showToast,

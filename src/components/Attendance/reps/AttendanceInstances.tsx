@@ -14,7 +14,7 @@ import {
   TextInput,
   Tooltip,
 } from "flowbite-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { MdBookmarkAdd, MdDeleteForever, MdRefresh } from "react-icons/md";
 import {
   AttendanceFilterInterface,
@@ -37,6 +37,10 @@ import AddNewAttendanceInstance from "./AddNewAttendanceInstance";
 import { BsQrCodeScan } from "react-icons/bs";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import ViewQRCodeModal from "./ViewQRCode";
+import { useNavigate } from "react-router-dom";
+import { GrView } from "react-icons/gr";
+import ToastMessage from "../../common/ToastMessage";
+
 const AttendanceInstances = () => {
   const [attendanceInstances, setAttendanceInstances] = useState<
     AttendanceInstanceInterface[]
@@ -80,6 +84,7 @@ const AttendanceInstances = () => {
     idToDelete: "",
     isAdding: false,
   });
+  const navigate = useNavigate();
 
   const filterParams: AttendanceFilterInterface = {
     page: Number(pagination.currentPage),
@@ -99,11 +104,13 @@ const AttendanceInstances = () => {
     showToast,
     loading: isLoading,
     remove,
+    toast,
+    closeToast,
   } = useCrud<Course>(crudServices);
 
   const getCourseName = (courseId: string) => {
     const course = courses.find((c) => c.id === courseId);
-    return course ? course.name : "Unknown Course";
+    return course ? course.name : "";
   };
 
   const clearFilters = () => {
@@ -245,7 +252,7 @@ const AttendanceInstances = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search Instances..."
             aria-label="Search Instances"
-            className="glow-on-focus w-[98%] pr-10"
+            className="glow-on-focus min-w-[98%] pr-2"
           />
         </div>
 
@@ -281,7 +288,7 @@ const AttendanceInstances = () => {
                 setPagination((prev) => ({
                   ...prev,
                   itemsPerPage: Number(e.target.value),
-                  currentPage: 1, // Reset to first page on items per page change
+                  currentPage: 1,
                 }))
               }
               className="w-full"
@@ -363,7 +370,7 @@ const AttendanceInstances = () => {
 
       <h2 className="text-2xl font-semibold tracking-normal">Instances</h2>
       <div className="overflow-x-auto rounded-lg shadow-md">
-        <Table striped hoverable>
+        <Table striped>
           <TableHead>
             <TableRow>
               {instanceTableHeaders.map((head, idx) => (
@@ -411,14 +418,14 @@ const AttendanceInstances = () => {
                   </TableCell>
                   <TableCell>
                     {instance.is_close ? (
-                      <span className="rounded-full bg-red-100 px-2 py-1 text-sm font-semibold text-red-800">
+                      <span className="cursor-not-allowed rounded-full bg-red-100 px-2 py-1 text-sm font-semibold text-red-800">
                         Closed
                       </span>
                     ) : (
                       <Tooltip content="Close attendance">
                         <Button
                           size="sm"
-                          className="cursor-pointer bg-emerald-500"
+                          className="cursor-pointer bg-emerald-500 text-white hover:bg-emerald-600 dark:bg-emerald-600 dark:text-gray-200 dark:hover:bg-emerald-700"
                           onClick={() => handleCloseAttendance(instance.id)}
                           disabled={closingInstanceId === instance.id}
                         >
@@ -470,6 +477,23 @@ const AttendanceInstances = () => {
                           }
                         >
                           <MdDeleteForever size={24} />
+                        </span>
+                      </Tooltip>
+
+                      <Tooltip content="Manage Attendance">
+                        <span
+                          className="cursor-pointer text-green-600 hover:text-green-800"
+                          onClick={() => {
+                            navigate(`${instance.id}`, {
+                              state: {
+                                imageUrl: instance?.qr_image ?? "",
+                                course_Id: instance?.courseId,
+                                date: instance?.date,
+                              },
+                            });
+                          }}
+                        >
+                          <GrView size={24} />
                         </span>
                       </Tooltip>
                     </div>
@@ -526,6 +550,14 @@ const AttendanceInstances = () => {
         itemToDelete={modalState?.itemToDelete}
         isDeleting={modalState.isDeleting}
       />
+
+      {toast && (
+        <ToastMessage
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
     </div>
   );
 };

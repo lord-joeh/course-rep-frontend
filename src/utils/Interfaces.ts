@@ -346,3 +346,17 @@ export interface AttendanceFilterInterface {
   date: string;
   class_type: "in-person" | "online" | "";
 }
+
+export interface AttendanceRecordInterface {
+  id: string;
+  instanceId: string;
+  courseId: string;
+  date: string;
+  studentId: string;
+  status: "absent" | "present";
+  createdAt: string;
+  updatedAt: string;
+  Student: {
+    name: string;
+  };
+}

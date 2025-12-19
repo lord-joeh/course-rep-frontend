@@ -16,6 +16,7 @@ import {
 import { addAttendanceInstance } from "../../../services/attendanceService";
 import { useCrud } from "../../../hooks/useCrud";
 import { FaSearchLocation } from "react-icons/fa";
+import ToastMessage from "../../common/ToastMessage";
 interface Props {
   courses: Course[];
   onSuccess?: () => void;
@@ -37,7 +38,7 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
     add: addAttendanceInstance,
   };
 
-  const { add, showToast, loading } =
+  const { add, showToast, loading, toast, closeToast } =
     useCrud<AddNewAttendanceInstanceInterface>(crudServices);
 
   const handleTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -243,6 +244,14 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
           Create Attendance Instance{" "}
         </Button>
       </form>
+
+      {toast && (
+        <ToastMessage
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
+      )}
     </div>
   );
 };

@@ -28,6 +28,7 @@ import AssignmentPage from "../pages/Assignment Page/AssignmentPage.tsx";
 import StudentSubmittedAssignmentPage from "../pages/Assignment Page/StudentSubmittedAssignmentPage.tsx";
 import AssignmentDetailsPage from "../pages/Assignment Page/AssignmentDetailsPage.tsx";
 import AttendanceInstancePage from "../pages/Attendance Page/AttendanceInstancePage.tsx";
+import AttendancePage from "../pages/Attendance Page/AttendancePage.tsx";
 
 const AppRoute = () => {
   return (
@@ -59,6 +60,7 @@ const AppRoute = () => {
                     <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage />} />
                     <Route path="assignments/:assignmentId/submissions/details" element={<AssignmentDetailsPage />} />
                     <Route path="attendance" element={<AttendanceInstancePage />} />
+                    <Route path="attendance/:instanceId" element={<AttendancePage />} />
                   </Route>
 
                   {/* Students */}
