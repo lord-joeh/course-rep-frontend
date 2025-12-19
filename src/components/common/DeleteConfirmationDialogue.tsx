@@ -12,7 +12,7 @@ export const DeleteConfirmationDialogue = ({
 }: DeleteType) => {
   return (
     <>
-      <Modal show={isOpen} size="lg" onClose={onClose} popup>
+      <Modal show={isOpen} size="lg" onClose={onClose} popup dismissible position="center">
         <ModalHeader />
         <ModalBody>
           <div className="text-center">

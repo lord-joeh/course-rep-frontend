@@ -336,7 +336,7 @@ export interface AttendanceInstanceInterface {
   latitude?: number;
   longitude?: number;
   createdAt: string;
-  is_closed: boolean;
+  is_close: boolean;
 }
 
 export interface AttendanceFilterInterface {

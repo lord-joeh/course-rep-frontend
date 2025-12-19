@@ -127,6 +127,7 @@ const EventListener = () => {
     const onUploadComplete = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
+        showToast(`Upload complete: ${payload.successful} of ${payload.total}`, "success");
         completeProgress(id, true, `Completed: ${payload.successful} sent.`);
       }
     };
@@ -135,7 +136,7 @@ const EventListener = () => {
       if (payload.socketId && payload.socketId === socket.id) {
         completeProgress(payload.socketId, false, payload.error || "Failed");
         console.error("Job Failed", payload);
-        showToast(`Job failed: ${payload.error || "Unknown error"}`, "error");
+        showToast(`${payload.error || "Unknown error"}`, "error");
       }
     };
 

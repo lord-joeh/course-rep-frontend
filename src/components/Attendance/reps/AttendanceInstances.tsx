@@ -14,7 +14,7 @@ import {
   TextInput,
   Tooltip,
 } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdBookmarkAdd, MdDeleteForever, MdRefresh } from "react-icons/md";
 import {
   AttendanceFilterInterface,
@@ -28,14 +28,15 @@ import { useCrud } from "../../../hooks/useCrud";
 import {
   deleteAttendanceInstance,
   getAttendanceInstances,
+  closeAttendanceInstance,
 } from "../../../services/attendanceService";
 import { isAxiosError } from "axios";
 import { useSearch } from "../../../hooks/useSearch";
 import CommonModal from "../../common/CommonModal";
 import AddNewAttendanceInstance from "./AddNewAttendanceInstance";
-import { BsDownload, BsQrCodeScan } from "react-icons/bs";
+import { BsQrCodeScan } from "react-icons/bs";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
-
+import ViewQRCodeModal from "./ViewQRCode";
 const AttendanceInstances = () => {
   const [attendanceInstances, setAttendanceInstances] = useState<
     AttendanceInstanceInterface[]
@@ -45,20 +46,26 @@ const AttendanceInstances = () => {
   const [courseId, setCourseId] = useState("");
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [closingInstanceId, setClosingInstanceId] = useState<string | null>(
+    null,
+  );
   const [pagination, setPagination] = useState<PaginationType>({
     currentPage: 1,
     itemsPerPage: 5,
     totalItems: 0,
     totalPages: 0,
   });
+
   const filteredInstances = useSearch<AttendanceInstanceInterface>(
     attendanceInstances,
     searchQuery,
   );
+
   const [viewQRCode, setViewQRCode] = useState<{
     open: boolean;
     imageUrl: string;
     course_Id?: string;
+    date?: string;
   }>({
     open: false,
     imageUrl: "",
@@ -82,6 +89,18 @@ const AttendanceInstances = () => {
     class_type: classType as "in-person" | "online" | "",
   };
 
+  const crudServices = {
+    list: getCourses,
+    remove: deleteAttendanceInstance,
+  };
+
+  const {
+    items: courses,
+    showToast,
+    loading: isLoading,
+    remove,
+  } = useCrud<Course>(crudServices);
+
   const getCourseName = (courseId: string) => {
     const course = courses.find((c) => c.id === courseId);
     return course ? course.name : "Unknown Course";
@@ -91,23 +110,12 @@ const AttendanceInstances = () => {
     setClassType("");
     setCourseId("");
     setDate("");
-  };
-
-  const crudServices = {
-    list: getCourses,
-    remove: deleteAttendanceInstance,
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
   const onPageChange = (pageNumber: number) => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
-
-  const {
-    items: courses,
-    showToast,
-    loading: isLoading,
-    remove,
-  } = useCrud<Course>(crudServices);
 
   const fetchInstances = async () => {
     try {
@@ -138,8 +146,26 @@ const AttendanceInstances = () => {
   const handleInstanceDelete = async (id: string) => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
-      await remove(id);
+      const response = await remove(id);
+      console.log("Del", response.data);
+      if (response) {
+        showToast(
+          response?.data?.message ||
+            response?.message ||
+            "Deleted successfully.",
+          "success",
+        );
+        await fetchInstances();
+      }
     } catch (error) {
+      if (isAxiosError(error)) {
+        showToast(
+          error?.response?.data?.message || "Failed to delete instance.",
+          "error",
+        );
+      } else {
+        showToast("An unexpected error occurred.", "error");
+      }
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -149,54 +175,60 @@ const AttendanceInstances = () => {
     }
   };
 
+  const handleCloseAttendance = async (id: string) => {
+    try {
+      setClosingInstanceId(id);
+      const response = await closeAttendanceInstance(id);
+      if (response) {
+        showToast(
+          response?.message || "Attendance instance closed successfully.",
+          "success",
+        );
+        await fetchInstances();
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        showToast(
+          error?.response?.data?.error ||
+            error?.response?.data?.message ||
+            "Failed to update attendance status.",
+          "error",
+        );
+      } else {
+        showToast("Failed to update attendance status.", "error");
+      }
+    } finally {
+      setClosingInstanceId(null);
+    }
+  };
+
+  const calculateTimeRemaining = (expiresAt: string) => {
+    const expiryTime = new Date(expiresAt).getTime();
+    const currentTime = new Date().getTime();
+
+    if (expiryTime > currentTime) {
+      const minutesRemaining = Math.ceil(
+        (expiryTime - currentTime) / (1000 * 60),
+      );
+      return `${minutesRemaining} mins`;
+    }
+    return "Expired";
+  };
+
   useEffect(() => {
     fetchInstances();
-  }, []);
+  }, [filterParams?.limit, filterParams?.page]);
 
   const instanceTableHeaders = [
     "#",
     "Course",
     "Date",
     "Class Type",
-    "status",
+    "Status",
     "Created At",
     "Expires In",
     "Actions",
   ];
-
-  const ViewQRCodeModal = () => {
-    return (
-      <div className="flex flex-col justify-center">
-        <Card imgSrc={viewQRCode.imageUrl} imgAlt="QR Code">
-          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {`${getCourseName(viewQRCode.course_Id || "")} ATTENDANCE `}
-          </h5>
-          <p className="font-normal text-gray-700 dark:text-gray-400">
-            Scan this QR code to mark your attendance for the Class.
-          </p>
-
-          <p className="font-normal">{new Date().toDateString()}</p>
-        </Card>
-
-        <div className="mt-4 flex justify-center">
-          <Button
-            className="w-full cursor-pointer text-xl"
-            onClick={() => {
-              const link = document.createElement("a");
-              link.href = viewQRCode.imageUrl;
-              link.download = `${getCourseName(viewQRCode?.course_Id ?? "")} ${new Date().toDateString()} Attendance qr-code.png`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
-          >
-            <BsDownload size={24} className="me-2" />
-            Download
-          </Button>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="container flex flex-col gap-6">
@@ -249,6 +281,7 @@ const AttendanceInstances = () => {
                 setPagination((prev) => ({
                   ...prev,
                   itemsPerPage: Number(e.target.value),
+                  currentPage: 1, // Reset to first page on items per page change
                 }))
               }
               className="w-full"
@@ -269,7 +302,6 @@ const AttendanceInstances = () => {
               id="classType"
               name="classType"
               value={classType}
-              defaultValue=""
               onChange={(e) => setClassType(e.target.value)}
               className="w-full"
             >
@@ -320,6 +352,7 @@ const AttendanceInstances = () => {
           </Button>
           <Button
             onClick={() => {
+              setPagination((prev) => ({ ...prev, currentPage: 1 }));
               fetchInstances();
             }}
           >
@@ -346,7 +379,7 @@ const AttendanceInstances = () => {
                   colSpan={instanceTableHeaders.length}
                   className="text-center"
                 >
-                  <Spinner size="lg" className="me-4 animate-spin" />{" "}
+                  <Spinner size="lg" className="me-4 animate-spin" />
                 </TableCell>
               </TableRow>
             ) : filteredInstances?.length < 1 ? (
@@ -373,34 +406,50 @@ const AttendanceInstances = () => {
                   <TableCell>
                     {new Date(instance.date).toDateString()}
                   </TableCell>
-                  <TableCell>{instance.class_type}</TableCell>
+                  <TableCell className="capitalize">
+                    {instance.class_type}
+                  </TableCell>
                   <TableCell>
-                    {!instance.is_closed &&
-                    new Date(instance.expires_at).getTime()! >
-                      new Date().getTime()
-                      ? "Active"
-                      : "Closed"}
+                    {instance.is_close ? (
+                      <span className="rounded-full bg-red-100 px-2 py-1 text-sm font-semibold text-red-800">
+                        Closed
+                      </span>
+                    ) : (
+                      <Tooltip content="Close attendance">
+                        <Button
+                          size="sm"
+                          className="cursor-pointer bg-emerald-500"
+                          onClick={() => handleCloseAttendance(instance.id)}
+                          disabled={closingInstanceId === instance.id}
+                        >
+                          {closingInstanceId === instance.id ? (
+                            <Spinner size="sm" />
+                          ) : (
+                            "Opened"
+                          )}
+                        </Button>
+                      </Tooltip>
+                    )}
                   </TableCell>
                   <TableCell>
                     {new Date(instance.createdAt).toDateString()}
                   </TableCell>
                   <TableCell>
-                    {instance.expires_at &&
-                    new Date(instance.expires_at).getTime()! >
-                      new Date().getTime()
-                      ? `${Math.ceil((new Date(instance.expires_at).getTime() - new Date().getTime()) / (1000 * 60))} mins`
-                      : "Expired"}
+                    {instance.expires_at
+                      ? calculateTimeRemaining(instance.expires_at)
+                      : "N/A"}
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between gap-2">
                       <Tooltip content="View QR Code">
                         <span
-                          className="cursor-pointer text-blue-600"
+                          className="cursor-pointer text-blue-600 hover:text-blue-800"
                           onClick={() =>
                             setViewQRCode({
                               open: true,
                               imageUrl: instance?.qr_image ?? "",
                               course_Id: instance?.courseId,
+                              date: instance?.date,
                             })
                           }
                         >
@@ -410,7 +459,7 @@ const AttendanceInstances = () => {
 
                       <Tooltip content="Delete Instance">
                         <span
-                          className="cursor-pointer text-red-600"
+                          className="cursor-pointer text-red-600 hover:text-red-800"
                           onClick={() =>
                             setModalState((prev) => ({
                               ...prev,
@@ -431,12 +480,13 @@ const AttendanceInstances = () => {
           </TableBody>
         </Table>
       </div>
+
       <div className="m-2 flex place-self-center sm:justify-center">
         <Pagination
           layout="table"
           currentPage={pagination.currentPage}
-          itemsPerPage={pagination.itemsPerPage}
-          totalItems={pagination.totalItems}
+          itemsPerPage={pagination?.itemsPerPage}
+          totalItems={pagination.totalPages}
           onPageChange={onPageChange}
           showIcons
         />
@@ -445,18 +495,24 @@ const AttendanceInstances = () => {
       <CommonModal
         open={modalState.isModalOpen || viewQRCode.open}
         onClose={() => {
-          setModalState((prev) => ({ ...prev, isModalOpen: false }));
           setViewQRCode({ open: false, imageUrl: "" });
+          setModalState((prev) => ({ ...prev, isModalOpen: false }));
         }}
       >
         {viewQRCode.open ? (
-          <ViewQRCodeModal />
+          <ViewQRCodeModal
+            imageUrl={viewQRCode?.imageUrl}
+            course_Id={viewQRCode?.course_Id}
+            date={viewQRCode?.date}
+            getCourseName={getCourseName}
+          />
         ) : (
           <AddNewAttendanceInstance
             courses={courses}
-            onSuccess={() =>
-              setModalState((prev) => ({ ...prev, isModalOpen: false }))
-            }
+            onSuccess={() => {
+              setModalState((prev) => ({ ...prev, isModalOpen: false }));
+              fetchInstances();
+            }}
           />
         )}
       </CommonModal>
