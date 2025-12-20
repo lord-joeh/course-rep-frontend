@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from "flowbite-react";
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   AttendanceRecordInterface,
   ModalState,
@@ -34,6 +34,7 @@ import { FaUserCheck } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import exportToCSV from "../../../helpers/exportAttendanceCSV";
+import { BsQrCodeScan } from "react-icons/bs";
 
 const Attendance = () => {
   const { instanceId } = useParams();
@@ -57,6 +58,8 @@ const Attendance = () => {
     idToDelete: "",
     itemToDelete: "",
   });
+  const [attendanceTrackId, setAttendanceTrackId] = useState("");
+  const navigate = useNavigate();
 
   const { showToast, setLoading, loading, toast, closeToast, remove } =
     useCrud<AttendanceRecordInterface>({
@@ -104,7 +107,7 @@ const Attendance = () => {
       return showToast("Attendance already marked", "error");
     else {
       try {
-        setLoading(true);
+        setAttendanceTrackId(attendanceId);
         const response = await markAttendance(studentId, attendanceId);
         if (response) {
           showToast(response?.message || "Marked", "success");
@@ -124,7 +127,7 @@ const Attendance = () => {
           showToast("Failed to update status manually", "error");
         }
       } finally {
-        setLoading(false);
+        setAttendanceTrackId("");
       }
     }
   };
@@ -216,7 +219,10 @@ const Attendance = () => {
         </Card>
       </div>
 
-      {/* Filters */}
+      <Button className="w-full md:max-w-md cursor-pointer" onClick={() => navigate("/mark")}>
+        <BsQrCodeScan className="me-2 h-4 w-4" />
+        Scan QR Code
+      </Button>
       <Card>
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
           <div className="md:col-span-2">
@@ -360,6 +366,8 @@ const Attendance = () => {
                               size={24}
                               className="cursor-not-allowed"
                             />
+                          ) : attendanceTrackId === record.id ? (
+                            <Spinner size="lg" />
                           ) : (
                             <FaUserCheck size={24} />
                           )}

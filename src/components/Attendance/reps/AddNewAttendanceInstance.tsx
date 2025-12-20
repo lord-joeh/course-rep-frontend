@@ -1,11 +1,4 @@
-import {
-  Button,
-  Label,
-  Radio,
-  Select,
-  Spinner,
-  TextInput,
-} from "flowbite-react";
+import { Button, Label, Radio, Select, TextInput } from "flowbite-react";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { MdBookmarkAdd } from "react-icons/md";
 import { RiUserLocationFill } from "react-icons/ri";
@@ -17,6 +10,7 @@ import { addAttendanceInstance } from "../../../services/attendanceService";
 import { useCrud } from "../../../hooks/useCrud";
 import { FaSearchLocation } from "react-icons/fa";
 import ToastMessage from "../../common/ToastMessage";
+
 interface Props {
   courses: Course[];
   onSuccess?: () => void;
@@ -31,6 +25,9 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
       latitude: 0,
       longitude: 0,
     });
+
+  const [isLocating, setIsLocating] = useState(false);
+
   const crudServices = {
     list: async () => {
       return { data: [] as AddNewAttendanceInstanceInterface[] };
@@ -48,6 +45,35 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
     }));
   };
 
+  const getLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      showToast("Geolocation is not supported by this browser.", "error");
+      return;
+    }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setInstanceData((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+        setIsLocating(false);
+      },
+      (error) => {
+        setIsLocating(false);
+        let msg = "Error obtaining location.";
+        if (error.code === 1) msg = "Location permission denied.";
+        else if (error.code === 2) msg = "Location unavailable (check GPS).";
+        else if (error.code === 3) msg = "Location request timed out.";
+        showToast(msg, "error");
+      },
+      { enableHighAccuracy: true, timeout: 15000 },
+    );
+  }, [showToast]);
+
   const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -56,9 +82,11 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
       errMessage = "Please select a course.";
     } else if (!instanceData.date) {
       errMessage = "Please select a date.";
-    } else if (instanceData.classType === "in-person" && location === null) {
-      errMessage =
-        "Location services must be enabled to create face-to-face attendance instances.";
+    } else if (
+      instanceData.classType === "in-person" &&
+      (instanceData.latitude === 0 || instanceData.longitude === 0)
+    ) {
+      errMessage = "Valid location is required for in-person classes.";
     }
 
     if (errMessage) {
@@ -71,50 +99,9 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
     } catch (error) {}
   };
 
-  const getLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      showToast("Geolocation is not supported by this browser.", "error");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setInstanceData((prev) => ({
-          ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        }));
-      },
-      (error) => {
-        showToast(error?.message || "Error obtaining location", "error");
-      },
-    );
-  }, []);
-
-  const getLocationPermission = useCallback(async () => {
-    try {
-      const permissionStatus = await navigator.permissions.query({
-        name: "geolocation",
-      });
-
-      if (permissionStatus.state === "granted") {
-        getLocation();
-      } else if (permissionStatus.state === "prompt") {
-        getLocation();
-      } else if (permissionStatus.state === "denied") {
-        showToast(
-          "Location access is blocked. Please click the lock icon in your address bar to enable it.",
-          "error",
-        );
-      }
-    } catch (error) {
-      getLocation();
-    }
-  }, [getLocation]);
-
   useEffect(() => {
-    getLocationPermission();
-  }, [getLocationPermission]);
+    getLocation();
+  }, []);
 
   return (
     <div className="container flex max-w-lg flex-col justify-center gap-5 dark:text-white">
@@ -130,24 +117,19 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
           <Label htmlFor="course" className="mb-2 block font-medium">
             Course
           </Label>
-
           <Select
             id="course"
             name="courseId"
-            defaultValue=""
             required
             value={instanceData.courseId}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-              setInstanceData((prev) => ({
-                ...prev,
-                courseId: e.target.value,
-              }))
+            onChange={(e) =>
+              setInstanceData((prev) => ({ ...prev, courseId: e.target.value }))
             }
           >
             <option value="" disabled>
               Select Course
             </option>
-            {courses?.map((course: Course) => (
+            {courses?.map((course) => (
               <option key={course?.id} value={course?.id}>
                 {course?.name}
               </option>
@@ -159,44 +141,33 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
           <Label htmlFor="date" className="mb-2 block font-medium">
             Date
           </Label>
-
           <TextInput
             id="date"
             name="date"
             type="date"
             value={instanceData.date}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setInstanceData((prev) => ({
-                ...prev,
-                date: e.target.value,
-              }))
+            onChange={(e) =>
+              setInstanceData((prev) => ({ ...prev, date: e.target.value }))
             }
             required
-            placeholder="Select Date"
           />
         </div>
 
         <div className="block">
-          <Label htmlFor="classType" className="mb-2 block font-medium">
-            Type of Class
-          </Label>
-
+          <Label className="mb-2 block font-medium">Type of Class</Label>
           <div className="mt-3 flex gap-7">
             <div className="flex items-center gap-4">
               <Radio
                 id="in-person"
-                name="classType"
                 value="in-person"
                 checked={instanceData.classType === "in-person"}
                 onChange={handleTypeChange}
               />
               <Label htmlFor="in-person"> Face To Face </Label>
             </div>
-
             <div className="flex items-center gap-4">
               <Radio
                 id="online"
-                name="classType"
                 value="online"
                 checked={instanceData.classType === "online"}
                 onChange={handleTypeChange}
@@ -206,42 +177,49 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
           </div>
         </div>
 
-        <span className="text-md text-gray-500 dark:text-gray-300">
-          <small>
-            Location services are required when creating face-to-face attendance
-            instances.
-          </small>
-        </span>
+        <hr className="border-gray-200 dark:border-gray-700" />
 
-        {instanceData?.latitude && instanceData?.longitude ? (
-          <div className="text-white-600 flex text-sm">
-            <span>
-              <RiUserLocationFill size={24} color="red" className="me-2" />
-            </span>
-            <span>
-              {" "}
-              Latitude: {instanceData.latitude}, Longitude:{" "}
-              {instanceData.longitude}
-            </span>
+        <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium">Location Status</h3>
+            <Button
+              size="xs"
+              color="gray"
+              onClick={getLocation}
+              disabled={isLocating}
+            >
+              {isLocating ? "Locating..." : "Refresh Location"}
+            </Button>
           </div>
-        ) : (
-          <div className="text-sm text-red-600">
-            <p>
-              Unable to obtain location. Please ensure location services are
-              enabled.
+
+          <div className="mt-3">
+            {instanceData.latitude !== 0 ? (
+              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                <RiUserLocationFill size={20} />
+                <span>
+                  Lat: {instanceData.latitude!.toFixed(6)}, Long
+                  {instanceData.longitude!.toFixed(6)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-red-500">
+                <FaSearchLocation size={20} />
+                <span>
+                  {isLocating
+                    ? "Acquiring GPS coordinates..."
+                    : "Location not found. Click Refresh."}
+                </span>
+              </div>
+            )}
+            <p className="mt-2 text-xs text-gray-500">
+              Required for Face-to-Face classes only.
             </p>
-            <FaSearchLocation
-              size={32}
-              className="mt-2 cursor-pointer"
-              onClick={getLocationPermission}
-            />
           </div>
-        )}
+        </div>
 
-        <Button type="submit" className="cursor-pointer" disabled={loading}>
-          {loading && <Spinner size="lg" />}
-          <MdBookmarkAdd size={24} className="me-2" />
-          Create Attendance Instance{" "}
+        <Button type="submit" className="mt-2" disabled={loading || isLocating}>
+          <MdBookmarkAdd size={20} className="me-2" />
+          Create Attendance Instance
         </Button>
       </form>
 

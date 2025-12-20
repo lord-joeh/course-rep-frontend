@@ -6,6 +6,8 @@ type fetchType = {
   studentId: string;
 };
 
+type locationType = { latitude: number; longitude: number };
+
 import {
   AddNewAttendanceInstanceInterface,
   AttendanceFilterInterface,
@@ -59,5 +61,17 @@ export const markAttendance = async (
 
 export const deleteAttendance = async (id: string) => {
   const response = await api.delete(`/api/attendance/${id}`);
+  return response?.data;
+};
+
+export const autoMarkAttendance = async (
+  studentId: string,
+  token: string,
+  location: locationType,
+) => {
+  const response = await api.post(
+    `/api/attendance/auto/mark?studentId=${studentId}&token=${token}`,
+    location,
+  );
   return response?.data;
 };

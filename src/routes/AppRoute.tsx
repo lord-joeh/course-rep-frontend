@@ -29,6 +29,7 @@ import StudentSubmittedAssignmentPage from "../pages/Assignment Page/StudentSubm
 import AssignmentDetailsPage from "../pages/Assignment Page/AssignmentDetailsPage.tsx";
 import AttendanceInstancePage from "../pages/Attendance Page/AttendanceInstancePage.tsx";
 import AttendancePage from "../pages/Attendance Page/AttendancePage.tsx";
+import ScanQrCodePage from "../pages/Attendance Page/ScanQrCodePage.tsx";
 
 const AppRoute = () => {
   return (
@@ -61,7 +62,10 @@ const AppRoute = () => {
                     <Route path="assignments/:assignmentId/submissions/details" element={<AssignmentDetailsPage />} />
                     <Route path="attendance" element={<AttendanceInstancePage />} />
                     <Route path="attendance/:instanceId" element={<AttendancePage />} />
+                    <Route path="attendance/mark" element={<ScanQrCodePage />} />
                   </Route>
+
+                  <Route path="mark" element={<ScanQrCodePage/>} />
 
                   {/* Students */}
                   <Route path="students/*" element={<PrivateRoute />}>
@@ -70,8 +74,10 @@ const AppRoute = () => {
                     <Route path="feedbacks" element={<StudentFeedbackPage />} />
                     <Route path="groups" element={<Groups />} />
                     <Route path="groups/:groupId" element={<GroupMembersPage />} />
+                    <Route path="assignments" element={<AssignmentPage />} />
                     <Route path="slides" element={<SlidePage />} />
                     <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage />} />
+                    <Route path="attendance" element={<ScanQrCodePage />} />
                   </Route>
                 </Route>
               </Routes>

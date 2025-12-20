@@ -136,7 +136,7 @@ const EventListener = () => {
       if (payload.socketId && payload.socketId === socket.id) {
         completeProgress(payload.socketId, false, payload.error || "Failed");
         console.error("Job Failed", payload);
-        showToast(`${payload.error || "Unknown error"}`, "error");
+        showToast(`${payload?.message || "Unknown error"}`, "error");
       }
     };
 
