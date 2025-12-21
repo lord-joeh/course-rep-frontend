@@ -30,6 +30,7 @@ import AssignmentDetailsPage from "../pages/Assignment Page/AssignmentDetailsPag
 import AttendanceInstancePage from "../pages/Attendance Page/AttendanceInstancePage.tsx";
 import AttendancePage from "../pages/Attendance Page/AttendancePage.tsx";
 import ScanQrCodePage from "../pages/Attendance Page/ScanQrCodePage.tsx";
+import GlobalErrorHandler from "../components/common/GlobalErrorHandler.tsx";
 
 const AppRoute = () => {
   return (
@@ -82,6 +83,7 @@ const AppRoute = () => {
                 </Route>
               </Routes>
               <EventListener />
+              <GlobalErrorHandler />
               <GlobalProgressTracker />
             </ThemeProvider>
           </AuthProvider>

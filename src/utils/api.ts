@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getSocketId } from "../context/socketContext";
+import dispatchHttpError from "./dispatchHttpError";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
@@ -9,31 +10,31 @@ const api = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  decompress: true,
 });
 
-const authRoutes = [
+// Routes that do not require an access token
+const publicRoutes = [
   "/api/auth/login",
   "/api/students/register",
   "/api/auth/refresh",
   "/api/auth/forgot",
   "/api/auth/reset",
 ];
+
 api.interceptors.request.use(
   async (config) => {
-    if (authRoutes.some((route) => config.url?.includes(route))) {
+    if (publicRoutes.some((route) => config.url?.includes(route))) {
       return config;
     }
 
     if (config.method === "get") {
-      config.headers["Cache-Control"] = "no-cache";
-      config.headers["Pragma"] = "no-cache";
+      config.headers.set("Cache-Control", "no-cache");
+      config.headers.set("Pragma", "no-cache");
     }
 
-    // Add socket ID to headers for socket tracking
     const socketId = getSocketId();
     if (socketId) {
-      config.headers["X-Socket-ID"] = socketId;
+      config.headers.set("X-Socket-ID", socketId);
     }
 
     try {
@@ -41,13 +42,11 @@ api.interceptors.request.use(
       if (userData) {
         const user = JSON.parse(userData);
         if (user?.token) {
-          config.headers.Authorization = `Bearer ${user.token}`;
+          config.headers.set("Authorization", `Bearer ${user.token}`);
         }
       }
     } catch (error) {
-      console.error("Failed to parse user data:", error);
-      localStorage.removeItem("user");
-      return Promise.reject(error);
+      console.error("Auth Error: Failed to parse user data", error);
     }
 
     return config;
@@ -57,81 +56,87 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+      _retryCount?: number;
+    };
 
+    if (!originalRequest) return Promise.reject(error);
+
+    // 1. Handle Token Expiration (401)
     if (error.response?.status === 401 && !originalRequest._retry) {
-      const isAuthRoute = authRoutes.some((route) =>
+      const isPublicRoute = publicRoutes.some((route) =>
         originalRequest.url?.includes(route),
       );
-      if (isAuthRoute) {
+
+      if (isPublicRoute) {
         return Promise.reject(error);
       }
+
       originalRequest._retry = true;
 
       try {
-        const response = await axios.post(
+        // Attempt to refresh token
+        const refreshResponse = await axios.post(
           `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );
 
-        const { token } = response.data;
+        const { token } = refreshResponse.data;
+
+        // Update Local Storage
         const userData = localStorage.getItem("user");
         if (userData) {
           const user = JSON.parse(userData);
           localStorage.setItem("user", JSON.stringify({ ...user, token }));
         }
 
-        const bearerToken = `Bearer ${token}`;
-        api.defaults.headers.common["Authorization"] = bearerToken;
-        originalRequest.headers["Authorization"] = bearerToken;
+        // Retry original request with new token
+        originalRequest.headers.set("Authorization", `Bearer ${token}`);
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Show user notification before clearing auth data
-        console.error("Session expired. Please log in again.");
-        // Note: Toast notifications would need to be handled at component level
-        // For now, we'll rely on auth context logout handling
+        dispatchHttpError("Session Expired");
         localStorage.removeItem("user");
+        window.location.href = "/";
         return Promise.reject(refreshError);
       }
     }
-    if (error.response) {
-      const status = error.response.status;
-      console.log(error.response)
-      switch (status) {
-        case 429:
-          console.error("Rate limit exceeded");
-          await new Promise((resolve) =>
-            setTimeout(
-              resolve,
-              1000 * Math.pow(2, originalRequest._retryCount || 0),
-            ),
-          );
-          return api(originalRequest);
-        case 500:
-          console.error("Server Error:", error.response.data);
-          break;
-        default:
-          if (status >= 500) {
-            console.error("Server Error:", error.response.data);
-          }
-      }
 
-      return Promise.reject(error);
+    if (error.response?.status === 429) {
+      const retryCount = originalRequest._retryCount || 0;
+      const MAX_RETRIES = 3;
+
+      if (retryCount < MAX_RETRIES) {
+        originalRequest._retryCount = retryCount + 1;
+        const delay = 1000 * Math.pow(2, retryCount);
+
+        console.warn(`Rate limit hit. Retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+
+        return api(originalRequest);
+      } else {
+        dispatchHttpError("Rate Limit Exceeded. Please try again later");
+      }
     }
+
+    if (error.response && error.response.status >= 500) {
+      console.error("Server Error:", error.response.data);
+      dispatchHttpError("Something went wrong on the server.");
+    }
+
+    return Promise.reject(error);
   },
 );
 
+// Debug logging in development
 if (import.meta.env.VITE_ENV === "development") {
   api.interceptors.request.use((request) => {
-    console.log("Starting Request", request);
+    console.log("Request:", request.method?.toUpperCase(), request.url);
     return request;
-  });
-  api.interceptors.response.use((response) => {
-    console.log("Response:", response);
-    return response;
   });
 }
 
