@@ -65,7 +65,7 @@ const ScanQrCode = () => {
         });
         setIsLocating(false);
       },
-      { enableHighAccuracy: true, timeout: 30000 },
+      { enableHighAccuracy: true, timeout: 20000 },
     );
   }, []);
 

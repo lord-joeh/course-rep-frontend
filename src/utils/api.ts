@@ -3,7 +3,7 @@ import { getSocketId } from "../context/socketContext";
 import dispatchHttpError from "./dispatchHttpError";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
   timeout: 15000,
   headers: {
@@ -79,7 +79,7 @@ api.interceptors.response.use(
       try {
         // Attempt to refresh token
         const refreshResponse = await axios.post(
-          `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/auth/refresh`,
+          `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
           {},
           { withCredentials: true },
         );
