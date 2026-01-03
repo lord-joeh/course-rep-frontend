@@ -22,41 +22,41 @@ const publicRoutes = [
 ];
 
 api.interceptors.request.use(
-  async (config) => {
-    if (publicRoutes.some((route) => config.url?.includes(route))) {
-      return config;
-    }
-
-    if (config.method === "get") {
-      config.headers.set("Cache-Control", "no-cache");
-      config.headers.set("Pragma", "no-cache");
-    }
-
-    const socketId = getSocketId();
-    if (socketId) {
-      config.headers.set("X-Socket-ID", socketId);
-    }
-
-    try {
-      const userData = localStorage.getItem("user");
-      if (userData) {
-        const user = JSON.parse(userData);
-        if (user?.token) {
-          config.headers.set("Authorization", `Bearer ${user.token}`);
-        }
-      }
-    } catch (error) {
-      console.error("Auth Error: Failed to parse user data", error);
-    }
-
+  async function (config): Promise<InternalAxiosRequestConfig<any>> {
+  if (publicRoutes.some((route) => config.url?.includes(route))) {
     return config;
-  },
+  }
+
+  if (config.method === "get") {
+    config.headers.set("Cache-Control", "no-cache");
+    config.headers.set("Pragma", "no-cache");
+  }
+
+  const socketId = getSocketId();
+  if (socketId) {
+    config.headers.set("X-Socket-ID", socketId);
+  }
+
+  try {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user?.token) {
+        config.headers.set("Authorization", `Bearer ${user.token}`);
+      }
+    }
+  } catch (error) {
+    console.error("Auth Error: Failed to parse user data", error);
+  }
+
+  return config;
+},
   (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
+  async function (error: AxiosError) {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
       _retryCount?: number;
@@ -66,8 +66,7 @@ api.interceptors.response.use(
 
     // 1. Handle Token Expiration (401)
     if (error.response?.status === 401 && !originalRequest._retry) {
-      const isPublicRoute = publicRoutes.some((route) =>
-        originalRequest.url?.includes(route),
+      const isPublicRoute = publicRoutes.some((route) => originalRequest.url?.includes(route)
       );
 
       if (isPublicRoute) {
@@ -81,7 +80,7 @@ api.interceptors.response.use(
         const refreshResponse = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
           {},
-          { withCredentials: true },
+          { withCredentials: true }
         );
 
         const { token } = refreshResponse.data;
@@ -108,7 +107,7 @@ api.interceptors.response.use(
 
     if (error.response?.status === 429) {
       const retryCount = originalRequest._retryCount || 0;
-      const MAX_RETRIES = 3;
+      const MAX_RETRIES = 2;
 
       if (retryCount < MAX_RETRIES) {
         originalRequest._retryCount = retryCount + 1;

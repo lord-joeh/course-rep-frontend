@@ -29,18 +29,15 @@ interface AddNewAssignmentProps {
   isEditing?: boolean;
 }
 
-const AddNewAssignment = ({
-  assignment,
-  onClose,
-  isEditing,
-}: AddNewAssignmentProps) => {
-  const [assignmentData, setAssignmentData] =
-    useState<AssignmentCreationInterface>({
-      title: "",
-      description: "",
-      courseId: "",
-      deadline: "",
-    });
+function AddNewAssignment({
+  assignment, onClose, isEditing,
+}: AddNewAssignmentProps) {
+  const [assignmentData, setAssignmentData] = useState<AssignmentCreationInterface>({
+    title: "",
+    description: "",
+    courseId: "",
+    deadline: "",
+  });
 
   const crudServices = {
     list: getCourses,
@@ -48,13 +45,7 @@ const AddNewAssignment = ({
     update: updateAssignmentDetails,
   };
   const {
-    items: courses,
-    loading,
-    toast,
-    showToast,
-    closeToast,
-    add,
-    update,
+    items: courses, loading, toast, showToast, closeToast, add, update,
   } = useCrud<CourseInterface>(crudServices);
 
   useEffect(() => {
@@ -68,7 +59,7 @@ const AddNewAssignment = ({
     }
   }, [assignment]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     if (name && value) {
       setAssignmentData((prev) => ({ ...prev, [name]: value }));
@@ -78,20 +69,18 @@ const AddNewAssignment = ({
       const file = e.target.files[0];
       setAssignmentData((prev) => ({ ...prev, file }));
     }
-  };
+  }
 
-  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
+  async function handleSubmit(e: ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      if (
-        !assignmentData?.courseId ||
+      if (!assignmentData?.courseId ||
         !assignmentData?.title ||
         !assignmentData?.description ||
-        !assignmentData?.deadline
-      ) {
+        !assignmentData?.deadline) {
         return showToast(
           "All fields are required. Except the file field",
-          "error",
+          "error"
         );
       }
 
@@ -119,7 +108,7 @@ const AddNewAssignment = ({
         courseId: "",
       });
     }
-  };
+  }
 
   return (
     <div className="container flex flex-col justify-center gap-5 dark:text-white">
@@ -145,7 +134,7 @@ const AddNewAssignment = ({
                 ...prev,
                 courseId: e.target.value,
               }));
-            }}
+            } }
           >
             <option value="" disabled>
               Select Course
@@ -167,8 +156,7 @@ const AddNewAssignment = ({
             required
             placeholder="Title"
             value={assignmentData?.title}
-            onChange={handleChange}
-          />
+            onChange={handleChange} />
         </div>
 
         <div className="mb-2 block max-w-md">
@@ -185,8 +173,7 @@ const AddNewAssignment = ({
                 ...prev,
                 description: e.target.value,
               }));
-            }}
-          />
+            } } />
         </div>
 
         {!isEditing && (
@@ -199,8 +186,7 @@ const AddNewAssignment = ({
               name="files"
               onChange={handleChange}
               accept=".pdf,.ppt,.pptx,.docx,.doc, .jpg, .png"
-              className="max-w-md"
-            />
+              className="max-w-md" />
             <HelperText>
               Supported Files: pdf, ppt, pptx, docx, doc, jpg, png. Max File
               Size: 10MB
@@ -217,8 +203,7 @@ const AddNewAssignment = ({
             value={assignmentData?.deadline}
             onChange={handleChange}
             required
-            className="max-w-md"
-          />
+            className="max-w-md" />
         </div>
 
         {/* Show selected file name and size */}
@@ -226,12 +211,10 @@ const AddNewAssignment = ({
           <div className="mt-2 max-w-md">
             <div className="text-sm font-medium">Selected file</div>
             <ul className="list-disc pl-5">
-              {
-                <li key={assignmentData?.file.name} className="text-sm">
-                  {assignmentData?.file.name} (
-                  {Math.round(assignmentData?.file.size / 1024)} KB)
-                </li>
-              }
+              {<li key={assignmentData?.file.name} className="text-sm">
+                {assignmentData?.file.name} (
+                {Math.round(assignmentData?.file.size / 1024)} KB)
+              </li>}
             </ul>
           </div>
         )}
@@ -256,11 +239,10 @@ const AddNewAssignment = ({
         <ToastMessage
           message={toast.message}
           type={toast.type}
-          onClose={closeToast}
-        />
+          onClose={closeToast} />
       )}
     </div>
   );
-};
+}
 
 export default AddNewAssignment;
