@@ -154,7 +154,7 @@ const Feedbacks = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6font-sans">
+    <div className="flex flex-col gap-3 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Feedbacks Management
       </h1>
@@ -188,7 +188,7 @@ const Feedbacks = () => {
             isAdding: true,
           }));
         }}
-        className="flex w-full md:w-50 mt-3 justify-center"
+        className="flex w-full md:w-md mt-3 justify-center"
       >
         <VscFeedback className="me-2 h-4 w-4" /> Submit a Feedback
       </Button>
