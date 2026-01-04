@@ -20,30 +20,32 @@ import { FiActivity } from "react-icons/fi";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { SidebarProps } from "../../utils/Interfaces";
+import { HiSpeakerphone } from "react-icons/hi";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleRedirect = (repPath: string, studentPath: string) => {
-     if (window.innerWidth <= 768) {
-      toggleSidebar()
+    if (window.innerWidth <= 768) {
+      toggleSidebar();
     }
     navigate(user?.isRep ? repPath : studentPath);
-   
   };
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-50 transform bg-gray-700 shadow-lg transition-transform duration-300 ease-in-out md:transform-none dark:bg-gray-900 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:static`}
+      className={`fixed inset-y-0 left-0 z-50 transform bg-gray-700 shadow-lg transition-transform duration-300 ease-in-out md:transform-none dark:bg-gray-900 ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      } md:static`}
     >
       <FlowbiteSidebar className="custom-scrollbar-hide h-full overflow-y-auto">
         <div className="flex items-center justify-between border-b border-gray-700 p-4 dark:border-gray-700">
           <h1 className="flex flex-wrap text-xl font-bold text-gray-900 dark:text-white">
             {user && user?.name}
           </h1>
-          <button aria-label="toggle-sidebar"
+          <button
+            aria-label="toggle-sidebar"
             onClick={toggleSidebar}
             className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 focus:outline-none md:hidden dark:text-gray-400 dark:hover:bg-gray-700"
           >
@@ -61,6 +63,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             >
               Dashboard
             </SidebarItem>
+            {user?.isRep && (
+              <SidebarItem
+                className="cursor-pointer"
+                onClick={() => handleRedirect("/reps/notifications", "")}
+                icon={HiSpeakerphone}
+              >
+                Announcements
+              </SidebarItem>
+            )}
+
             <SidebarItem
               className="cursor-pointer"
               onClick={() =>

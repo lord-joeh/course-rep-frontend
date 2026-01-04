@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -34,65 +34,60 @@ const StudentDashboard = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStudentData = async () => {
-      try {
-        setLoading(true);
+  const fetchStudentData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        const coursesRes = await getCourses();
-        const coursesList = coursesRes?.data || [];
-        setCourses(coursesList);
+      const coursesRes = await getCourses();
+      const coursesList = coursesRes?.data
+      setCourses(coursesList);
 
-        const eventsRes = await getEvents();
-        const eventsList = (eventsRes?.data as Event[]) || [];
+      const eventsRes = await getEvents();
+      const eventsList = (eventsRes?.data as Event[]);
 
-        let allAssignments: AssignmentsInterface[] = [];
+      let allAssignments: AssignmentsInterface[] = [];
 
-        if (coursesList.length > 0) {
-          const assignmentsPromises = coursesList
-            .slice(0, 3)
-            .map((c: Course) => getAssignmentsByCourse(c.id, 5, 1));
-          const assignmentsResults =
-            await Promise.allSettled(assignmentsPromises);
+      if (coursesList.length > 0) {
+        const assignmentsPromises = coursesList
+          .slice(0, 3)
+          .map((c: Course) => getAssignmentsByCourse(c?.id, 5, 1));
+        const assignmentsResults =
+          await Promise.allSettled(assignmentsPromises);
 
-          assignmentsResults.forEach((res) => {
-            if (res.status === "fulfilled" && res.value?.data?.assignments) {
-              allAssignments = [
-                ...allAssignments,
-                ...res.value.data.assignments,
-              ];
-            }
-          });
-        }
+        assignmentsResults.forEach((res) => {
+          if (res.status === "fulfilled" && res.value?.data?.assignments) {
+            allAssignments = [...allAssignments, ...res.value.data.assignments];
+          }
+        });
+      }
 
-        const futureAssignments = allAssignments
-          .filter((a) => new Date(a.deadline) > new Date())
-          .sort(
-            (a, b) =>
-              new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
-          );
-
-        const nextEvent = eventsList.find(
-          (e) => new Date(e.date) >= new Date(),
+      const futureAssignments = allAssignments
+        .filter((a) => new Date(a.deadline) > new Date())
+        .sort(
+          (a, b) =>
+            new Date(a.deadline).getTime() - new Date(b.deadline).getTime(),
         );
 
-        setDeadlines(futureAssignments.slice(0, 3));
-        setStats({
-          activeAssignments: futureAssignments.length,
-          nextClass: nextEvent
-            ? format(new Date(nextEvent.date), "MMM dd")
-            : "No Events",
-          eventsCount: eventsList.length,
-        });
-      } catch (error) {
-        console.error("Error fetching student dashboard data", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const nextEvent = eventsList.find((e) => new Date(e.date) >= new Date());
 
+      setDeadlines(futureAssignments.slice(0, 3));
+      setStats({
+        activeAssignments: futureAssignments.length,
+        nextClass: nextEvent
+          ? format(new Date(nextEvent.date), "MMM dd")
+          : "No Events",
+        eventsCount: eventsList.length,
+      });
+    } catch (error) {
+      console.error("Error fetching student dashboard data", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [courses.length, deadlines.length]);
+
+  useEffect(() => {
     fetchStudentData();
-  }, []);
+  }, [fetchStudentData]);
 
   return (
     <div className="fade-in space-y-6">

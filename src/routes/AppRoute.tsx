@@ -32,6 +32,7 @@ import AttendancePage from "../pages/Attendance Page/AttendancePage.tsx";
 import ScanQrCodePage from "../pages/Attendance Page/ScanQrCodePage.tsx";
 import GlobalErrorHandler from "../components/common/GlobalErrorHandler.tsx";
 import DashboardPage from "../pages/Dashboard Page/DashboardPage.tsx";
+import RepNotificationPage from "../pages/Notification page/RepNotificationPage.tsx";
 
 const AppRoute = () => {
   return (
@@ -51,6 +52,7 @@ const AppRoute = () => {
                 <Route element={<AppLayout />}>
                   <Route path="reps/*" element={<RepRoute />}>
                   <Route path="dashboard" element={<DashboardPage />} />
+                    <Route path="notifications" element={<RepNotificationPage />} />
                     <Route path="students" element={<StudentsPage />} />
                     <Route path="students/:studentId" element={<StudentDetailsPage />} />
                     <Route path="lecturers" element={<LecturerPage />} />
