@@ -17,7 +17,12 @@ import {
   HiOutlineClipboardList,
   HiCalendar,
 } from "react-icons/hi";
-import { MdAssignment, MdBookmarkAdd, MdClass, MdQrCodeScanner } from "react-icons/md";
+import {
+  MdAssignment,
+  MdBookmarkAdd,
+  MdClass,
+  MdQrCodeScanner,
+} from "react-icons/md";
 import StatCard from "../common/StatCard";
 import { getStudents } from "../../../services/studentService";
 import { getFeedbacks } from "../../../services/feedbackService";
@@ -45,10 +50,10 @@ const RepDashboard = () => {
         setLoading(true);
         const [studentsRes, feedbackRes, eventsRes, coursesRes] =
           await Promise.allSettled([
-            getStudents(1, 1), 
-            getFeedbacks(1, 5), 
+            getStudents(1, 1),
+            getFeedbacks(1, 5),
             getEvents(),
-            getCourses(), 
+            getCourses(),
           ]);
 
         const studentCount =
@@ -67,8 +72,7 @@ const RepDashboard = () => {
         const eventCount = Array.isArray(eventsData) ? eventsData.length : 0;
 
         const courseCount =
-          coursesRes.status === "fulfilled" &&
-          coursesRes.value?.data
+          coursesRes.status === "fulfilled" && coursesRes.value?.data
             ? coursesRes.value.data.length
             : 0;
 
@@ -138,27 +142,19 @@ const RepDashboard = () => {
               </h5>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Button
-                onClick={() => navigate("/reps/events")}
-              >
+              <Button onClick={() => navigate("/reps/events")}>
                 <HiCalendar className="mr-2 h-5 w-5" />
                 Create Event
               </Button>
-              <Button
-                onClick={() => navigate("/reps/slides")}
-              >
+              <Button onClick={() => navigate("/reps/slides")}>
                 <MdClass className="mr-2 h-5 w-5" />
                 Upload Slide
               </Button>
-              <Button
-                onClick={() => navigate("/reps/attendance")}
-              >
+              <Button onClick={() => navigate("/reps/attendance")}>
                 <MdBookmarkAdd className="mr-2 h-5 w-5" />
                 Create Attendance Instance
               </Button>
-              <Button
-                onClick={() => navigate("/reps/attendance/mark")}
-              >
+              <Button onClick={() => navigate("/reps/attendance/mark")}>
                 <MdQrCodeScanner className="mr-2 h-5 w-5" />
                 Mark Attendance
               </Button>
@@ -185,9 +181,11 @@ const RepDashboard = () => {
               ) : recentFeedbacks.length > 0 ? (
                 <Table hoverable striped>
                   <TableHead>
-                    <TableHeadCell>From</TableHeadCell>
-                    <TableHeadCell>Message</TableHeadCell>
-                    <TableHeadCell>Type</TableHeadCell>
+                    <TableRow>
+                      <TableHeadCell>From</TableHeadCell>
+                      <TableHeadCell>Message</TableHeadCell>
+                      <TableHeadCell>Type</TableHeadCell>
+                    </TableRow>
                   </TableHead>
                   <TableBody className="divide-y">
                     {recentFeedbacks.map((fb) => (

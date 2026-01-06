@@ -10,8 +10,7 @@ import {
   TableHeadCell,
   TableRow,
 } from "flowbite-react";
-import { HiPlus, HiPencil, HiTrash, HiSpeakerphone } from "react-icons/hi";
-import { useCrud } from "../../hooks/useCrud";
+import { HiPlus, HiPencil, HiTrash } from "react-icons/hi";
 import {
   getNotifications,
   addNotification,
@@ -154,7 +153,7 @@ const RepNotification = () => {
           <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
             Announcements
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
             Manage system-wide notifications for all students.
           </p>
         </div>
@@ -173,11 +172,14 @@ const RepNotification = () => {
         <div className="overflow-x-auto">
           <Table hoverable>
             <TableHead>
-              <TableHeadCell>Title</TableHeadCell>
-              <TableHeadCell>Message</TableHeadCell>
-              <TableHeadCell>Date Posted</TableHeadCell>
-              <TableHeadCell>Actions</TableHeadCell>
+              <TableRow>
+                <TableHeadCell>Title</TableHeadCell>
+                <TableHeadCell>Message</TableHeadCell>
+                <TableHeadCell>Date Posted</TableHeadCell>
+                <TableHeadCell>Actions</TableHeadCell>
+              </TableRow>
             </TableHead>
+
             <TableBody className="divide-y">
               {notifications.length > 0 ? (
                 notifications.map((note) => (
@@ -199,14 +201,14 @@ const RepNotification = () => {
                       <div className="flex gap-2">
                         <Button
                           size="xs"
-                          color="gray"
+                          color="green"
                           onClick={() => openEdit(note)}
                         >
                           <HiPencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="xs"
-                          color="failure"
+                          color="red"
                           onClick={() => setDeleteId(note.id)}
                         >
                           <HiTrash className="h-4 w-4" />

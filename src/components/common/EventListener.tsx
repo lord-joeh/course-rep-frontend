@@ -25,28 +25,28 @@ const EventListener = () => {
 
     const onConnect = () => {
       showToast("Socket connected", "success");
-      console.log("🔌 Socket connected with ID:", socket.id);
+      console.log(" Socket connected with ID:", socket.id);
     };
 
     const onWorkerStarted = (payload: any) => {
-      console.log("🎉 Received workerStarted event:", payload);
+      console.log(" Received workerStarted event:", payload);
       showToast(payload?.message || "Worker started", "success");
     };
 
     const onTest = (payload: any) => {
-      console.log("🧪 Received test event:", payload);
+      console.log(" Received test event:", payload);
       showToast("Test event received", "success");
     };
 
     const onNotification = (payload: any) => {
-      showToast(payload?.message, "success");
-      console.log("🔔 Received notification event:", payload);
+      showToast(`New Notification Received\n ${payload.message}`, "success");
+      console.log(" Received notification event:", payload);
     };
 
     const onJobStart = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
-        console.log("🚀 Job started:", payload);
+        console.log("Job started:", payload);
         const jobTitle = payload.message
           ? `${payload?.message}...`
           : "Starting job...";
@@ -57,7 +57,7 @@ const EventListener = () => {
     const onJobProgress = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
-        console.log("⏳ Job progress:", payload);
+        console.log(" Job progress:", payload);
         updateProgress(
           id,
           payload.progress || 0,
@@ -68,7 +68,7 @@ const EventListener = () => {
 
     const onEmailSent = (payload: any) => {
       if (payload.socketId && payload.socketId === socket.id) {
-        console.log("📧 Email sent:", payload);
+        console.log(" Email sent:", payload);
         showToast(`Email sent to ${payload?.to ?? payload?.email}`, "success");
         completeProgress(payload.socketId, true, "Email sent successfully");
       }
@@ -76,7 +76,7 @@ const EventListener = () => {
 
     const onSMSSent = (payload: any) => {
       if (payload.socketId && payload.socketId === socket.id) {
-        console.log("📱 SMS sent:", payload);
+        console.log(" SMS sent:", payload);
         showToast(`SMS sent to ${payload?.to ?? payload?.phone}`, "success");
         completeProgress(payload.socketId, true, "SMS sent successfully");
       }
@@ -127,7 +127,10 @@ const EventListener = () => {
     const onUploadComplete = (payload: any) => {
       const id = payload.socketId;
       if (id && id === socket.id) {
-        showToast(`Upload complete: ${payload.successful} of ${payload.total}`, "success");
+        showToast(
+          `Upload complete: ${payload.successful} of ${payload.total}`,
+          "success",
+        );
         completeProgress(id, true, `Completed: ${payload.successful} sent.`);
       }
     };
@@ -148,7 +151,7 @@ const EventListener = () => {
     socket.on("connect", onConnect);
     socket.on("workerStarted", onWorkerStarted);
     socket.on("test", onTest);
-    socket.on("notification", onNotification);
+    socket.on("newNotification", onNotification);
     socket.on("jobStarted", onJobStart);
     socket.on("jobProgress", onJobProgress);
     socket.on("emailSent", onEmailSent);
@@ -162,7 +165,7 @@ const EventListener = () => {
       socket.off("connect", onConnect);
       socket.off("workerStarted", onWorkerStarted);
       socket.off("test", onTest);
-      socket.off("notification", onNotification);
+      socket.off("newNotification", onNotification);
       socket.off("jobStarted", onJobStart);
       socket.off("jobProgress", onJobProgress);
       socket.off("jobComplete", onJobComplete);

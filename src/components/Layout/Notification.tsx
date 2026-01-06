@@ -9,7 +9,6 @@ import {
   Notification,
 } from "../../services/notificationServices";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
