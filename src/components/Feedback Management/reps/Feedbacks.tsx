@@ -40,7 +40,7 @@ const Feedbacks = () => {
 
   const [currentStudentId, setCurrentStudentId] = useState<string>("");
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastInterface>({
     message: "",
@@ -67,7 +67,7 @@ const Feedbacks = () => {
     itemsPerPage = pagination.itemsPerPage,
   ) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       const response = await FeedbackService.getFeedbacks(page, itemsPerPage);
@@ -90,13 +90,13 @@ const Feedbacks = () => {
         showToast("An unexpected error occurred.", "error");
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const debouncedFetch = useCallback((page: number, perPage: number) => {
     const timeoutId = setTimeout(() => {
-      fetchFeedbacksData(page, perPage)
+      fetchFeedbacksData(page, perPage);
     }, 300);
 
     return () => clearTimeout(timeoutId);
@@ -120,7 +120,7 @@ const Feedbacks = () => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
-  const filteredFeedbacks = useSearch<Feedback>(feedbacks, searchQuery)
+  const filteredFeedbacks = useSearch<Feedback>(feedbacks, searchQuery);
 
   const handleFeedbackDelete = async (id: string) => {
     try {
@@ -188,19 +188,18 @@ const Feedbacks = () => {
             isAdding: true,
           }));
         }}
-        className="flex w-full md:w-md mt-3 justify-center"
+        className="mt-3 flex w-full justify-center md:w-md"
       >
         <VscFeedback className="me-2 h-4 w-4" /> Submit a Feedback
       </Button>
 
-      <h1 className="text-3xl mt-3 font-bold text-gray-900 dark:text-white">
+      <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-white">
         Recent Feedbacks
       </h1>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {isLoading ? (
-          <Spinner size="lg" />
-        ) : filteredFeedbacks.length > 0 ? (
+        {isLoading && <Spinner size="lg" />}
+        {filteredFeedbacks?.length > 0 ? (
           filteredFeedbacks.map((feedback: Feedback) => (
             <div
               key={feedback?.id}

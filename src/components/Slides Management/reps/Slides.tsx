@@ -21,7 +21,7 @@ import {
   downloadSlide,
   getSlidesByCourse,
 } from "../../../services/slidesServices.ts";
-import {  isAxiosError } from "axios";
+import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage.tsx";
 import { courses as getCourses } from "../../../services/courseService.ts";
 import { IoCloudUploadOutline } from "react-icons/io5";
@@ -58,17 +58,16 @@ const Slides = () => {
   const crudServices = {
     list: getCourses,
     download: downloadSlide,
-    remove: deleteSlide
-  }
+    remove: deleteSlide,
+  };
   const {
     items: courses,
     showToast,
     remove,
     download,
     toast,
-    closeToast
-  } = useCrud<CourseInterface>(crudServices)
-
+    closeToast,
+  } = useCrud<CourseInterface>(crudServices);
 
   const fetchSlidesData = async (
     page = 1,
@@ -131,9 +130,7 @@ const Slides = () => {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
 
       await remove(slideId);
-
     } catch (error) {
-
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -147,12 +144,10 @@ const Slides = () => {
     if (!slideId) return;
     try {
       await download(slideId);
-
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
-  const filteredSlides = useSearch<SlideInterface>(slides, searchQuery)
+  const filteredSlides = useSearch<SlideInterface>(slides, searchQuery);
 
   useEffect(() => {
     const cleanup = debouncedFetch(
@@ -171,7 +166,7 @@ const Slides = () => {
   return (
     <div className="flex flex-col gap-6 font-sans dark:text-white">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        {user && user.isRep ? "Slides Management" : "Slides"}
+        {user?.isRep ? "Slides Management" : "Slides"}
       </h1>
 
       <div className="flex w-full items-center gap-3">
@@ -199,7 +194,7 @@ const Slides = () => {
       <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
         {user && user.isRep && (
           <Button
-            className="w-full md:w-50 justify-center"
+            className="w-full justify-center md:w-50"
             onClick={() =>
               setModalState((prev) => ({ ...prev, isAdding: true }))
             }
@@ -212,7 +207,7 @@ const Slides = () => {
         <Select
           id="courses"
           name="courseId"
-          className="w-full md:w-auto justify-center"
+          className="w-full justify-center md:w-auto"
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             setCurrentCourse(e.target.value);
           }}
@@ -235,7 +230,7 @@ const Slides = () => {
           onChange={(e) =>
             setPagination((prev) => ({
               ...prev,
-              itemsPerPage: parseInt(e.target.value),
+              itemsPerPage: Number.parseInt(e.target.value),
               currentPage: 1,
             }))
           }
@@ -248,12 +243,15 @@ const Slides = () => {
         Entries
       </div>
 
-      {loading ? (
-        <Spinner size="lg" className="mr-4 place-self-center" />
-      ) : (filteredSlides?.length ?? 0) > 0 ? (
+      {loading && <Spinner size="lg" className="mr-4 place-self-center" />}
+
+      {filteredSlides?.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {filteredSlides.map((slide: SlideInterface) => (
-            <Card key={slide?.id} className="flex flex-col justify-between wrap-break-word">
+            <Card
+              key={slide?.id}
+              className="flex flex-col justify-between wrap-break-word"
+            >
               <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 {slide.fileName || "Untitled Slide"}
               </h5>
@@ -268,7 +266,7 @@ const Slides = () => {
                   Download Slide
                 </Button>
 
-                {user && user.isRep && (
+                {user?.isRep && (
                   <Tooltip content="Delete Slide">
                     <MdDelete
                       size={32}
@@ -295,21 +293,18 @@ const Slides = () => {
         </div>
       )}
 
-      {
-        filteredSlides.length > 0 && (
-          <div className="m-2 flex place-self-center sm:justify-center">
-            <Pagination
-              layout="table"
-              currentPage={pagination?.currentPage || 1}
-              itemsPerPage={pagination?.itemsPerPage || 10}
-              totalItems={pagination?.totalItems || 0}
-              onPageChange={onPageChange}
-              showIcons
-            />
-          </div>
-        )
-      }
-
+      {filteredSlides.length > 0 && (
+        <div className="m-2 flex place-self-center sm:justify-center">
+          <Pagination
+            layout="table"
+            currentPage={pagination?.currentPage || 1}
+            itemsPerPage={pagination?.itemsPerPage || 10}
+            totalItems={pagination?.totalItems || 0}
+            onPageChange={onPageChange}
+            showIcons
+          />
+        </div>
+      )}
 
       {toast.visible && (
         <ToastMessage

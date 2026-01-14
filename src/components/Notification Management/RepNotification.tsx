@@ -22,6 +22,7 @@ import NotificationModal from "../../components/Notification Management/Notifica
 import { DeleteConfirmationDialogue } from "../../components/common/DeleteConfirmationDialogue";
 import ToastMessage from "../../components/common/ToastMessage";
 import { format } from "date-fns";
+import { isAxiosError } from "axios";
 
 const RepNotification = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -53,11 +54,12 @@ const RepNotification = () => {
       setNotifications(res.data.notifications);
       setPagination(res.data.pagination);
     } catch (err) {
-      setToast({
-        visible: true,
-        message: "Failed to fetch notifications",
-        type: "error",
-      });
+      if (isAxiosError(err))
+        setToast({
+          visible: true,
+          message: err?.message || "Failed to fetch notifications",
+          type: "error",
+        });
     } finally {
       setLoading(false);
     }

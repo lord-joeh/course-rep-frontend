@@ -31,7 +31,7 @@ interface AddNewAssignmentProps {
 
 function AddNewAssignment({
   assignment, onClose, isEditing,
-}: AddNewAssignmentProps) {
+}:Readonly<AddNewAssignmentProps>) {
   const [assignmentData, setAssignmentData] = useState<AssignmentCreationInterface>({
     title: "",
     description: "",
@@ -65,7 +65,7 @@ function AddNewAssignment({
       setAssignmentData((prev) => ({ ...prev, [name]: value }));
     }
 
-    if (e.target.files) {
+    if (e.target?.files) {
       const file = e.target.files[0];
       setAssignmentData((prev) => ({ ...prev, file }));
     }
@@ -100,6 +100,7 @@ function AddNewAssignment({
         await add(transformedFormData);
       }
     } catch (error) {
+      console.log(error)
     } finally {
       setAssignmentData({
         title: "",

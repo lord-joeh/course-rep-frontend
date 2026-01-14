@@ -19,14 +19,13 @@ const Register = () => {
     confirmPassword: "",
     isRep: false,
   });
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError("");
-    handleShowPassword
     setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -64,7 +63,7 @@ const Register = () => {
       setError(validationError);
       return;
     }
-    setLoading(true);
+    setIsLoading(true);
     setError("");
     try {
       const response = await registerStudent(registerData);
@@ -83,7 +82,7 @@ const Register = () => {
         setRegisterData((prev) => ({ ...prev, password: "" }));
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       setRegisterData({
         id: "",
         name: "",
@@ -220,11 +219,10 @@ const Register = () => {
         <small>
           Already have an Account?
           <span>
-            {" "}
             <a href="/" className="text-[#03045e] hover:text-blue-300">
               Login Here
             </a>
-          </span>{" "}
+          </span>
         </small>
       </div>
     </div>

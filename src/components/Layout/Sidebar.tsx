@@ -4,7 +4,7 @@ import {
   SidebarItemGroup,
   SidebarItems,
 } from "flowbite-react";
-import { HiHome, HiUser, HiChevronLeft } from "react-icons/hi";
+import { HiHome, HiUser, HiChevronLeft, HiSpeakerphone } from "react-icons/hi";
 import {
   MdLibraryBooks,
   MdGroups,
@@ -20,7 +20,6 @@ import { FiActivity } from "react-icons/fi";
 import useAuth from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { SidebarProps } from "../../utils/Interfaces";
-import { HiSpeakerphone } from "react-icons/hi";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
   const { user, logout } = useAuth();

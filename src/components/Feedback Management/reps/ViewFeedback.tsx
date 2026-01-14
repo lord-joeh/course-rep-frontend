@@ -49,7 +49,7 @@ export const ViewFeedback: React.FC<ViewFeedbackProps> = ({
             setModalState((prev: ModalState) => ({
               ...prev,
               isDeleteDialogueOpen: true,
-              itemToDelete: `${formData?.content.slice(0, 30)}...` || "",
+              itemToDelete: `${formData?.content.slice(0, 30)}...`,
               idToDelete: formData?.id || "",
             }))
           }

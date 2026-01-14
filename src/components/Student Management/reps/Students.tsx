@@ -31,7 +31,7 @@ import {
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const navigate = useNavigate();
 
@@ -62,7 +62,7 @@ const Students = () => {
     itemsPerPage = pagination.itemsPerPage,
   ) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       const response = await getStudents(page, itemsPerPage);
@@ -89,7 +89,7 @@ const Students = () => {
         });
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -169,7 +169,7 @@ const Students = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6  font-sans">
+    <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Students Management
       </h1>
@@ -181,9 +181,12 @@ const Students = () => {
           placeholder="Search students..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full flex grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
+          className="flex w-full grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
         />
-        <Button onClick={handleExport} className="w-full md:w-50 justify-center">
+        <Button
+          onClick={handleExport}
+          className="w-full justify-center md:w-50"
+        >
           <FaFileExport className="me-2 h-4 w-4" /> Export Students
         </Button>
       </div>
@@ -219,7 +222,7 @@ const Students = () => {
             onChange={(e) =>
               setPagination((prev) => ({
                 ...prev,
-                itemsPerPage: parseInt(e.target.value),
+                itemsPerPage: Number.parseInt(e.target.value),
                 currentPage: 1,
               }))
             }
@@ -246,13 +249,15 @@ const Students = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {isLoading ? (
+            {isLoading && (
               <TableRow>
                 <TableCell colSpan={studentTableHeaders.length}>
                   <Spinner size="lg" className="me-4" />{" "}
                 </TableCell>
               </TableRow>
-            ) : filteredStudents.length > 0 ? (
+            )}
+
+            {filteredStudents?.length > 0 ? (
               filteredStudents.map((student, index) => (
                 <TableRow
                   key={student.id}

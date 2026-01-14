@@ -211,7 +211,7 @@ const AttendanceInstances = () => {
 
   const calculateTimeRemaining = (expiresAt: string) => {
     const expiryTime = new Date(expiresAt).getTime();
-    const currentTime = new Date().getTime();
+    const currentTime = Date.now();
 
     if (expiryTime > currentTime) {
       const minutesRemaining = Math.ceil(
@@ -380,16 +380,19 @@ const AttendanceInstances = () => {
           </TableHead>
 
           <TableBody>
-            {loading || isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={instanceTableHeaders.length}
-                  className="text-center"
-                >
-                  <Spinner size="lg" className="me-4 animate-spin" />
-                </TableCell>
-              </TableRow>
-            ) : filteredInstances?.length < 1 ? (
+            {loading ||
+              (isLoading && (
+                <TableRow>
+                  <TableCell
+                    colSpan={instanceTableHeaders.length}
+                    className="text-center"
+                  >
+                    <Spinner size="lg" className="me-4 animate-spin" />
+                  </TableCell>
+                </TableRow>
+              ))}
+
+            {filteredInstances?.length < 1 ? (
               <TableRow>
                 <TableCell
                   colSpan={instanceTableHeaders.length}

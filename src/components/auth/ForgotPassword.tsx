@@ -9,7 +9,7 @@ import { ToastInterface } from "../../utils/Interfaces.ts";
 
 const ForgotPassword = () => {
   const [student, setStudent] = useState({ studentId: "" });
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastInterface>({
     message: "",
@@ -36,11 +36,11 @@ const ForgotPassword = () => {
     }
 
     try {
-      setLoading(true)
+      setIsLoading(true)
       const response = await forgotPassword(student);
       if (!response)
         setError("Password reset request failed. Please try again");
-      if (response && response.message) {
+      if (response?.message) {
         setToast((prev) => ({
           ...prev,
           message: response.message,
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
       }
     } finally {
       setStudent((prev) => ({ ...prev, studentId: "" }));
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 

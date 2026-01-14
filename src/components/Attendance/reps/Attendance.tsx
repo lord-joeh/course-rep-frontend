@@ -137,6 +137,7 @@ const Attendance = () => {
     try {
       await remove(id);
     } catch (error) {
+      console.log(error);
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -219,7 +220,10 @@ const Attendance = () => {
         </Card>
       </div>
 
-      <Button className="w-full md:max-w-md cursor-pointer" onClick={() => navigate("/mark")}>
+      <Button
+        className="w-full cursor-pointer md:max-w-md"
+        onClick={() => navigate("/mark")}
+      >
         <BsQrCodeScan className="me-2 h-4 w-4" />
         Scan QR Code
       </Button>
@@ -277,24 +281,25 @@ const Attendance = () => {
         </div>
       </Card>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow-md">
         <Table striped hoverable>
           <TableHead>
             <TableRow>
-              {attendanceTableHeaders.map((head, idx) => (
-                <TableHeadCell key={idx}>{head}</TableHeadCell>
+              {attendanceTableHeaders.map((head) => (
+                <TableHeadCell key={head}>{head}</TableHeadCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
+            {loading && (
               <TableRow>
                 <TableCell colSpan={5} className="py-10 text-center">
                   <Spinner size="xl" />
                 </TableCell>
               </TableRow>
-            ) : attendanceData.length === 0 ? (
+            )}
+
+            {attendanceData?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-10 text-center">
                   No records found.
@@ -347,7 +352,16 @@ const Attendance = () => {
                         }
                       >
                         <span
+                          role="button"
                           onClick={() =>
+                            handleManualMark(
+                              record?.id,
+                              record?.studentId,
+                              record.status,
+                            )
+                          }
+                          onKeyDown={(e) =>
+                            e.key === "Enter" &&
                             handleManualMark(
                               record?.id,
                               record?.studentId,

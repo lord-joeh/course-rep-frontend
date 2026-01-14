@@ -15,7 +15,7 @@ const AddGroupMember = ({ onSuccess, groupId }: NewGroupMemberProp) => {
     studentId: "",
     groupId: groupId,
   });
-  const [isAdding, setAdding] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [toast, setToast] = useState<ToastInterface>({
     message: "",
     type: "error",
@@ -39,7 +39,7 @@ const AddGroupMember = ({ onSuccess, groupId }: NewGroupMemberProp) => {
     if (!memberData?.studentId || !memberData?.groupId)
       return showToast("Make sure all the fields are not empty", "error");
     try {
-      setAdding(true);
+      setIsAdding(true);
       const response = await addGroupMember(memberData);
       const successMessage =
         response?.data?.message || "Group member added successfully";
@@ -54,7 +54,7 @@ const AddGroupMember = ({ onSuccess, groupId }: NewGroupMemberProp) => {
         showToast("An unexpected error occurred.", "error");
       }
     } finally {
-      setAdding(false);
+      setIsAdding(false);
     }
   };
 

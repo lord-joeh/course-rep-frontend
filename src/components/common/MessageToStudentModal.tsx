@@ -20,7 +20,7 @@ import {
 } from "../../utils/Interfaces";
 
 const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
-  const [isSending, setSending] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
   const [messageData, setMessageData] = useState<MessageInterface>({
     message: "",
     messageType: "SMS",
@@ -67,7 +67,7 @@ const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
     }
 
     try {
-      setSending(true);
+      setIsSending(true);
       const response = await sendMessageToStudent({
         ...messageData,
         studentId,
@@ -95,7 +95,7 @@ const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
         });
       }
     } finally {
-      setSending(false);
+      setIsSending(false);
     }
   };
 

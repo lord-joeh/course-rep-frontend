@@ -1,8 +1,7 @@
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, ReactNode, useCallback } from "react";
 import { SocketContext, SocketContextType } from "./socketContextInstance";
 import { io } from "socket.io-client";
 
-// module-scoped singleton socket to avoid multiple connections (React StrictMode/HMR)
 let socketSingleton: SocketContextType = null;
 let socketId: string | null = null;
 let currentToken: string | null = null;
@@ -10,8 +9,17 @@ let currentToken: string | null = null;
 export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [socket, setSocket] = useState<SocketContextType>(socketSingleton);
 
+  const getLocalStorageToken = useCallback(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      return user.token || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
-    const { token } = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = getLocalStorageToken();
     currentToken = token;
 
     if (!socketSingleton) {
@@ -21,70 +29,60 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
           ? "/"
           : "http://localhost:5000");
 
-      const secure = typeof url === "string" && url.startsWith("https");
       socketSingleton = io(url, {
         path: "/api/socket.io",
         withCredentials: true,
-        secure,
         auth: { token },
-      });
-
-      // Store socket ID when connected
-      socketSingleton.on("connect", () => {
-        socketId = socketSingleton?.id || null;
-      });
-
-      // Clear socket ID when disconnected
-      socketSingleton.on("disconnect", () => {
-        socketId = null;
-        console.log("🔌 Socket disconnected");
-      });
-
-      // Add error handling
-      socketSingleton.on("connect_error", (error) => {
-        console.error("❌ Socket connection error:", error);
+        autoConnect: true, 
       });
     }
+
+    const onConnect = () => {
+      socketId = socketSingleton?.id || null;
+    };
+    const onDisconnect = () => {
+      socketId = null;
+    };
+    const onError = (err: Error) => console.error(" Socket Error:", err);
+
+    socketSingleton.on("connect", onConnect);
+    socketSingleton.on("disconnect", onDisconnect);
+    socketSingleton.on("connect_error", onError);
 
     setSocket(socketSingleton);
 
     return () => {
-      // only disconnect when the page is unloading and no other consumers exist.
-      // For dev/HMR/StrictMode the singleton avoids double connections.
-      // Do not set socketSingleton = null here to keep a stable instance across remounts.
-      if (typeof window !== "undefined") {
-        // leave socket connected; it will be cleaned up on full page unload
-      }
+      socketSingleton?.off("connect", onConnect);
+      socketSingleton?.off("disconnect", onDisconnect);
+      socketSingleton?.off("connect_error", onError);
     };
-  }, []);
+  }, [getLocalStorageToken]);
 
-  // Listen for token changes and re-authenticate socket
   useEffect(() => {
-    const checkTokenChange = () => {
-      const { token } = JSON.parse(localStorage.getItem("user") || "{}");
-      if (token !== currentToken && socketSingleton) {
-        currentToken = token;
-        // Update socket authentication with new token
-        socketSingleton.auth = { token };
-        // Reconnect with new token
-        socketSingleton.disconnect();
-        socketSingleton.connect();
-        console.log("🔄 Socket re-authenticated with new token");
+    const syncToken = () => {
+      const newToken = getLocalStorageToken();
+      if (newToken !== currentToken && socketSingleton) {
+        console.log("🔄 Re-authenticating socket...");
+        currentToken = newToken;
+        socketSingleton.auth = { token: newToken };
+        socketSingleton.disconnect().connect();
       }
     };
 
-    // Check for token changes every 5 seconds
-    const interval = setInterval(checkTokenChange, 30000);
+    // Instant sync across tabs
+    globalThis.window.addEventListener("storage", syncToken);
 
-    return () => clearInterval(interval);
-  }, []);
+    const interval = setInterval(syncToken, 30000);
+
+    return () => {
+      globalThis.window.removeEventListener("storage", syncToken);
+      clearInterval(interval);
+    };
+  }, [getLocalStorageToken]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 };
 
-// Export function to get current socket ID
-export const getSocketId = (): string | null => {
-  return socketId;
-};
+export const getSocketId = () => socketId;

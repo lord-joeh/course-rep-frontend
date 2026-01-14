@@ -17,7 +17,7 @@ const GlobalErrorHandler = () => {
 
     window.addEventListener("http-error", handleHttpError);
 
-    return () => window.removeEventListener("http-error", handleHttpError);
+    return () => globalThis.removeEventListener("http-error", handleHttpError);
   }, []);
 
   if (!toast?.isVisible) return null;

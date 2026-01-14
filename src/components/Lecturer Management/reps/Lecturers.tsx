@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import * as lecturerService from "../../../services/lecturerService";
-import { MdRefresh } from "react-icons/md";
+import { MdRefresh, MdDeleteForever } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
 import CommonModal from "../../common/CommonModal";
 import {
   Button,
@@ -18,11 +17,7 @@ import {
 } from "flowbite-react";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import { HiUser } from "react-icons/hi";
-import {
-  ModalState,
-  Lecturer,
-  courseType,
-} from "../../../utils/Interfaces";
+import { ModalState, Lecturer, courseType } from "../../../utils/Interfaces";
 import { useCrud } from "../../../hooks/useCrud";
 import { useSearch } from "../../../hooks/useSearch";
 import LecturerModalContent from "./LecturerModalContent";
@@ -84,7 +79,6 @@ const Lecturers = () => {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
       await remove(id);
     } catch (err) {
-      // Error handling is done in useCrud
     } finally {
       setModalState((prev) => ({
         ...prev,
@@ -189,7 +183,7 @@ const Lecturers = () => {
             isEditing: false,
           }));
         }}
-        className="flex w-full md:w-50 justify-center"
+        className="flex w-full justify-center md:w-50"
       >
         <HiUser className="me-2 h-4 w-4" /> Add New Lecturer
       </Button>
@@ -203,13 +197,15 @@ const Lecturers = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {isLoading ? (
+            {isLoading && (
               <TableRow>
                 <TableCell colSpan={lecturersTableHeader.length}>
                   <Spinner size="lg" className="me-4 animate-spin" />{" "}
                 </TableCell>
               </TableRow>
-            ) : filteredLecturers.length > 0 ? (
+            )}
+
+            {filteredLecturers?.length > 0 ? (
               filteredLecturers.map((lecturer, index) => (
                 <TableRow
                   key={lecturer?.id}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -39,11 +39,11 @@ const StudentDashboard = () => {
       setLoading(true);
 
       const coursesRes = await getCourses();
-      const coursesList = coursesRes?.data
+      const coursesList = coursesRes?.data;
       setCourses(coursesList);
 
       const eventsRes = await getEvents();
-      const eventsList = (eventsRes?.data as Event[]);
+      const eventsList = eventsRes?.data as Event[];
 
       let allAssignments: AssignmentsInterface[] = [];
 
@@ -127,11 +127,13 @@ const StudentDashboard = () => {
             <h5 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
               Upcoming Deadlines
             </h5>
-            {loading ? (
+            {loading && (
               <div className="flex justify-center p-6">
                 <Spinner />
               </div>
-            ) : deadlines.length > 0 ? (
+            )}
+
+            {deadlines?.length > 0 ? (
               <Timeline>
                 {deadlines.map((assignment) => (
                   <TimelineItem key={assignment.id}>

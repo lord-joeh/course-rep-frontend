@@ -43,7 +43,7 @@ export interface ModalState {
 const Groups = () => {
   const [groups, setGroups] = useState<GroupInterface[]>([]);
   const [coursesList, setCoursesList] = useState<Course[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filterQuery, setFilterQuery] = useState<string>("");
   const [editForm, setEditForm] = useState<Partial<GroupInterface>>({});
@@ -101,7 +101,7 @@ const Groups = () => {
     courseId = filterQuery,
   ) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
 
       const response = await groupService.getGroups(
         page,
@@ -127,7 +127,7 @@ const Groups = () => {
         showToast("An unexpected error occurred.", "error");
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -168,7 +168,7 @@ const Groups = () => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
-  const filteredGroup = useSearch<GroupInterface>(groups, searchQuery)
+  const filteredGroup = useSearch<GroupInterface>(groups, searchQuery);
 
   const handleGroupDelete = async () => {
     try {
@@ -301,7 +301,7 @@ const Groups = () => {
           onChange={(e) =>
             setPagination((prev) => ({
               ...prev,
-              itemsPerPage: parseInt(e.target.value),
+              itemsPerPage: Number.parseInt(e.target.value),
               currentPage: 1,
             }))
           }
@@ -320,9 +320,9 @@ const Groups = () => {
         </h1>
       )}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {isLoading ? (
-          <Spinner size="lg" />
-        ) : filteredGroup.length > 0 ? (
+        {isLoading && <Spinner size="lg" />}
+
+        {filteredGroup?.length > 0 ? (
           filteredGroup.map((group: GroupInterface) => (
             <Card key={group?.id} className="overscroll-x-auto">
               <div className="flex flex-col items-start justify-between">
@@ -382,7 +382,9 @@ const Groups = () => {
             </Card>
           ))
         ) : (
-          <p className="dark:text-white">No Groups found. Try selecting a course </p>
+          <p className="dark:text-white">
+            No Groups found. Try selecting a course{" "}
+          </p>
         )}
       </div>
 

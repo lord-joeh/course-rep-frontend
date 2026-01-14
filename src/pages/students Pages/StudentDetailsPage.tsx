@@ -1,11 +1,7 @@
 import StudentDetails from "../../components/Student Management/reps/StudentDetails";
 
 const StudentDetailsPage = () => {
-  return (
-    <>
-      <StudentDetails />
-    </>
-  );
+  return <StudentDetails />;
 };
 
 export default StudentDetailsPage;

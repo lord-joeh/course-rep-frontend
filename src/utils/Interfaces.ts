@@ -316,11 +316,12 @@ export interface AssignmentDetailsInterface extends SubmittedAssignment {
     email: string;
   };
 }
+export type ClassType = "in-person" | "online" | "";
 
 export interface AddNewAttendanceInstanceInterface {
   courseId: string;
   date: string;
-  classType: "in-person" | "online" | "";
+  classType: ClassType;
   latitude?: number;
   longitude?: number;
 }
@@ -332,7 +333,7 @@ export interface AttendanceInstanceInterface {
   qr_image: string;
   qr_token: string;
   expires_at: string;
-  class_type: "in-person" | "online" | "";
+  class_type: ClassType;
   latitude?: number;
   longitude?: number;
   createdAt: string;
@@ -344,7 +345,7 @@ export interface AttendanceFilterInterface {
   limit: number;
   courseId: string;
   date: string;
-  class_type: "in-person" | "online" | "";
+  class_type: ClassType;
 }
 
 export interface AttendanceRecordInterface {

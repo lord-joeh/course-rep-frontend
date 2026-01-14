@@ -11,7 +11,6 @@ export const DeleteConfirmationDialogue = ({
   onClose,
 }: DeleteType) => {
   return (
-    <>
       <Modal show={isOpen} size="lg" onClose={onClose} popup dismissible position="center">
         <ModalHeader />
         <ModalBody>
@@ -33,6 +32,5 @@ export const DeleteConfirmationDialogue = ({
           </div>
         </ModalBody>
       </Modal>
-    </>
   );
 };

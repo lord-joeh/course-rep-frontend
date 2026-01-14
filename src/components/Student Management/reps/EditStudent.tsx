@@ -33,7 +33,6 @@ const EditStudent: React.FC<EditStudentProps> = ({
       </h1>
 
       <form onSubmit={handleUserEdit} className="flex flex-col gap-4">
-        <>
           <div>
             <Label htmlFor="status">Status</Label>
             <select
@@ -65,7 +64,6 @@ const EditStudent: React.FC<EditStudentProps> = ({
               {studentData?.isRep ? "Change to student" : "Change to Rep"}
             </Label>
           </div>
-        </>
         <div className="flex justify-center gap-4">
           <Button type="submit" disabled={isEditing} color="green">
             {isEditing ? "Saving..." : "Save Changes"}

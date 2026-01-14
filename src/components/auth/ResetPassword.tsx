@@ -25,7 +25,7 @@ const ResetPassword = () => {
     newPassword: "",
     confirmPassword: "",
   });
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     const getTokenFromUrl = () => {
-      const queryString = window.location.search;
+      const queryString = globalThis.location.search;
 
       const urlParams = new URLSearchParams(queryString);
 
@@ -95,10 +95,10 @@ const ResetPassword = () => {
     }
 
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError("");
       const response: ResetResponse = await resetPassword(resetData);
-      if (response && response.message) {
+      if (response?.message) {
         const successMessage = `${response.message}. Redirecting to Login`;
         setToast((prev) => ({
           ...prev,
@@ -138,7 +138,7 @@ const ResetPassword = () => {
         }));
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
   return (

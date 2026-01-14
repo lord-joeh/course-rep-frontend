@@ -96,7 +96,7 @@ const Course = () => {
     "ACTIONS",
   ];
 
-  const filteredCourses = useSearch<CourseInterface>(courses, searchQuery)
+  const filteredCourses = useSearch<CourseInterface>(courses, searchQuery);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -155,8 +155,6 @@ const Course = () => {
   const handleRefresh = () => {
     refresh();
   };
-
-
 
   useEffect(() => {
     fetchLecturers().catch((err) => console.log(err));
@@ -220,7 +218,7 @@ const Course = () => {
   return (
     <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        {user && user.isRep ? "Course Management" : "Courses"}
+        {user?.isRep ? "Course Management" : "Courses"}
       </h1>
 
       <div className="flex w-full items-center gap-3">
@@ -238,7 +236,7 @@ const Course = () => {
 
         <Button
           onClick={handleRefresh}
-          className="shrink-0 flex items-center gap-2 px-3 py-2"
+          className="flex shrink-0 items-center gap-2 px-3 py-2"
           aria-label="Refresh courses"
         >
           <MdRefresh size={18} className="me-1" /> Refresh
@@ -253,7 +251,7 @@ const Course = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-full md:w-50 justify-center"
+          className="flex w-full justify-center md:w-50"
         >
           <MdOutlineBookmarkAdd className="me-2 h-4 w-4" /> Add New Course
         </Button>
@@ -269,13 +267,15 @@ const Course = () => {
           </TableHead>
 
           <TableBody>
-            {isLoading ? (
+            {isLoading && (
               <TableRow>
                 <TableCell colSpan={courseTableHeader.length}>
                   <Spinner size="lg" className="me-4 animate-spin" />{" "}
                 </TableCell>
               </TableRow>
-            ) : filteredCourses.length > 0 ? (
+            )}
+
+            {filteredCourses?.length > 0 ? (
               filteredCourses.map((course: CourseInterface, index) => (
                 <TableRow
                   key={course?.id}

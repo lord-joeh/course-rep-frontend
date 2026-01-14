@@ -3,6 +3,7 @@ import {
   useState,
   ReactNode,
   useCallback,
+  useMemo,
 } from "react";
 
 export interface ProgressItem {
@@ -43,7 +44,7 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     (id: string, title: string, metadata?: ProgressItem["metadata"]) => {
       setItems((prev) => {
         // Prevent duplicates
-        if (prev.find((item) => item.id === id)) return prev;
+        if (prev.some((item) => item.id === id)) return prev;
         return [
           ...prev,
           {
@@ -108,17 +109,27 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     [items],
   );
 
+  const contextValue = useMemo(
+    () => ({
+      items,
+      addProgress,
+      updateProgress,
+      completeProgress,
+      removeProgress,
+      getProgressItem,
+    }),
+    [
+      items,
+      addProgress,
+      updateProgress,
+      completeProgress,
+      removeProgress,
+      getProgressItem,
+    ],
+  );
+
   return (
-    <ProgressContext.Provider
-      value={{
-        items,
-        addProgress,
-        updateProgress,
-        completeProgress,
-        removeProgress,
-        getProgressItem,
-      }}
-    >
+    <ProgressContext.Provider value={contextValue}>
       {children}
     </ProgressContext.Provider>
   );

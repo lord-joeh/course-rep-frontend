@@ -151,7 +151,7 @@ const ScanQrCode = () => {
 
     if (hasToken && hasLocation && !autoMarkAttempted.current) {
       autoMarkAttempted.current = true;
-      markAttendance(params.token!);
+      markAttendance(params.token as string);
     }
   }, [location, params.token, markAttendance]);
 

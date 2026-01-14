@@ -1,10 +1,4 @@
-import {
-  FileInput,
-  Label,
-  HelperText,
-  Button,
-  Spinner,
-} from "flowbite-react";
+import { FileInput, Label, HelperText, Button, Spinner } from "flowbite-react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { submitAssignment } from "../../../services/assignmentService";
 import { useCrud } from "../../../hooks/useCrud";
@@ -27,9 +21,8 @@ const SubmitAssignment = ({
   const { loading, add, toast, closeToast } =
     useCrud<AssignmentSubmissionInterface>(crudServices);
 
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target?.files && e.target?.files[0]) {
       setSelectedFile(e.target.files[0]);
     }
   };
@@ -47,10 +40,7 @@ const SubmitAssignment = ({
     formData.append("assignmentId", assignmentId);
     formData.append("studentId", studentId);
 
-    try {
-      await add(formData);
-    } catch (error) {
-    }
+    await add(formData);
   };
 
   return (
@@ -101,7 +91,6 @@ const SubmitAssignment = ({
             </>
           )}
         </Button>
-
       </form>
 
       {toast.visible && (

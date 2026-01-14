@@ -167,6 +167,7 @@ const RepDashboard = () => {
                 Recent Feedback
               </h5>
               <span
+                role="button"
                 onClick={() => navigate("/reps/feedbacks")}
                 className="cursor-pointer text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
               >
@@ -174,11 +175,13 @@ const RepDashboard = () => {
               </span>
             </div>
             <div className="overflow-x-auto">
-              {loading ? (
+              {loading && (
                 <div className="flex justify-center p-4">
                   <Spinner />
                 </div>
-              ) : recentFeedbacks.length > 0 ? (
+              )}
+
+              {recentFeedbacks?.length > 0 ? (
                 <Table hoverable striped>
                   <TableHead>
                     <TableRow>

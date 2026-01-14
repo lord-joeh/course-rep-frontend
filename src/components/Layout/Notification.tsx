@@ -121,9 +121,11 @@ const Notifications = () => {
         <ul className="max-h-80 divide-y divide-gray-100 overflow-y-auto dark:divide-gray-700">
           {notifications.length > 0 ? (
             notifications.map((note) => (
-              <li
+              <li role="button"
+              tabIndex={0}
                 key={note.id}
                 onClick={() => handleMarkRead(note)}
+                onKeyDown={(e) => e.key === 'Enter' && handleMarkRead(note)}
                 className={`group cursor-pointer px-4 py-3 transition-colors ${
                   note.isRead
                     ? "opacity-60 hover:bg-gray-50 dark:hover:bg-gray-700"

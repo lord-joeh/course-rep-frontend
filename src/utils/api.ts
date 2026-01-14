@@ -100,7 +100,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         dispatchHttpError("Session Expired");
         localStorage.removeItem("user");
-        window.location.href = "/";
+        globalThis.location.href = "/";
         return Promise.reject(refreshError);
       }
     }

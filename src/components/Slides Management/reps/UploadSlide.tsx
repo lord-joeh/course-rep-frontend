@@ -57,7 +57,6 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
     },
   });
 
-
   const showToast = (message: string, type: "error" | "success") => {
     setToast((prev) => ({ ...prev, isVisible: true, message, type }));
   };
@@ -94,7 +93,7 @@ const UploadSlide = ({ courses, onSuccess }: any) => {
 
       fd.append("courseId", formData.courseId);
       if (formData.folderId) fd.append("folderId", formData.folderId);
-      if (socket && socket.id) fd.append("socketId", socket.id);
+      if (socket?.id) fd.append("socketId", socket.id);
 
       const response = await uploadSlides(fd);
 

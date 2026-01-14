@@ -93,10 +93,8 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
       return showToast(errMessage, "error");
     }
 
-    try {
-      await add(instanceData);
-      onSuccess?.();
-    } catch (error) {}
+    await add(instanceData);
+    onSuccess?.();
   };
 
   useEffect(() => {
@@ -193,12 +191,12 @@ const AddNewAttendanceInstance = ({ courses, onSuccess }: Props) => {
           </div>
 
           <div className="mt-3">
-            {instanceData.latitude !== 0 ? (
+            {instanceData?.latitude ? (
               <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
                 <RiUserLocationFill size={20} />
                 <span>
-                  Lat: {instanceData.latitude!.toFixed(6)}, Long
-                  {instanceData.longitude!.toFixed(6)}
+                  Lat: {instanceData.latitude.toFixed(6)}, Long:{" "}
+                  {instanceData.longitude?.toFixed(6)}
                 </span>
               </div>
             ) : (

@@ -1,5 +1,5 @@
 function dispatchHttpError(message: string) {
-  window.dispatchEvent(
+  globalThis.dispatchEvent(
     new CustomEvent("http-error", {
       detail: {
         message,

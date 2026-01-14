@@ -14,25 +14,25 @@ interface StudentInfoProps {
 }
 
 const useStudentData = (studentId: string | undefined) => {
-  const [studentData, setStudent] = useState<StudentInfoProps | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const [studentData, setStudentData] = useState<StudentInfoProps | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!studentId) {
-      setLoading(false);
+      setIsLoading(false);
       setError("Student ID is missing.");
       return;
     }
 
     const fetchStudent = async () => {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       try {
         const response = await studentById(studentId);
         const results = response?.data;
         if (results) {
-          setStudent(results);
+          setStudentData(results);
         } else {
           setError("Student not found.");
         }
@@ -45,7 +45,7 @@ const useStudentData = (studentId: string | undefined) => {
           setError("An unexpected error occurred while fetching student.");
         }
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchStudent().catch((err) => {console.log(err)});

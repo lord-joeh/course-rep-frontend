@@ -8,6 +8,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), flowbiteReact()],
 
   server: {
-    allowedHosts: ['.ngrok-free.dev']
+    allowedHosts: ['.ngrok-free.dev', '.outray.app']
   }
 });

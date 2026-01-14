@@ -12,7 +12,7 @@ import { createMagicGroups } from "../../../services/groupsService";
 import ToastMessage from "../../common/ToastMessage";
 
 const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [magicData, setMagicData] = useState<MagicInterface>({
     courseId: "",
     studentsPerGroup: 0,
@@ -34,7 +34,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
   const handleMagicSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await createMagicGroups(magicData);
       const successMessage = response?.message || "Groups created successfully";
       if (typeof onSuccess === "function") onSuccess(successMessage);
@@ -51,7 +51,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
         );
       }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
       setMagicData({
         courseId: "",
         studentsPerGroup: 0,
@@ -105,7 +105,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
               onChange={(e) =>
                 setMagicData((prev) => ({
                   ...prev,
-                  studentsPerGroup: parseInt(e.target.value),
+                  studentsPerGroup: Number.parseInt(e.target.value),
                 }))
               }
             />

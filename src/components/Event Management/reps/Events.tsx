@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import * as eventService from "../../../services/eventService";
-import {
-  Button,
-  Card,
-  Spinner,
-} from "flowbite-react";
+import { Button, Card, Spinner } from "flowbite-react";
 import { MdDeleteForever, MdRefresh } from "react-icons/md";
 import { IoLocationOutline, IoTimeOutline } from "react-icons/io5";
 import { FiEdit3 } from "react-icons/fi";
@@ -145,7 +141,7 @@ const Events = () => {
   return (
     <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        {user && user.isRep ? "Event Management" : "Events"}
+        {user?.isRep ? "Event Management" : "Events"}
       </h1>
 
       <div className="flex w-full items-center gap-3">
@@ -179,7 +175,7 @@ const Events = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-full md:w-50 justify-center"
+          className="flex w-full justify-center md:w-50"
         >
           <TbTimelineEventPlus className="me-2 h-4 w-4" /> Add New Event
         </Button>
@@ -188,11 +184,12 @@ const Events = () => {
         Upcoming Events
       </h1>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {isLoading ? (
+        {isLoading && (
           <Card>
             <Spinner size="lg" />
           </Card>
-        ) : filteredEvents.length > 0 ? (
+        )}
+        {filteredEvents?.length > 0 ? (
           filteredEvents.map((event: Event, idx) => (
             <div
               key={idx}
