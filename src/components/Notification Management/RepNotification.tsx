@@ -72,6 +72,8 @@ const RepNotification = () => {
   const handleCreate = async (data: { title: string; message: string }) => {
     setLoading(true);
     try {
+      data.message.trim();
+      data.title.trim();
       await addNotification(data);
       setToast({
         visible: true,

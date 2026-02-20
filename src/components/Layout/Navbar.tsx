@@ -1,7 +1,7 @@
 import Notifications from "./Notification";
 import { FiMenu } from "react-icons/fi";
-import { Avatar } from "flowbite-react";
 import { navbarProp } from "../../utils/Interfaces";
+import Profile from "./Profile";
 
 const Navbar = ({
   toggleSidebar,
@@ -23,7 +23,7 @@ const Navbar = ({
 
       <div className="flex items-center space-x-8">
         <Notifications />
-        <Avatar rounded />
+        <Profile />
       </div>
     </nav>
   );

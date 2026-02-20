@@ -138,6 +138,8 @@ const Events = () => {
     "NOV",
     "DEC",
   ];
+
+  
   return (
     <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">

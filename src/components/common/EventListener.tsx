@@ -24,7 +24,7 @@ const EventListener = () => {
     if (!socket) return;
 
     const onConnect = () => {
-      showToast("Socket connected", "success");
+      // showToast("Socket connected", "success");
       console.log(" Socket connected with ID:", socket.id);
     };
 

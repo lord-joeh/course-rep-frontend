@@ -55,9 +55,25 @@ const Notifications = () => {
       setNotifications((prev) => [newNote, ...prev]);
       setUnreadCount((prev) => prev + 1);
     };
+
+    const handleUpdate = (updatedNote: Notification) => {
+      setNotifications((prev) =>
+        prev.map((note) => (note.id === updatedNote.id ? updatedNote : note)),
+      );
+    };
+
+    const handleDelete = (deletedId: string) => {
+      setNotifications((prev) => prev.filter((note) => note?.id !== deletedId));
+      setUnreadCount((prev) => prev - 1);
+    };
+
     socket.on("newNotification", handleNew);
+    socket.on("updateNotification", handleUpdate);
+    socket.on("deleteNotification", handleDelete);
     return () => {
       socket.off("newNotification", handleNew);
+      socket.off("updateNotification", handleUpdate);
+      socket.off("deleteNotification", handleDelete);
     };
   }, [socket]);
 
@@ -121,11 +137,12 @@ const Notifications = () => {
         <ul className="max-h-80 divide-y divide-gray-100 overflow-y-auto dark:divide-gray-700">
           {notifications.length > 0 ? (
             notifications.map((note) => (
-              <li role="button"
-              tabIndex={0}
+              <li
+                role="button"
+                tabIndex={0}
                 key={note.id}
                 onClick={() => handleMarkRead(note)}
-                onKeyDown={(e) => e.key === 'Enter' && handleMarkRead(note)}
+                onKeyDown={(e) => e.key === "Enter" && handleMarkRead(note)}
                 className={`group cursor-pointer px-4 py-3 transition-colors ${
                   note.isRead
                     ? "opacity-60 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -144,7 +161,7 @@ const Notifications = () => {
                         <div className="h-2 w-2 rounded-full bg-blue-600"></div>
                       )}
                     </div>
-                    <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       {note.message}
                     </p>
                     <div className="mt-2 flex items-center justify-between">

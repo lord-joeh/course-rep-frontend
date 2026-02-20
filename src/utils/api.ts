@@ -2,6 +2,23 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { getSocketId } from "../context/socketContext";
 import dispatchHttpError from "./dispatchHttpError";
 
+// Types for the queuing system
+interface FailedRequest {
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}
+
+let isRefreshing = false;
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else if (token) prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
@@ -12,7 +29,6 @@ const api = axios.create({
   },
 });
 
-// Routes that do not require an access token
 const publicRoutes = [
   "/api/auth/login",
   "/api/students/register",
@@ -22,65 +38,77 @@ const publicRoutes = [
 ];
 
 api.interceptors.request.use(
-  async function (config): Promise<InternalAxiosRequestConfig<any>> {
-  if (publicRoutes.some((route) => config.url?.includes(route))) {
-    return config;
-  }
+  async (config): Promise<InternalAxiosRequestConfig> => {
+    const isPublic = publicRoutes.some((route) => config.url?.includes(route));
 
-  if (config.method === "get") {
-    config.headers.set("Cache-Control", "no-cache");
-    config.headers.set("Pragma", "no-cache");
-  }
-
-  const socketId = getSocketId();
-  if (socketId) {
-    config.headers.set("X-Socket-ID", socketId);
-  }
-
-  try {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const user = JSON.parse(userData);
-      if (user?.token) {
-        config.headers.set("Authorization", `Bearer ${user.token}`);
-      }
+    if (!isPublic && config.method === "get") {
+      config.headers.set("Cache-Control", "no-cache");
+      config.headers.set("Pragma", "no-cache");
     }
-  } catch (error) {
-    console.error("Auth Error: Failed to parse user data", error);
-  }
 
-  return config;
-},
+    // Attach Socket ID for real-time tracking
+    const socketId = getSocketId();
+    if (socketId) {
+      config.headers.set("X-Socket-ID", socketId);
+    }
+
+    // Attach Bearer Token
+    try {
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user?.token) {
+          config.headers.set("Authorization", `Bearer ${user.token}`);
+        }
+      }
+    } catch (e) {
+      console.error("Auth Header Error:", e);
+    }
+
+    return config;
+  },
   (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
   (response) => response,
-  async function (error: AxiosError) {
+  async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
       _retryCount?: number;
     };
 
-    if (!originalRequest) return Promise.reject(error);
+    if (!originalRequest || !error.response) return Promise.reject(error);
 
-    // 1. Handle Token Expiration (401)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      const isPublicRoute = publicRoutes.some((route) => originalRequest.url?.includes(route)
-      );
-
-      if (isPublicRoute) {
+    // 1. Handle 401 Unauthorized (Token Expiry)
+    if (error.response.status === 401) {
+      // If we are already retrying or it's a public/refresh route, fail immediately
+      if (
+        originalRequest._retry ||
+        originalRequest.url?.includes("/api/auth/refresh")
+      ) {
         return Promise.reject(error);
       }
 
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.set("Authorization", `Bearer ${token}`);
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        // Attempt to refresh token
         const refreshResponse = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         const { token } = refreshResponse.data;
@@ -92,51 +120,42 @@ api.interceptors.response.use(
           localStorage.setItem("user", JSON.stringify({ ...user, token }));
         }
 
-        // Retry original request with new token
-        originalRequest.headers.set("Authorization", `Bearer ${token}`);
+        // Update instance and retry original
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        originalRequest.headers.set("Authorization", `Bearer ${token}`);
 
+        processQueue(null, token);
         return api(originalRequest);
       } catch (refreshError) {
-        dispatchHttpError("Session Expired");
+        processQueue(refreshError, null);
+        dispatchHttpError("Session Expired. Please log in again.");
         localStorage.removeItem("user");
-        globalThis.location.href = "/";
+        window.location.href = "/";
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    if (error.response?.status === 429) {
+    // 2. Handle 429 Too Many Requests (Rate Limiting)
+    if (error.response.status === 429) {
       const retryCount = originalRequest._retryCount || 0;
-      const MAX_RETRIES = 2;
-
-      if (retryCount < MAX_RETRIES) {
+      if (retryCount < 2) {
         originalRequest._retryCount = retryCount + 1;
-        const delay = 1000 * Math.pow(2, retryCount);
-
-        console.warn(`Rate limit hit. Retrying in ${delay}ms...`);
-        await new Promise((resolve) => setTimeout(resolve, delay));
-
+        const backoffDelay = 1000 * Math.pow(2, retryCount); // 1s, 2s
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay));
         return api(originalRequest);
-      } else {
-        dispatchHttpError("Rate Limit Exceeded. Please try again later");
       }
+      dispatchHttpError("Rate limit exceeded. Try again in a moment.");
     }
 
-    if (error.response && error.response.status >= 500) {
-      console.error("Server Error:", error.response.data);
-      dispatchHttpError("Something went wrong on the server.");
+    // 3. Handle 500+ Server Errors
+    if (error.response.status >= 500) {
+      dispatchHttpError("Server error. We are working on it!");
     }
 
     return Promise.reject(error);
   },
 );
-
-// Debug logging in development
-if (import.meta.env.VITE_ENV === "development") {
-  api.interceptors.request.use((request) => {
-    console.log("Request:", request.method?.toUpperCase(), request.url);
-    return request;
-  });
-}
 
 export default api;
