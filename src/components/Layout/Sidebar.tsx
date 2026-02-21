@@ -12,7 +12,6 @@ import {
   MdAssignment,
 } from "react-icons/md";
 import { VscFeedback } from "react-icons/vsc";
-import { RiLogoutCircleLine } from "react-icons/ri";
 import { HiMiniAcademicCap } from "react-icons/hi2";
 import { FaUserCheck } from "react-icons/fa";
 import { IoBookSharp } from "react-icons/io5";
@@ -22,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { SidebarProps } from "../../utils/Interfaces";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleRedirect = (repPath: string, studentPath: string) => {

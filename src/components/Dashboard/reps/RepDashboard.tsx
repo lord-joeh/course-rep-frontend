@@ -14,12 +14,10 @@ import {
 } from "flowbite-react";
 import {
   HiUserGroup,
-  HiOutlineClipboardList,
   HiCalendar,
   HiSpeakerphone,
 } from "react-icons/hi";
 import {
-  MdAssignment,
   MdBookmarkAdd,
   MdClass,
   MdQrCodeScanner,
