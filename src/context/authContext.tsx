@@ -60,14 +60,11 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL || "https://madalene-noninflected-writhingly.ngrok-free.dev"}/api/auth/logout`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
     } catch (e) {}
     setUser(null);
     clearAuthData();
@@ -86,7 +83,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }
     } catch (error) {
       console.error("Error parsing user from localStorage:", error);
-      logout().then(r => console.log(r));
+      logout().then((r) => console.log(r));
     } finally {
       setLoading(false);
     }

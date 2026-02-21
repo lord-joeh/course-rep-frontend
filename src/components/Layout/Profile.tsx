@@ -1,8 +1,13 @@
-import { Avatar, Button, Dropdown } from "flowbite-react";
+import { Avatar, Dropdown } from "flowbite-react";
 import useAuth from "../../hooks/useAuth";
+import { PiGearFineBold } from "react-icons/pi";
+import { MdOutlineToggleOff } from "react-icons/md";
+import { CiLogout } from "react-icons/ci";
+import useTheme from "../../hooks/useTheme";
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   let userInitials = "";
 
@@ -37,10 +42,36 @@ export default function Profile() {
           </span>
         </div>
 
-        <div className="mt-2">
-          <Button color="alternative" className="w-full border-none">
-            Change Password
-          </Button>
+        <div className="mt-2 flex flex-col">
+          <span
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            role="button"
+          >
+            <PiGearFineBold size={24} color="gray" />
+            <p className="text-xl font-medium text-gray-600 dark:text-gray-100">
+              Settings
+            </p>
+          </span>
+
+          <span
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            role="button"
+            onClick={toggleTheme}
+          >
+            <MdOutlineToggleOff size={32} color="gray" />
+            <p className="text-xl font-medium text-gray-600 dark:text-gray-100">
+              {theme?.name} mode
+            </p>
+          </span>
+
+          <span
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            role="button"
+            onClick={logout}
+          >
+            <CiLogout size={24} color="red" />
+            <p className="text-xl font-medium text-red-500">Logout</p>
+          </span>
         </div>
       </div>
     </Dropdown>

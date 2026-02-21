@@ -160,13 +160,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
                 Security
               </SidebarItem>
             )}
-            <SidebarItem
-              className="cursor-pointer"
-              onClick={logout}
-              icon={RiLogoutCircleLine}
-            >
-              Logout
-            </SidebarItem>
           </SidebarItemGroup>
         </SidebarItems>
       </FlowbiteSidebar>

@@ -16,6 +16,7 @@ import {
   HiUserGroup,
   HiOutlineClipboardList,
   HiCalendar,
+  HiSpeakerphone,
 } from "react-icons/hi";
 import {
   MdAssignment,
@@ -30,10 +31,14 @@ import { getEvents } from "../../../services/eventService";
 import { courses as getCourses } from "../../../services/courseService";
 import { Feedback } from "../../../utils/Interfaces";
 import useAuth from "../../../hooks/useAuth";
+import { getSocketId } from "../../../context/socketContext";
+import { IoBookSharp } from "react-icons/io5";
+import { VscFeedback } from "react-icons/vsc";
 
 const RepDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const socketConnection = getSocketId()
 
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -43,6 +48,7 @@ const RepDashboard = () => {
   });
   const [recentFeedbacks, setRecentFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -93,7 +99,7 @@ const RepDashboard = () => {
   }, []);
 
   return (
-    <div className="fade-in space-y-6">
+    <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Students"
@@ -107,7 +113,7 @@ const RepDashboard = () => {
         <StatCard
           title="Total Feedbacks"
           value={stats.totalFeedbacks}
-          icon={HiOutlineClipboardList}
+          icon={VscFeedback}
           color="red"
           subText="Received to date"
           loading={loading}
@@ -116,7 +122,7 @@ const RepDashboard = () => {
         <StatCard
           title="Active Courses"
           value={stats.activeCourses}
-          icon={MdAssignment}
+          icon={IoBookSharp}
           color="purple"
           subText="Courses managed"
           loading={loading}
@@ -141,7 +147,7 @@ const RepDashboard = () => {
                 Quick Actions
               </h5>
             </div>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-1 gap-6 2xl:grid-cols-3 lg:grid-cols-2">
               <Button onClick={() => navigate("/reps/events")}>
                 <HiCalendar className="mr-2 h-5 w-5" />
                 Create Event
@@ -152,11 +158,15 @@ const RepDashboard = () => {
               </Button>
               <Button onClick={() => navigate("/reps/attendance")}>
                 <MdBookmarkAdd className="mr-2 h-5 w-5" />
-                Create Attendance Instance
+                Create Attendance
               </Button>
               <Button onClick={() => navigate("/reps/attendance/mark")}>
                 <MdQrCodeScanner className="mr-2 h-5 w-5" />
                 Mark Attendance
+              </Button>
+               <Button onClick={() => navigate("/reps/notifications")}>
+                <HiSpeakerphone className="mr-2 h-5 w-5" />
+                Announcement
               </Button>
             </div>
           </Card>
@@ -201,12 +211,12 @@ const RepDashboard = () => {
                             ? "Anonymous"
                             : fb.Student?.name || "Unknown"}
                         </TableCell>
-                        <TableCell className="max-w-xs truncate">
+                        <TableCell className="max-w-xs truncate line-clamp-2">
                           {fb.content}
                         </TableCell>
                         <TableCell>
                           <Badge color={fb.is_anonymous ? "warning" : "info"}>
-                            {fb.is_anonymous ? "Private" : "Public"}
+                            {fb.is_anonymous ? "Anonymous" : "Public"}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -230,11 +240,11 @@ const RepDashboard = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <span className="relative flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+                  <span className={`absolute inline-flex h-full w-full ${socketConnection ? "animate-ping rounded-full bg-green-400 opacity-75": ""}  `}></span>
+                  <span className={`relative inline-flex h-3 w-3 rounded-full ${socketConnection ? "bg-green-500": "bg-red-500"}`}></span>
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Live Socket Connection
+                  Socket Connection
                 </span>
               </div>
               <div className="flex items-center gap-3">

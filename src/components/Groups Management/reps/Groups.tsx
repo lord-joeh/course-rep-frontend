@@ -335,7 +335,7 @@ const Groups = () => {
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                   {group?.Course?.name || "General Group"}
                 </p>
-                <div className="mt-2 flex justify-between gap-4 pt-2">
+                <div className="mt-2 flex justify-between gap-2 pt-2">
                   <Button
                     color="gray"
                     onClick={() => {
