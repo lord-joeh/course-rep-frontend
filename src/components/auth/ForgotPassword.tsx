@@ -93,7 +93,7 @@ const ForgotPassword = () => {
           disabled={isLoading}
           className="hover:t mb-4 cursor-pointer text-lg"
         >
-          {isLoading && <Spinner size="md" className="me-4" color="warning" />}
+          {isLoading && <Spinner size="md" className="me-4" color="gray" />}
           <FaTelegramPlane className="me-2 h-4 w-4" />
           Submit
         </Button>

@@ -4,10 +4,12 @@ import { PiGearFineBold } from "react-icons/pi";
 import { MdOutlineToggleOff } from "react-icons/md";
 import { CiLogout } from "react-icons/ci";
 import useTheme from "../../hooks/useTheme";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   let userInitials = "";
 
@@ -28,24 +30,27 @@ export default function Profile() {
       <div className="w-80 sm:w-96">
         <div className="flex flex-col items-center justify-center gap-2">
           <Avatar rounded placeholderInitials={userInitials} size="lg" />
-          <span className="text-lg font-medium text-gray-700">
+          <span className="text-lg font-medium text-gray-700 dark:text-gray-100">
             {user?.data.name}
           </span>
-          <span className="text-md font-medium text-gray-700">
+          <span className="text-md font-medium text-gray-700 dark:text-gray-100">
             {user?.data.id}
           </span>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
             {user?.data.email}
           </span>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
             {user?.data.phone}
           </span>
         </div>
 
         <div className="mt-2 flex flex-col">
           <span
-            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-gray-600"
             role="button"
+            onClick={() =>
+              navigate(`${user?.isRep ? "reps/settings" : "students/settings"}`)
+            }
           >
             <PiGearFineBold size={24} color="gray" />
             <p className="text-xl font-medium text-gray-600 dark:text-gray-100">
@@ -54,7 +59,7 @@ export default function Profile() {
           </span>
 
           <span
-            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100 dark:hover:bg-gray-600"
             role="button"
             onClick={toggleTheme}
           >
@@ -65,7 +70,7 @@ export default function Profile() {
           </span>
 
           <span
-            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-neutral-100"
+            className="mb-0.5 flex h-12 w-full cursor-pointer items-center justify-start gap-2 p-2 hover:bg-red-100"
             role="button"
             onClick={logout}
           >

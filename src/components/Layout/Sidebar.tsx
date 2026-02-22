@@ -61,6 +61,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
             >
               Dashboard
             </SidebarItem>
+
             {user?.isRep && (
               <SidebarItem
                 className="cursor-pointer"

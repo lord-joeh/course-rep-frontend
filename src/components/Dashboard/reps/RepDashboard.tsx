@@ -12,16 +12,8 @@ import {
   TableRow,
   TableCell,
 } from "flowbite-react";
-import {
-  HiUserGroup,
-  HiCalendar,
-  HiSpeakerphone,
-} from "react-icons/hi";
-import {
-  MdBookmarkAdd,
-  MdClass,
-  MdQrCodeScanner,
-} from "react-icons/md";
+import { HiUserGroup, HiCalendar, HiSpeakerphone } from "react-icons/hi";
+import { MdBookmarkAdd, MdClass, MdQrCodeScanner } from "react-icons/md";
 import StatCard from "../common/StatCard";
 import { getStudents } from "../../../services/studentService";
 import { getFeedbacks } from "../../../services/feedbackService";
@@ -36,7 +28,7 @@ import { VscFeedback } from "react-icons/vsc";
 const RepDashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const socketConnection = getSocketId()
+  let socketConnection = getSocketId();
 
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -46,7 +38,6 @@ const RepDashboard = () => {
   });
   const [recentFeedbacks, setRecentFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -145,7 +136,7 @@ const RepDashboard = () => {
                 Quick Actions
               </h5>
             </div>
-            <div className="grid grid-cols-1 gap-6 2xl:grid-cols-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 2xl:grid-cols-3">
               <Button onClick={() => navigate("/reps/events")}>
                 <HiCalendar className="mr-2 h-5 w-5" />
                 Create Event
@@ -162,7 +153,7 @@ const RepDashboard = () => {
                 <MdQrCodeScanner className="mr-2 h-5 w-5" />
                 Mark Attendance
               </Button>
-               <Button onClick={() => navigate("/reps/notifications")}>
+              <Button onClick={() => navigate("/reps/notifications")}>
                 <HiSpeakerphone className="mr-2 h-5 w-5" />
                 Announcement
               </Button>
@@ -209,7 +200,7 @@ const RepDashboard = () => {
                             ? "Anonymous"
                             : fb.Student?.name || "Unknown"}
                         </TableCell>
-                        <TableCell className="max-w-xs truncate line-clamp-2">
+                        <TableCell className="line-clamp-2 max-w-xs truncate">
                           {fb.content}
                         </TableCell>
                         <TableCell>
@@ -238,8 +229,12 @@ const RepDashboard = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <span className="relative flex h-3 w-3">
-                  <span className={`absolute inline-flex h-full w-full ${socketConnection ? "animate-ping rounded-full bg-green-400 opacity-75": ""}  `}></span>
-                  <span className={`relative inline-flex h-3 w-3 rounded-full ${socketConnection ? "bg-green-500": "bg-red-500"}`}></span>
+                  <span
+                    className={`absolute inline-flex h-full w-full ${socketConnection ? "animate-ping rounded-full bg-green-400 opacity-75" : ""} `}
+                  ></span>
+                  <span
+                    className={`relative inline-flex h-3 w-3 rounded-full ${socketConnection ? "bg-green-500" : "bg-red-500"}`}
+                  ></span>
                 </span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Socket Connection

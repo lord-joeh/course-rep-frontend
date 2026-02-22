@@ -67,15 +67,9 @@ const ResetPassword = () => {
     e.preventDefault();
 
     let validationError = "";
-    if (
-      !resetData.token ||
-      resetData.token.trim().length < 1
-    ) {
+    if (!resetData.token || resetData.token.trim().length < 1) {
       validationError = "Token not provided";
-    } else if (
-      !resetData.newPassword ||
-      resetData.newPassword.length < 8
-    ) {
+    } else if (!resetData.newPassword || resetData.newPassword.length < 8) {
       validationError = "Your password should be at least 8 characters";
     } else if (
       !resetData.confirmPassword ||
@@ -179,7 +173,11 @@ const ResetPassword = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Checkbox id="show_password" onChange={handleShowPassword} />
+          <Checkbox
+            id="show_password"
+            onChange={handleShowPassword}
+            checked={showPassword}
+          />
           <Label htmlFor="show_Password">Show password</Label>
         </div>
         <Button
@@ -188,7 +186,7 @@ const ResetPassword = () => {
           disabled={isLoading}
           className="mb-4 cursor-pointer border-none text-lg"
         >
-          {isLoading && <Spinner size="md" className="me-4" color="warning" />}
+          {isLoading && <Spinner size="md" className="me-4" color="gray" />}
           <LuSendHorizontal className="me-2 h-4 w-4" />
           Submit
         </Button>

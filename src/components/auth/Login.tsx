@@ -12,17 +12,13 @@ const Login = () => {
     studentId: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
 
-  const passwordBox = document.querySelector("#studentPassword");
   const handleShowPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      passwordBox?.setAttribute("type", "text");
-    } else {
-      passwordBox?.setAttribute("type", "password");
-    }
+    setShowPassword(e.target.checked);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +77,7 @@ const Login = () => {
             <Label htmlFor="studentPassword">Password</Label>
           </div>
           <TextInput
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="studentPassword"
             name="password"
             placeholder="Password"
@@ -94,7 +90,11 @@ const Login = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Checkbox id="show_password" onChange={handleShowPassword} />
+          <Checkbox
+            id="show_password"
+            onChange={handleShowPassword}
+            checked={showPassword}
+          />
           <Label htmlFor="show_Password">Show password</Label>
         </div>
         <Button
@@ -103,18 +103,24 @@ const Login = () => {
           disabled={isLoading}
           className="hover:t cursor-pointer border-none text-lg"
         >
-          {isLoading && <Spinner size="md" className="me-4" color="warning" />}
+          {isLoading && <Spinner size="md" className="me-4" color="gray" />}
           <FaTelegramPlane className="me-2 h-4 w-4" />
           Login
         </Button>
       </form>
-      {error && <p className="text-center text-red-700">{error}</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
       <hr />
       <div className="flex justify-between text-white">
-        <a href="/forgot-password" className="dark:text-primary-500 text-sm hover:underline">
+        <a
+          href="/forgot-password"
+          className="dark:text-primary-500 text-sm hover:underline"
+        >
           Lost Password?
         </a>
-        <a href="/register" className="dark:text-primary-500 text-sm hover:underline">
+        <a
+          href="/register"
+          className="dark:text-primary-500 text-sm hover:underline"
+        >
           Not registered?
         </a>
       </div>

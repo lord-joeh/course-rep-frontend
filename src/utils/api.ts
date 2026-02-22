@@ -12,9 +12,9 @@ let isRefreshing = false;
 let failedQueue: FailedRequest[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) prom.reject(error);
-    else if (token) prom.resolve(token);
+  failedQueue.forEach((promise) => {
+    if (error) promise.reject(error);
+    else if (token) promise.resolve(token);
   });
   failedQueue = [];
 };

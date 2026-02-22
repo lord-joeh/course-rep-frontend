@@ -6,7 +6,6 @@ import { Outlet } from "react-router-dom";
 
 const AppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   useEffect(() => {
     const checkScreenSize = () => {
       if (window.innerWidth >= 768) {
@@ -41,7 +40,7 @@ const AppLayout = () => {
         />
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <Outlet />
+          <Outlet  />
         </div>
       </div>
     </div>

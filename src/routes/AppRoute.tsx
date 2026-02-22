@@ -33,6 +33,7 @@ import ScanQrCodePage from "../pages/Attendance Page/ScanQrCodePage.tsx";
 import GlobalErrorHandler from "../components/common/GlobalErrorHandler.tsx";
 import DashboardPage from "../pages/Dashboard Page/DashboardPage.tsx";
 import RepNotificationPage from "../pages/Notification page/RepNotificationPage.tsx";
+import SettingsPage from "../pages/Auth Pages/SettingsPage.tsx";
 
 const AppRoute = () => {
   return (
@@ -68,6 +69,8 @@ const AppRoute = () => {
                     <Route path="attendance" element={<AttendanceInstancePage />} />
                     <Route path="attendance/:instanceId" element={<AttendancePage />} />
                     <Route path="attendance/mark" element={<ScanQrCodePage />} />
+                    <Route path="settings" element={<SettingsPage/>} />
+
                   </Route>
 
                   <Route path="mark" element={<ScanQrCodePage/>} />
@@ -84,6 +87,7 @@ const AppRoute = () => {
                     <Route path="slides" element={<SlidePage />} />
                     <Route path="assignments/submissions" element={<StudentSubmittedAssignmentPage />} />
                     <Route path="attendance" element={<ScanQrCodePage />} />
+                    <Route path="settings" element={<SettingsPage/>} />
                   </Route>
                 </Route>
               </Routes>

@@ -34,6 +34,12 @@ export const forgotPassword = async (forgotDetails: object) => {
   return response.data;
 };
 
+export const changePassword = async (changeData: object) => {
+  const response = await api.post("/api/auth/change", changeData);
+  if (!response.data) throw new Error("Failed changing password");
+  return response.data;
+};
+
 export const resetPassword = async (resetData: ResetInterface) => {
   const response = await api.post(
     `/api/auth/reset?token=${resetData?.token}`,

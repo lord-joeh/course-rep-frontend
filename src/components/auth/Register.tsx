@@ -22,23 +22,15 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setError("");
     setRegisterData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const mainPass = document.querySelector("#password");
-  const confirmPass = document.querySelector("#confirm-password");
   const handleShowPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      mainPass?.setAttribute("type", "text");
-      confirmPass?.setAttribute("type", "text");
-    } else {
-      mainPass?.setAttribute("type", "password");
-      confirmPass?.setAttribute("type", "password");
-    }
+    setShowPassword(e.target.checked);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -170,7 +162,7 @@ const Register = () => {
             <Label htmlFor="password">Password</Label>
           </div>
           <TextInput
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             className="pass-check sm:text-sm md:text-base"
             placeholder="Password"
@@ -187,7 +179,7 @@ const Register = () => {
             <Label htmlFor="confirm-password">Confirm Password</Label>
           </div>
           <TextInput
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="confirm-password"
             className="pass-check sm:text-sm md:text-base"
             placeholder="Confirm Password"
@@ -200,7 +192,11 @@ const Register = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Checkbox id="show_password" onChange={handleShowPassword} />
+          <Checkbox
+            id="show_password"
+            onChange={handleShowPassword}
+            checked={showPassword}
+          />
           <Label htmlFor="show_Password">Show password</Label>
         </div>
         <Button
@@ -209,12 +205,12 @@ const Register = () => {
           disabled={isLoading}
           className="hover:t mb-4 cursor-pointer border-none text-lg"
         >
-          {isLoading && <Spinner size="md" className="me-4" color="warning" />}
+          {isLoading && <Spinner size="md" className="me-4" color="gray" />}
           <LuSendHorizontal className="me-2 h-4 w-4" />
           Register
         </Button>
       </form>
-      {error && <p className="text-center text-red-700">{error}</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
       <div className="mb-4 flex justify-center text-white sm:text-sm md:text-base">
         <small>
           Already have an Account?
