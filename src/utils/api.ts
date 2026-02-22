@@ -148,12 +148,6 @@ api.interceptors.response.use(
       }
       dispatchHttpError("Rate limit exceeded. Try again in a moment.");
     }
-
-    // 3. Handle 500+ Server Errors
-    if (error.response.status >= 500) {
-      dispatchHttpError("Server error. We are working on it!");
-    }
-
     return Promise.reject(error);
   },
 );
