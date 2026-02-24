@@ -16,7 +16,6 @@ import {
   Tooltip,
 } from "flowbite-react";
 import { MdAssignmentAdd, MdOutlineAssignmentTurnedIn } from "react-icons/md";
-import { AiOutlineFolderView } from "react-icons/ai";
 import useAuth from "../../../hooks/useAuth";
 import { FiDownload } from "react-icons/fi";
 import { useSearch } from "../../../hooks/useSearch";
@@ -33,6 +32,7 @@ import AddNewAssignment from "./AddNewAssignment";
 import SubmitAssignment from "./SubmitAssignment";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineSearch } from "react-icons/hi";
+import { BsFolder } from "react-icons/bs";
 
 const Assignments = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -157,8 +157,8 @@ const Assignments = () => {
         </Button>
 
         <Card>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <div className="md:max-w-48">
+          <div className="grid grid-cols-1 items-center md:gap-14 gap-3 md:grid-cols-12">
+            <div className="md:col-span-2">
               <Label htmlFor="entries" className="mb-2 block font-medium">
                 Show
               </Label>
@@ -181,7 +181,7 @@ const Assignments = () => {
               </Select>
             </div>
 
-            <div className="max-w-sm">
+            <div className="md:col-span-4">
               <Label htmlFor="course" className="mb-2 block font-medium">
                 Course
               </Label>
@@ -203,7 +203,7 @@ const Assignments = () => {
               </Select>
             </div>
 
-            <div className="max-w-sm">
+            <div className="md:col-span-6">
               <Label htmlFor="search" className="mb-2 block font-medium">
                 Search Assignment
               </Label>
@@ -226,22 +226,20 @@ const Assignments = () => {
       {loading ? (
         <Spinner size="lg" className="mr-4 place-self-center" />
       ) : (filteredAssignments?.length ?? 0) > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filteredAssignments.map((assignment, idx) => (
             <Card key={idx}>
-              <div className="flex flex-col gap-3">
-                <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              <div className="flex flex-col gap-2">
+                <h5 className="text-sm font-medium tracking-tight text-gray-900 dark:text-white">
                   {assignment?.title || "Untitled Assignment"}
                 </h5>
 
-                <p className="text-xl">
-                  {assignment?.description.length > 200
-                    ? assignment?.description.slice(0, 200)
-                    : assignment?.description || ""}
+                <p className="line-clamp-3 text-sm">
+                  {assignment?.description || ""}
                 </p>
-                <span className="flex gap-3">
+                <span className="flex items-center gap-2">
                   <TbCalendarDue size={24} color="red" />
-                  <p className="text-xl font-semibold">
+                  <p className="text-sm font-medium text-red-500">
                     {assignment?.deadline
                       ? new Date(assignment.deadline).toDateString()
                       : ""}{" "}
@@ -249,7 +247,7 @@ const Assignments = () => {
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Button
                   className="mt-4 h-12 flex-1 cursor-pointer"
                   rel="noopener noreferrer"
@@ -269,16 +267,16 @@ const Assignments = () => {
 
                 <Tooltip content="Download Assignment">
                   <FiDownload
-                    size={30}
+                    size={32}
                     className="me-2 mt-4 cursor-pointer"
                     onClick={() => handleFileDownload(assignment?.fileId)}
                   />
                 </Tooltip>
 
                 {user && user.isRep && (
-                  <Tooltip content="View Assignment Details">
-                    <AiOutlineFolderView
-                      size={30}
+                  <Tooltip content="View Submission">
+                    <BsFolder
+                      size={32}
                       className="me-2 mt-4 cursor-pointer"
                       onClick={() =>
                         navigate(`${assignment?.id}/submissions/details`)

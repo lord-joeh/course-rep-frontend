@@ -78,7 +78,7 @@ const SubmitAssignment = ({
         )}
 
         <Button
-          className="mt-4 w-full max-w-md cursor-pointer place-self-center"
+          className="mt-4 w-full max-w-sm cursor-pointer place-self-center"
           type="submit"
           disabled={loading || !selectedFile}
         >

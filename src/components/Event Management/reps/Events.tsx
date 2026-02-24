@@ -206,12 +206,13 @@ const Events = () => {
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Upcoming Events
       </h1>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {isLoading && (
-          <Card>
-            <Spinner size="lg" />
-          </Card>
-        )}
+
+      {isLoading && (
+        <Card>
+          <Spinner size="lg" />
+        </Card>
+      )}
+      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-3">
         {filteredEvents?.length > 0 ? (
           filteredEvents.map((event: Event, idx) => (
             <div

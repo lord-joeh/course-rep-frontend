@@ -5,11 +5,12 @@ import {
   Pagination,
   Select,
   Spinner,
+  TextInput,
   Tooltip,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { FaArrowLeft, FaEdit, FaRegCalendarCheck } from "react-icons/fa";
-import { MdDeleteForever, MdRefresh } from "react-icons/md";
+import { FaArrowLeft, FaRegCalendarCheck } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   AssignmentDetailsInterface,
@@ -30,6 +31,8 @@ import ToastMessage from "../../common/ToastMessage";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import CommonModal from "../../common/CommonModal";
 import AddNewAssignment from "./AddNewAssignment";
+import { HiOutlineSearch } from "react-icons/hi";
+import { BiEditAlt } from "react-icons/bi";
 
 function AssignmentDetails() {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -108,10 +111,6 @@ function AssignmentDetails() {
     }
   }
 
-  const handleRefresh = () => {
-    fetchAssignmentSubmissions();
-  };
-
   useEffect(() => {
     fetchAssignmentSubmissions();
   }, [pagination?.currentPage, pagination?.itemsPerPage]);
@@ -134,36 +133,57 @@ function AssignmentDetails() {
         Assignment Details
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search Submissions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search Submissions"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              value={pagination.itemsPerPage}
+              onChange={(e) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  itemsPerPage: parseInt(e.target.value),
+                  currentPage: 1,
+                }))
+              }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={pagination?.totalItems}>All</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Submission
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Submission..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
+      </Card>
 
-        <Button
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh Submitted Assignments"
-          onClick={handleRefresh}
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-l-4 border-l-emerald-500">
-          <h5 className="text-xl font-bold">Number of Submitted Assignments</h5>
-          <p className="text-4xl font-extrabold text-emerald-500">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+        <Card className="bg-emerald-50 text-center">
+          <h5 className="text-lg font-medium text-emerald-500">
+            Number of Submitted Assignments
+          </h5>
+          <p className="text-4xl font-semibold text-emerald-500">
             {pagination?.totalItems || 0}
           </p>
         </Card>
-        <Card className="border-l-4 border-l-blue-600">
+
+        <Card className="bg-blue-50">
           <h5 className="text-xl font-bold">Assignment Details</h5>
           <p className="text-3xl font-extrabold text-blue-600">
             {assignmentInfo?.title || ""}
@@ -171,7 +191,7 @@ function AssignmentDetails() {
           <small>{assignmentInfo?.Course?.name || ""}</small>
           <span className="flex gap-3">
             <TbCalendarDue size={24} color="red" />
-            <p className="text-lg font-semibold">
+            <p className="text-lg font-semibold text-red-500">
               {assignmentInfo?.deadline
                 ? new Date(assignmentInfo?.deadline).toDateString()
                 : ""}{" "}
@@ -180,63 +200,45 @@ function AssignmentDetails() {
         </Card>
 
         {user && user?.isRep && (
-          <Card className="border-l-4 border-l-red-600">
-            <h5 className="text-xl font-bold">Assignment Actions</h5>
+          <Card className="bg-red-50">
+            <h5 className="text-xl font-semibold">Assignment Actions</h5>
 
-            <Tooltip content="Update Assignment Info">
-              <span
-                className="cursor-pointer"
-                onClick={() =>
-                  setModalState((prev) => ({
-                    ...prev,
-                    isModalOpen: true,
-                    isEditing: true,
-                  }))
-                }
-              >
-                <FaEdit size={30} color="green" />{" "}
-              </span>
-            </Tooltip>
+            <div className="flex justify-between">
+              <Tooltip content="Update Assignment Info">
+                <span
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setModalState((prev) => ({
+                      ...prev,
+                      isModalOpen: true,
+                      isEditing: true,
+                    }))
+                  }
+                >
+                  <BiEditAlt size={32} color="green" />{" "}
+                </span>
+              </Tooltip>
 
-            <Tooltip content="Delete Assignment and all Data">
-              <span
-                className="cursor-pointer"
-                onClick={() =>
-                  setModalState((prev) => ({
-                    ...prev,
-                    itemToDelete: assignmentInfo?.title ?? "",
-                    idToDelete: assignmentInfo?.id ?? "",
-                    isDeleteDialogueOpen: true,
-                  }))
-                }
-              >
-                <MdDeleteForever size={30} color="red" />{" "}
-              </span>
-            </Tooltip>
+              <Tooltip content="Delete Assignment and all Data">
+                <span
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setModalState((prev) => ({
+                      ...prev,
+                      itemToDelete: assignmentInfo?.title ?? "",
+                      idToDelete: assignmentInfo?.id ?? "",
+                      isDeleteDialogueOpen: true,
+                    }))
+                  }
+                >
+                  <MdDeleteForever size={32} color="red" />{" "}
+                </span>
+              </Tooltip>
+            </div>
           </Card>
         )}
       </div>
-      <div className="flex items-center gap-2">
-        <Label htmlFor="entries">Show</Label>
-        <Select
-          id="entries"
-          className="rounded border-none text-gray-900 dark:text-white"
-          value={pagination.itemsPerPage}
-          onChange={(e) =>
-            setPagination((prev) => ({
-              ...prev,
-              itemsPerPage: parseInt(e.target.value),
-              currentPage: 1,
-            }))
-          }
-        >
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={pagination?.totalItems}>All</option>
-        </Select>
-        Entries
-      </div>
+
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Submissions
       </h1>
@@ -247,18 +249,20 @@ function AssignmentDetails() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredSubmissions.map((submitted, idx) => (
             <Card key={idx}>
-              <div className="flex flex-col flex-wrap gap-3">
-                <h5 className="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+              <div className="flex flex-col flex-wrap gap-2">
+                <h5 className="text-md font-light tracking-tight text-gray-900 dark:text-white">
                   {submitted?.fileName ?? "Untitled"}
                 </h5>
-                <p className="text-lg font-light">
-                  {submitted?.Student?.name || ""}
-                </p>
-                <small>{submitted?.Student?.id || ""}</small>
-                <small>{submitted?.Student?.email || ""}</small>
-                <span className="flex gap-3">
+                <span className="flex flex-row">
+                  <p className="text-sm">Student ID: </p>
+                  <p className="text-sm font-bold">
+                    {` ${submitted?.Student?.id || ""}`}
+                  </p>
+                </span>
+                <span className="flex items-center gap-2 text-center">
                   <FaRegCalendarCheck size={24} color="green" />
-                  <p className="text-lg font-light">
+                  <p className="text-sm">Submitted On: </p>
+                  <p className="text-sm font-bold">
                     {submitted?.submittedAt
                       ? new Date(submitted?.submittedAt).toDateString()
                       : ""}
