@@ -8,11 +8,7 @@ import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialo
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { getLecturers } from "../../../services/lecturerService";
-import {
-  MdDeleteForever,
-  MdOutlineBookmarkAdd,
-  MdRefresh,
-} from "react-icons/md";
+import { MdDeleteForever, MdOutlineBookmarkAdd } from "react-icons/md";
 import {
   Button,
   Table,
@@ -23,6 +19,10 @@ import {
   TableRow,
   Spinner,
   Tooltip,
+  TextInput,
+  Label,
+  Select,
+  Card,
 } from "flowbite-react";
 import { formatTimeWithOffset } from "../../../helpers/formatTime";
 import { CiEdit } from "react-icons/ci";
@@ -35,6 +35,7 @@ import {
   CourseStudentData,
 } from "../../../utils/Interfaces";
 import { CourseModalContent } from "./CourseModalContent";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const Course = () => {
   const { user } = useAuth();
@@ -81,7 +82,6 @@ const Course = () => {
     toast,
     showToast,
     closeToast,
-    refresh,
     add,
     update,
     remove,
@@ -152,10 +152,6 @@ const Course = () => {
     }
   };
 
-  const handleRefresh = () => {
-    refresh();
-  };
-
   useEffect(() => {
     fetchLecturers().catch((err) => console.log(err));
     setCourseStudent((prev) => ({
@@ -221,27 +217,6 @@ const Course = () => {
         {user?.isRep ? "Course Management" : "Courses"}
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search course..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search courses"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh courses"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
       {user?.isRep && (
         <Button
           onClick={() => {
@@ -251,11 +226,51 @@ const Course = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-full justify-center md:w-50"
+          className="flex w-full justify-center md:w-sm"
         >
           <MdOutlineBookmarkAdd className="me-2 h-4 w-4" /> Add New Course
         </Button>
       )}
+
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              // value={pagination.itemsPerPage}
+              // onChange={(e) =>
+              //   setPagination((prev) => ({
+              //     ...prev,
+              //     itemsPerPage: Number.parseInt(e.target.value),
+              //     currentPage: 1,
+              //   }))
+              // }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              {/* <option value={pagination?.totalItems}>All</option> */}
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Courses
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Courses..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </Card>
       <div className="overflow-x-auto rounded-lg shadow-md">
         <Table striped>
           <TableHead>

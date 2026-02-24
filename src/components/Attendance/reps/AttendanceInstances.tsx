@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { MdBookmarkAdd, MdDeleteForever, MdRefresh } from "react-icons/md";
+import { MdBookmarkAdd, MdDeleteForever } from "react-icons/md";
 import {
   AttendanceFilterInterface,
   AttendanceInstanceInterface,
@@ -40,6 +40,7 @@ import ViewQRCodeModal from "./ViewQRCode";
 import { useNavigate } from "react-router-dom";
 import { GrView } from "react-icons/gr";
 import ToastMessage from "../../common/ToastMessage";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const AttendanceInstances = () => {
   const [attendanceInstances, setAttendanceInstances] = useState<
@@ -135,7 +136,7 @@ const AttendanceInstances = () => {
     } catch (error) {
       if (isAxiosError(error)) {
         showToast(
-          error?.response?.data?.message ||
+          error?.response?.data?.error ||
             "Failed to fetch attendance instances.",
           "error",
         );
@@ -154,7 +155,6 @@ const AttendanceInstances = () => {
     try {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
       const response = await remove(id);
-      console.log("Del", response.data);
       if (response) {
         showToast(
           response?.data?.message ||
@@ -162,12 +162,14 @@ const AttendanceInstances = () => {
             "Deleted successfully.",
           "success",
         );
-        await fetchInstances();
+        setAttendanceInstances((prev) =>
+          prev.filter((instance) => instance.id !== id),
+        );
       }
     } catch (error) {
       if (isAxiosError(error)) {
         showToast(
-          error?.response?.data?.message || "Failed to delete instance.",
+          error?.response?.data?.error || "Failed to delete instance.",
           "error",
         );
       } else {
@@ -243,28 +245,6 @@ const AttendanceInstances = () => {
         Attendance Instance Management
       </h1>
 
-      <div className="flex w-full items-center gap-2">
-        <div className="relative flex flex-1 items-center">
-          <TextInput
-            id="search"
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search Instances..."
-            aria-label="Search Instances"
-            className="glow-on-focus min-w-[98%] pr-2"
-          />
-        </div>
-
-        <Button
-          className="flex w-60 items-center gap-2 px-4 py-3"
-          aria-label="Refresh Instances"
-          onClick={fetchInstances}
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
       <Button
         className="flex w-full justify-center md:w-sm"
         onClick={() =>
@@ -276,7 +256,7 @@ const AttendanceInstances = () => {
       </Button>
 
       <Card>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div>
             <Label htmlFor="entries" className="mb-2 block font-medium">
               Show
@@ -353,18 +333,34 @@ const AttendanceInstances = () => {
           </div>
         </div>
 
-        <div className="mt-4 flex justify-end gap-2">
-          <Button color="gray" outline onClick={clearFilters}>
-            Clear
-          </Button>
-          <Button
-            onClick={() => {
-              setPagination((prev) => ({ ...prev, currentPage: 1 }));
-              fetchInstances();
-            }}
-          >
-            Apply Filters
-          </Button>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Attendance Instance
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Enter Attendance Instance..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              // onKeyUp={(e) => e.key === "Enter" && handleApplyFilters()}
+            />
+          </div>
+
+          <div className="mt-6 flex gap-2 md:col-span-5 md:justify-end">
+            <Button color="gray" outline onClick={clearFilters}>
+              Clear
+            </Button>
+            <Button
+              onClick={() => {
+                setPagination((prev) => ({ ...prev, currentPage: 1 }));
+                fetchInstances();
+              }}
+            >
+              Apply Filters
+            </Button>
+          </div>
         </div>
       </Card>
 

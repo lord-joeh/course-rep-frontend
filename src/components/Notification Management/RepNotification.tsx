@@ -82,6 +82,7 @@ const RepNotification = () => {
       });
       setIsModalOpen(false);
       setPagination((prev) => ({ ...prev, currentPage: 1 }));
+      // setNotifications((prev) => ({ data, ...prev }));
       fetchNotifications(1);
     } catch {
       setToast({
@@ -129,8 +130,8 @@ const RepNotification = () => {
           message: "Notification deleted",
           type: "success",
         });
+        setNotifications((prev) => prev.filter((note) => note.id !== deleteId));
         setDeleteId(null);
-        fetchNotifications(pagination.currentPage);
       } catch {
         setToast({
           visible: true,

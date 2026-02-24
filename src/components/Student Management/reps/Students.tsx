@@ -13,10 +13,9 @@ import {
   Tooltip,
   Label,
   Select,
+  TextInput,
 } from "flowbite-react";
 import { SiGooglemessages } from "react-icons/si";
-import { FaFileExport } from "react-icons/fa6";
-import { MdRefresh } from "react-icons/md";
 import { getStudents } from "../../../services/studentService";
 import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
@@ -27,6 +26,10 @@ import {
   ToastInterface,
   Student,
 } from "../../../utils/Interfaces";
+import { useSearch } from "../../../hooks/useSearch";
+import exportStudentCSV from "../../../helpers/exportStudentCSV";
+import DetailsCard from "../../common/DetailsCard";
+import { HiOutlineDownload, HiOutlineSearch } from "react-icons/hi";
 
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -60,20 +63,16 @@ const Students = () => {
   const fetchStudentsData = async (
     page = 1,
     itemsPerPage = pagination.itemsPerPage,
+    student_id = "",
   ) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const response = await getStudents(page, itemsPerPage);
+      const response = await getStudents(page, itemsPerPage, student_id);
 
       setStudents(response.data?.students || []);
-      setPagination({
-        currentPage: response.data?.pagination?.currentPage || page,
-        itemsPerPage: response.data?.pagination?.itemsPerPage || itemsPerPage,
-        totalItems: response.data?.pagination?.totalItems || 0,
-        totalPages: response.data?.pagination?.totalPages || 1,
-      });
+      setPagination(response.data?.pagination);
     } catch (error) {
       if (isAxiosError(error)) {
         setToast({
@@ -91,6 +90,15 @@ const Students = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleApplyFilters = () => {
+    fetchStudentsData(1, pagination.itemsPerPage, searchQuery);
+  };
+
+  const handleClear = () => {
+    setSearchQuery("");
+    fetchStudentsData(1, pagination.itemsPerPage, "");
   };
 
   const debouncedFetch = useCallback((page: number, perPage: number) => {
@@ -112,43 +120,7 @@ const Students = () => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
 
-  const handleRefresh = () => {
-    fetchStudentsData(pagination.currentPage, pagination.itemsPerPage);
-  };
-
-  const handleExport = () => {
-    const headers = ["Student ID", "Name", "Phone Number", "Email"]
-      .map((header) => `"${header}"`)
-      .join(",");
-    const rows = students
-      .map(
-        (student) =>
-          `"${student.id}","${student.name}","${student.phone}","${student.email}"`,
-      )
-      .join("\n");
-    const csvContent = `${headers}\n${rows}`;
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "students.csv";
-    link.click();
-    setToast({
-      message: "Students data exported successfully!",
-      type: "success",
-      isVisible: true,
-    });
-  };
-
-  const filteredStudents = useMemo(() => {
-    if (!searchQuery) return students;
-    const lowerQuery = searchQuery.toLowerCase();
-    return students.filter((student) =>
-      Object.values(student).some((value) =>
-        String(value).toLowerCase().includes(lowerQuery),
-      ),
-    );
-  }, [students, searchQuery]);
+  const filteredStudents = useSearch<Student>(students, searchQuery);
 
   const activeStudentsCount = useMemo(
     () => students.filter((s) => s.status === "active").length,
@@ -170,74 +142,94 @@ const Students = () => {
 
   return (
     <div className="flex flex-col gap-6 font-sans">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        Students Management
-      </h1>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold tracking-normal">
+          Students Management
+        </h2>
 
-      <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-        <input
-          id="search"
-          type="search"
-          placeholder="Search students..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex w-full grow rounded-lg border px-4 py-2 focus:outline-none md:w-auto"
-        />
         <Button
-          onClick={handleExport}
-          className="w-full justify-center md:w-50"
+          size="md"
+          onClick={() => exportStudentCSV(students)}
+          disabled={students.length === 0}
+          className="cursor-pointer"
         >
-          <FaFileExport className="me-2 h-4 w-4" /> Export Students
+          <HiOutlineDownload className="mr-2 h-5 w-5" />
+          Export Students
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
-        <Card className="border-l-4 border-l-emerald-500">
-          <h5 className="text-xl font-bold">Active Students</h5>
-          <p className="text-4xl font-extrabold text-emerald-500">
-            {activeStudentsCount}
-          </p>
-        </Card>
-        <Card className="border-l-4 border-l-red-600">
-          <h5 className="text-xl font-bold">Inactive Students</h5>
-          <p className="text-4xl font-extrabold text-red-600">
-            {inactiveStudentsCount}
-          </p>
-        </Card>
-        <Card className="border-l-4 border-l-blue-600">
-          <h5 className="text-xl font-bold">Registered Students</h5>
-          <p className="text-4xl font-extrabold text-blue-600">
-            {pagination.totalItems}
-          </p>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <DetailsCard
+          color="emerald"
+          title="Active Students"
+          value={activeStudentsCount}
+        />
+        <DetailsCard
+          color="red"
+          title="Inactive Students"
+          value={inactiveStudentsCount}
+        />
+        <DetailsCard
+          color="blue"
+          title="Registered Students"
+          value={pagination.totalItems}
+        />
       </div>
 
-      <div className="flex justify-between">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="entries">Show</Label>
-          <Select
-            id="entries"
-            className="rounded text-gray-900 dark:text-white"
-            value={pagination.itemsPerPage}
-            onChange={(e) =>
-              setPagination((prev) => ({
-                ...prev,
-                itemsPerPage: Number.parseInt(e.target.value),
-                currentPage: 1,
-              }))
-            }
-          >
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value={pagination.totalItems}>All</option>
-          </Select>
-          Entries
+      <Card>
+        <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              value={pagination.itemsPerPage}
+              onChange={(e) => {
+                const newLimit = Number(e.target.value);
+                setPagination((prev) => ({ ...prev, itemsPerPage: newLimit }));
+                fetchStudentsData(1, newLimit, searchQuery);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={pagination?.totalItems}>All</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-6">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Student ID
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Enter Student ID..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyUp={(e) => e.key === "Enter" && handleApplyFilters()}
+            />
+          </div>
+
+          <div className="flex gap-2 md:col-span-4 md:justify-end">
+            <Button
+              color="gray"
+              outline
+              onClick={handleClear}
+              className="flex-1 md:flex-none"
+            >
+              Clear
+            </Button>
+            <Button
+              onClick={handleApplyFilters}
+              className="flex-1 md:flex-none"
+            >
+              Apply Filters
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleRefresh}>
-          <MdRefresh className="me-2 h-4 w-4" /> Refresh
-        </Button>
-      </div>
+      </Card>
 
       <div className="overflow-x-auto rounded-lg shadow-md">
         <Table striped>

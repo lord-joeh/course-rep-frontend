@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-
+import downloadFileWithBlob from "./downloadFile";
 
 const getFileName = (res: AxiosResponse): string => {
   const disposition = res.headers["content-disposition"] || "";
@@ -26,25 +26,12 @@ const normalizeToBlob = (res: AxiosResponse): Blob => {
   return new Blob([buffer], { type });
 };
 
-
 export const downloadFile = async (res: AxiosResponse) => {
   try {
     const fileName = getFileName(res);
     const fileBlob = normalizeToBlob(res);
 
-    const url = globalThis.URL.createObjectURL(fileBlob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-
-    link.click();
-
-    setTimeout(() => {
-      globalThis.URL.revokeObjectURL(url);
-      link.remove();
-    }, 150);
+    downloadFileWithBlob(fileBlob, fileName);
   } catch (error) {
     console.error("File download failed:", error);
     throw error;

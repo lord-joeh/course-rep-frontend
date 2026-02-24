@@ -1,7 +1,13 @@
 import api from "../utils/api";
 
-export const getStudents = async (page: number, limit: number) => {
-  const response = await api.get(`/api/students/?page=${page}&limit=${limit}`);
+export const getStudents = async (
+  page: number,
+  limit: number,
+  student_id = "",
+) => {
+  const response = await api.get(
+    `/api/students/?page=${page}&limit=${limit}&student_id=${student_id}`,
+  );
   if (!response?.data) throw new Error("Failed fetching students ");
   return response.data;
 };

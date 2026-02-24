@@ -150,7 +150,7 @@ const AddNewGroup: React.FC<AddNewGroupProps> = ({
 
         <Button
           type="submit"
-          className="mt-4 flex w-70 justify-center place-self-center"
+          className="mt-4 flex w-sm justify-center place-self-center"
           disabled={loading}
         >
           <FaMagic className="me-2 h-4 w-4" />

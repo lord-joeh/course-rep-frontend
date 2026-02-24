@@ -40,9 +40,9 @@ const LecturerModalContent: React.FC<LecturerModalContentProps> = ({
         {modalState.isEditing ? "Edit Lecturer" : "New Lecturer"}
       </h1>
 
-      <form onSubmit={handleLecturerSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleLecturerSubmit} className="flex flex-col gap-3">
         <div>
-          <div className="md-4 mt-2 block">
+          <div className="mt-2 block">
             <Label htmlFor="Lecturer Name"> Name</Label>
           </div>
           <TextInput
@@ -60,7 +60,7 @@ const LecturerModalContent: React.FC<LecturerModalContentProps> = ({
           />
         </div>
         <div>
-          <div className="md-4 mt-2 block">
+          <div className="mt-2 block">
             <Label htmlFor="Lecturer Email"> Email</Label>
           </div>
           <TextInput
@@ -78,7 +78,7 @@ const LecturerModalContent: React.FC<LecturerModalContentProps> = ({
           />
         </div>
         <div>
-          <div className="md-4 mt-2 block">
+          <div className="mt-2 block">
             <Label htmlFor="Lecturer phone"> Phone</Label>
           </div>
           <TextInput
@@ -97,7 +97,7 @@ const LecturerModalContent: React.FC<LecturerModalContentProps> = ({
           />
         </div>
         <div className="flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isAdding} color="green">
+          <Button type="submit" disabled={modalState.isAdding} color="green" className="w-sm">
             {modalState.isAdding
               ? modalState.isEditing
                 ? "Updating Lecturer..."

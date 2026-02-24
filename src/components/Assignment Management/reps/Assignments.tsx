@@ -12,13 +12,10 @@ import {
   Pagination,
   Select,
   Spinner,
+  TextInput,
   Tooltip,
 } from "flowbite-react";
-import {
-  MdAssignmentAdd,
-  MdOutlineAssignmentTurnedIn,
-  MdRefresh,
-} from "react-icons/md";
+import { MdAssignmentAdd, MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { AiOutlineFolderView } from "react-icons/ai";
 import useAuth from "../../../hooks/useAuth";
 import { FiDownload } from "react-icons/fi";
@@ -35,6 +32,7 @@ import CommonModal from "../../common/CommonModal";
 import AddNewAssignment from "./AddNewAssignment";
 import SubmitAssignment from "./SubmitAssignment";
 import { useNavigate } from "react-router-dom";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const Assignments = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -94,33 +92,31 @@ const Assignments = () => {
       setModalState((prev) => ({ ...prev, isModalOpen: false }));
     }
   };
+  const fetchAssignments = async () => {
+    try {
+      setLoading(true);
+      const response = await getAssignmentsByCourse(
+        course_Id,
+        pagination?.itemsPerPage,
+        pagination?.currentPage,
+      );
+      setAssignments(response?.data?.assignments);
+      setPagination(response?.data?.pagination);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        showToast(
+          error?.response?.data?.message?.error || "Error fetching assignments",
+          "error",
+        );
+      } else {
+        showToast("Error fetching assignments", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAssignments = async () => {
-      try {
-        setLoading(true);
-        const response = await getAssignmentsByCourse(
-          course_Id,
-          pagination?.itemsPerPage,
-          pagination?.currentPage,
-        );
-        setAssignments(response?.data?.assignments);
-        setPagination(response?.data?.pagination);
-      } catch (error) {
-        if (isAxiosError(error)) {
-          showToast(
-            error?.response?.data?.message?.error ||
-              "Error fetching assignments",
-            "error",
-          );
-        } else {
-          showToast("Error fetching assignments", "error");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (course_Id?.length > 0) {
       fetchAssignments();
     }
@@ -133,42 +129,16 @@ const Assignments = () => {
     } catch (error) {}
   };
 
-  const handleRefresh = () => {
-    setPagination((prev) => ({ ...prev, currentPage: 1 }));
-  };
-
   return (
     <div className="flex flex-col gap-5">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-        {user && user.isRep ? "Assignment Management" : "Assignments"}
+        {user?.isRep ? "Assignment Management" : "Assignments"}
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search Assignment..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search Assignment"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh Assignment"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
-      <div className="flex flex-wrap justify-evenly gap-6">
-        {user && user?.isRep && (
+      <div className="flex flex-wrap justify-start gap-6">
+        {user?.isRep && (
           <Button
-            className="flex w-full justify-center md:w-auto"
+            className="flex h-12 w-full justify-center md:w-auto"
             onClick={() =>
               setModalState((prev) => ({ ...prev, isAdding: true }))
             }
@@ -179,52 +149,76 @@ const Assignments = () => {
         )}
 
         <Button
-          className="flex w-full justify-center md:w-auto"
+          className="flex h-12 w-full justify-center md:w-auto"
           onClick={() => navigate("submissions")}
         >
           <MdOutlineAssignmentTurnedIn className="me-2 h-4 w-4" />
           Your Submitted Assignments
         </Button>
 
-        <Select
-          id="courses"
-          name="courseId"
-          className="w-full justify-center md:w-auto"
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            setCourse_Id(e.target.value);
-            setPagination((prev) => ({ ...prev, currentPage: 1 }));
-          }}
-        >
-          <option value="">Select Course for Assignments</option>
-          {courses.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.name}
-            </option>
-          ))}
-        </Select>
+        <Card>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="md:max-w-48">
+              <Label htmlFor="entries" className="mb-2 block font-medium">
+                Show
+              </Label>
+              <Select
+                id="entries"
+                value={pagination?.itemsPerPage}
+                onChange={(e) =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    itemsPerPage: Number(e.target.value),
+                    currentPage: 1,
+                  }))
+                }
+                className="w-full"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={pagination?.totalItems ?? 100}>All</option>
+              </Select>
+            </div>
 
-        <div className="flex items-center gap-2">
-          <Label htmlFor="entries">Show</Label>
-          <Select
-            id="entries"
-            className="w-auto rounded border-none text-gray-900 dark:text-white"
-            value={pagination.itemsPerPage}
-            onChange={(e) =>
-              setPagination((prev) => ({
-                ...prev,
-                itemsPerPage: parseInt(e.target.value),
-                currentPage: 1,
-              }))
-            }
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={pagination?.totalItems}>All</option>
-          </Select>
-          Entries
-        </div>
+            <div className="max-w-sm">
+              <Label htmlFor="course" className="mb-2 block font-medium">
+                Course
+              </Label>
+              <Select
+                id="course"
+                name="courseId"
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  setCourse_Id(e.target.value);
+                  setPagination((prev) => ({ ...prev, currentPage: 1 }));
+                }}
+                className="w-full"
+              >
+                <option value="">Select Course for Assignments</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="max-w-sm">
+              <Label htmlFor="search" className="mb-2 block font-medium">
+                Search Assignment
+              </Label>
+              <TextInput
+                id="search"
+                placeholder="Search Assignment..."
+                icon={HiOutlineSearch}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+        </Card>
       </div>
+
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Recent Assignments
       </h1>
@@ -243,7 +237,7 @@ const Assignments = () => {
                 <p className="text-xl">
                   {assignment?.description.length > 200
                     ? assignment?.description.slice(0, 200)
-                    : assignment?.description || ""}{" "}
+                    : assignment?.description || ""}
                 </p>
                 <span className="flex gap-3">
                   <TbCalendarDue size={24} color="red" />

@@ -13,9 +13,10 @@ import {
   Pagination,
   Select,
   Spinner,
+  TextInput,
   Tooltip,
 } from "flowbite-react";
-import { MdDelete, MdRefresh } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import {
   deleteSlide,
   downloadSlide,
@@ -31,6 +32,7 @@ import UploadSlide from "./UploadSlide.tsx";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue.tsx";
 import { useSearch } from "../../../hooks/useSearch.ts";
 import { useCrud } from "../../../hooks/useCrud.ts";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const Slides = () => {
   const [slides, setSlides] = useState<SlideInterface[]>([]);
@@ -113,14 +115,6 @@ const Slides = () => {
     [],
   );
 
-  const handleRefresh = () => {
-    fetchSlidesData(
-      pagination.currentPage,
-      pagination.itemsPerPage,
-      currentCourse,
-    ).catch((err) => console.log(err));
-  };
-
   const onPageChange = (pageNumber: number) => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
@@ -169,32 +163,71 @@ const Slides = () => {
         {user?.isRep ? "Slides Management" : "Slides"}
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search slide..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search slide"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none dark:bg-gray-700 dark:text-white"
-          />
-        </div>
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              value={pagination.itemsPerPage}
+              onChange={(e) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  itemsPerPage: Number.parseInt(e.target.value),
+                  currentPage: 1,
+                }))
+              }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={pagination?.totalItems}>All</option>
+            </Select>
+          </div>
 
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh slides"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Slides
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Slides..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="courses" className="mb-2 block font-medium">
+              Select Course
+            </Label>
+            <Select
+              id="courses"
+              name="courseId"
+              className="w-full justify-center md:w-auto"
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                setCurrentCourse(e.target.value);
+              }}
+            >
+              <option value="">Select Course for slides</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </div>
+      </Card>
 
       <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
         {user && user.isRep && (
           <Button
-            className="w-full justify-center md:w-50"
+            className="w-full justify-center md:w-sm"
             onClick={() =>
               setModalState((prev) => ({ ...prev, isAdding: true }))
             }
@@ -203,60 +236,22 @@ const Slides = () => {
             Upload Slides
           </Button>
         )}
-
-        <Select
-          id="courses"
-          name="courseId"
-          className="w-full justify-center md:w-auto"
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            setCurrentCourse(e.target.value);
-          }}
-        >
-          <option value="">Select Course for slides</option>
-          {courses.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.name}
-            </option>
-          ))}
-        </Select>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Label htmlFor="entries">Show</Label>
-        <Select
-          id="entries"
-          className="rounded border-none text-gray-900 dark:text-white"
-          value={pagination.itemsPerPage}
-          onChange={(e) =>
-            setPagination((prev) => ({
-              ...prev,
-              itemsPerPage: Number.parseInt(e.target.value),
-              currentPage: 1,
-            }))
-          }
-        >
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={pagination?.totalItems}>All</option>
-        </Select>
-        Entries
       </div>
 
       {loading && <Spinner size="lg" className="mr-4 place-self-center" />}
 
       {filteredSlides?.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
           {filteredSlides.map((slide: SlideInterface) => (
             <Card
               key={slide?.id}
-              className="flex flex-col justify-between wrap-break-word"
+              className="flex flex-col justify-end"
             >
               <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 {slide.fileName || "Untitled Slide"}
               </h5>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-between gap-3">
                 <Button
                   className="mt-4 flex-1 cursor-pointer"
                   rel="noopener noreferrer"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Label, TextInput, Button } from "flowbite-react";
+import { Label, TextInput, Button, Select } from "flowbite-react";
 import {
   Course,
   GroupEditInterface,
@@ -96,7 +96,7 @@ const EditGroup = ({
           />
 
           <Label htmlFor="edit-course">Course</Label>
-          <select
+          <Select
             id="edit-course"
             name="courseId"
             value={editForm?.courseId || ""}
@@ -109,9 +109,9 @@ const EditGroup = ({
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
 
-          <div className="mt-3 flex flex-grow-1 justify-center gap-2">
+          <div className="mt-3 flex grow justify-center gap-2">
             <Button onClick={closeEditModal} className="w-40 focus:border-none">
               Cancel
             </Button>

@@ -35,6 +35,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import exportToCSV from "../../../helpers/exportAttendanceCSV";
 import { BsQrCodeScan } from "react-icons/bs";
+import DetailsCard from "../../common/DetailsCard";
 
 const Attendance = () => {
   const { instanceId } = useParams();
@@ -192,32 +193,19 @@ const Attendance = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="bg-blue-50 dark:bg-blue-900/20">
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-medium text-blue-600">
-              Total Records
-            </span>
-            <span className="text-2xl font-bold">{pagination.totalItems}</span>
-          </div>
-        </Card>
-        <Card className="bg-emerald-50 dark:bg-emerald-900/20">
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-medium text-emerald-600">
-              Present
-            </span>
-            <span className="text-2xl font-bold text-emerald-500">
-              {presentCount}
-            </span>
-          </div>
-        </Card>
-        <Card className="bg-red-50 dark:bg-red-900/20">
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-medium text-red-600">Absent</span>
-            <span className="text-2xl font-bold text-red-500">
-              {Math.max(0, pagination.totalItems - presentCount)}
-            </span>
-          </div>
-        </Card>
+        <DetailsCard
+          color="blue"
+          title="Total Records"
+          value={pagination.totalItems}
+        />
+
+        <DetailsCard color="emerald" title="Present" value={presentCount} />
+
+        <DetailsCard
+          color="red"
+          title="Absent"
+          value={Math.max(0, pagination.totalItems - presentCount)}
+        />
       </div>
 
       <Button

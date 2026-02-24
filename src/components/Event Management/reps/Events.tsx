@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import * as eventService from "../../../services/eventService";
-import { Button, Card, Spinner } from "flowbite-react";
-import { MdDeleteForever, MdRefresh } from "react-icons/md";
+import {
+  Button,
+  Card,
+  Label,
+  Select,
+  Spinner,
+  TextInput,
+} from "flowbite-react";
+import { MdDeleteForever } from "react-icons/md";
 import { IoLocationOutline, IoTimeOutline } from "react-icons/io5";
 import { FiEdit3 } from "react-icons/fi";
 import useAuth from "../../../hooks/useAuth";
@@ -14,6 +21,7 @@ import { ModalState, Event } from "../../../utils/Interfaces";
 import { useCrud } from "../../../hooks/useCrud";
 import { useSearch } from "../../../hooks/useSearch";
 import EventModalContent from "./EventModalContent";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const Events = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -51,7 +59,6 @@ const Events = () => {
     error,
     toast,
     closeToast,
-    refresh,
     add,
     update,
     remove,
@@ -71,10 +78,6 @@ const Events = () => {
 
   const closeModal = () =>
     setModalState((prev) => ({ ...prev, isModalOpen: false }));
-
-  const handleRefresh = () => {
-    refresh();
-  };
 
   const handleEventDelete = async (id: string) => {
     try {
@@ -139,34 +142,11 @@ const Events = () => {
     "DEC",
   ];
 
-  
   return (
     <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         {user?.isRep ? "Event Management" : "Events"}
       </h1>
-
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search event..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search event"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh event"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
 
       {user?.isRep && (
         <Button
@@ -177,11 +157,52 @@ const Events = () => {
               isEditing: false,
             }));
           }}
-          className="flex w-full justify-center md:w-50"
+          className="flex w-full justify-center md:w-sm"
         >
           <TbTimelineEventPlus className="me-2 h-4 w-4" /> Add New Event
         </Button>
       )}
+
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              // value={pagination.itemsPerPage}
+              // onChange={(e) =>
+              //   setPagination((prev) => ({
+              //     ...prev,
+              //     itemsPerPage: Number.parseInt(e.target.value),
+              //     currentPage: 1,
+              //   }))
+              // }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              {/* <option value={pagination?.totalItems}>All</option> */}
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Slides
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Events..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </Card>
+
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Upcoming Events
       </h1>

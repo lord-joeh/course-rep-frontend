@@ -148,6 +148,7 @@ api.interceptors.response.use(
       }
       dispatchHttpError("Rate limit exceeded. Try again in a moment.");
     }
+
     return Promise.reject(error);
   },
 );

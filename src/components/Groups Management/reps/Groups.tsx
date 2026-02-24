@@ -5,7 +5,7 @@ import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
-import { MdDeleteForever, MdGroupAdd, MdRefresh } from "react-icons/md";
+import { MdDeleteForever, MdGroupAdd } from "react-icons/md";
 import {
   Button,
   Card,
@@ -14,6 +14,7 @@ import {
   Label,
   Tooltip,
   Select,
+  TextInput,
 } from "flowbite-react";
 import { FaEdit, FaMagic } from "react-icons/fa";
 import AddNewGroup from "./AddNewGroup";
@@ -28,6 +29,7 @@ import EditGroup from "./EditGroup";
 import CreateMagicGroups from "./CreateMagicGroups";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../../hooks/useSearch";
+import { HiOutlineSearch } from "react-icons/hi";
 
 export interface ModalState {
   isAdding: boolean;
@@ -156,14 +158,6 @@ const Groups = () => {
     filterQuery,
   ]);
 
-  const handleRefresh = () => {
-    fetchGroupsData(
-      pagination.currentPage,
-      pagination.itemsPerPage,
-      filterQuery,
-    );
-  };
-
   const onPageChange = (pageNumber: number) => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
@@ -178,7 +172,9 @@ const Groups = () => {
         response?.data?.message || "Group deleted successfully",
         "success",
       );
-      await fetchGroupsData(1, pagination.itemsPerPage, filterQuery);
+      setGroups((prev) =>
+        prev.filter((group) => group.id !== modalState.idToDelete),
+      );
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(
@@ -231,111 +227,112 @@ const Groups = () => {
         Groups Management
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search group..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search group"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh group"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
       <div className="flex flex-wrap items-center gap-3">
         <Button
           onClick={() => setModalState((prev) => ({ ...prev, isAdding: true }))}
-          className="w-full md:w-60"
+          className="w-full md:w-sm"
         >
           <MdGroupAdd className="me-2 h-4 w-4" /> Add New Group
         </Button>
 
         <Button
-          className="w-full md:w-60"
+          className="w-full md:w-sm"
           onClick={() => setModalState((prev) => ({ ...prev, doMagic: true }))}
         >
           <FaMagic className="me-2 h-4 w-4" /> Magic Groups
         </Button>
+      </div>
 
-        <div className="block items-center gap-2">
-          <Label htmlFor="course-filter">Select course to get groups</Label>
-          <Select
-            id="course-filter"
-            className="rounded text-gray-900 dark:text-white"
-            value={filterQuery}
-            onChange={(e) => {
-              setFilterQuery(e.target.value);
-              setPagination((prev) => ({
-                ...prev,
-                currentPage: 1,
-              }));
-            }}
-          >
-            <option value="">All Groups</option>
-            {coursesList?.map((c: Course) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </Select>
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              value={pagination.itemsPerPage}
+              onChange={(e) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  itemsPerPage: Number.parseInt(e.target.value),
+                  currentPage: 1,
+                }))
+              }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={pagination?.totalItems}>All</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Groups
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Groups..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="course-filter" className="mb-2 block">
+              Select course to get groups
+            </Label>
+            <Select
+              id="course-filter"
+              className="rounded text-gray-900 dark:text-white"
+              value={filterQuery}
+              onChange={(e) => {
+                setFilterQuery(e.target.value);
+                setPagination((prev) => ({
+                  ...prev,
+                  currentPage: 1,
+                }));
+              }}
+            >
+              <option value="">All Groups</option>
+              {coursesList?.map((c: Course) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Label htmlFor="entries">Show</Label>
-        <Select
-          id="entries"
-          className="rounded border-none text-gray-900 dark:text-white"
-          value={pagination.itemsPerPage}
-          onChange={(e) =>
-            setPagination((prev) => ({
-              ...prev,
-              itemsPerPage: Number.parseInt(e.target.value),
-              currentPage: 1,
-            }))
-          }
-        >
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={pagination?.totalItems}>All</option>
-        </Select>
-        Entries
-      </div>
+      </Card>
 
       {groups && (
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Showing Groups For {filterQuery || "All"}
         </h1>
       )}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {isLoading && <Spinner size="lg" />}
 
         {filteredGroup?.length > 0 ? (
           filteredGroup.map((group: GroupInterface) => (
             <Card key={group?.id} className="overscroll-x-auto">
-              <div className="flex flex-col items-start justify-between">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {group?.name || ""}
-                </p>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  {group?.description || ""}
-                </p>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  {group?.Course?.name || "General Group"}
-                </p>
-                <div className="mt-2 flex justify-between gap-2 pt-2">
+              <div className="flex flex-col gap-4 justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {group?.name || ""}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    {group?.description || ""}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    {group?.Course?.name || "General Group"}
+                  </p>
+                </div>
+
+                <div className="flex flex-row justify-between items-center gap-4 px-3">
                   <Button
                     color="gray"
                     onClick={() => {
@@ -350,6 +347,7 @@ const Groups = () => {
                     <FaEdit className="me-2 h-4 w-4" />
                     Edit
                   </Button>
+
                   <Button
                     outline
                     color="red"
@@ -372,7 +370,7 @@ const Groups = () => {
 
                   <Tooltip content="View Group Members">
                     <IoEyeOutline
-                      size={24}
+                      size={32}
                       className="mt-2 cursor-pointer"
                       onClick={() => navigate(`${group.id}`)}
                     />

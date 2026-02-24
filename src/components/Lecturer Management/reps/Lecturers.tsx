@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ToastMessage from "../../common/ToastMessage";
 import * as lecturerService from "../../../services/lecturerService";
-import { MdRefresh, MdDeleteForever } from "react-icons/md";
+import { MdDeleteForever } from "react-icons/md";
 import { FaUserEdit } from "react-icons/fa";
 import CommonModal from "../../common/CommonModal";
 import {
@@ -14,9 +14,13 @@ import {
   TableRow,
   Spinner,
   Tooltip,
+  TextInput,
+  Label,
+  Select,
+  Card,
 } from "flowbite-react";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
-import { HiUser } from "react-icons/hi";
+import { HiOutlineSearch, HiUser } from "react-icons/hi";
 import { ModalState, Lecturer, courseType } from "../../../utils/Interfaces";
 import { useCrud } from "../../../hooks/useCrud";
 import { useSearch } from "../../../hooks/useSearch";
@@ -55,7 +59,6 @@ const Lecturers = () => {
     error,
     toast,
     closeToast,
-    refresh,
     add,
     update,
     remove,
@@ -135,10 +138,6 @@ const Lecturers = () => {
     }
   };
 
-  const handleRefresh = () => {
-    refresh();
-  };
-
   const lecturersTableHeader = [
     "#",
     "Name",
@@ -153,28 +152,6 @@ const Lecturers = () => {
         Lecturers Management
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search lecturers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search lecturers"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh lecturer"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
       <Button
         onClick={() => {
           setModalState((prev) => ({
@@ -183,10 +160,51 @@ const Lecturers = () => {
             isEditing: false,
           }));
         }}
-        className="flex w-full justify-center md:w-50"
+        className="flex w-full justify-center md:w-sm"
       >
         <HiUser className="me-2 h-4 w-4" /> Add New Lecturer
       </Button>
+
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              // value={pagination.itemsPerPage}
+              // onChange={(e) =>
+              //   setPagination((prev) => ({
+              //     ...prev,
+              //     itemsPerPage: Number.parseInt(e.target.value),
+              //     currentPage: 1,
+              //   }))
+              // }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              {/* <option value={pagination?.totalItems}>All</option> */}
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Slides
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Lecturers..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </Card>
+
       <div className="overflow-x-auto rounded-lg shadow-md">
         <Table striped>
           <TableHead>

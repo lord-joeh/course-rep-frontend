@@ -15,7 +15,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [magicData, setMagicData] = useState<MagicInterface>({
     courseId: "",
-    studentsPerGroup: 0,
+    studentsPerGroup: 1,
     isGeneral: false,
   });
   const [toast, setToast] = useState<ToastInterface>({
@@ -128,7 +128,7 @@ const CreateMagicGroups = ({ coursesList, onSuccess }: MagicGroupsProp) => {
 
           <Button
             type="submit"
-            className="mt-4 flex w-70 justify-center place-self-center"
+            className="mt-4 flex w-sm justify-center place-self-center"
             disabled={isLoading}
           >
             <FaMagic className="me-2 h-4 w-4" />

@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  GroupMembersInterface,
-  ToastInterface,
-} from "../../utils/Interfaces";
+import { GroupMembersInterface, ToastInterface } from "../../utils/Interfaces";
 import { isAxiosError } from "axios";
 import {
   getGroupMembers,
@@ -12,6 +9,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
+  Label,
+  Select,
   Spinner,
   Table,
   TableBody,
@@ -19,18 +18,19 @@ import {
   TableHead,
   TableHeadCell,
   TableRow,
+  TextInput,
   Tooltip,
 } from "flowbite-react";
-import { MdRefresh } from "react-icons/md";
 import { FaArrowLeft, FaUserTimes } from "react-icons/fa";
 import { SiGooglemessages } from "react-icons/si";
 import useAuth from "../../hooks/useAuth.ts";
 import ToastMessage from "../common/ToastMessage.tsx";
 import MessageToStudentModal from "../common/MessageToStudentModal.tsx";
-import { HiUserAdd } from "react-icons/hi";
+import { HiOutlineSearch, HiUserAdd } from "react-icons/hi";
 import { DeleteConfirmationDialogue } from "../common/DeleteConfirmationDialogue.tsx";
 import CommonModal from "../common/CommonModal.tsx";
 import AddGroupMember from "./reps/AddGroupMember.tsx";
+import DetailsCard from "../common/DetailsCard.tsx";
 
 const GroupMembers = () => {
   const [groupData, setGroupData] = useState<GroupMembersInterface>();
@@ -159,69 +159,56 @@ const GroupMembers = () => {
         Group Members Management
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search group members..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search group members"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh group members"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-l-4 border-l-emerald-500">
-          <h5 className="text-xl font-bold">Number Group Members</h5>
-          <p className="text-4xl font-extrabold text-emerald-500">
-            {groupData?.Students.length}
-          </p>
-        </Card>
-        <Card className="border-l-4 border-l-red-600">
-          <h5 className="text-xl font-bold">Group Details</h5>
-          <p className="text-4xl font-extrabold text-red-600">
-            {groupData?.name || ""}
-          </p>
-          <small>{groupData?.description || ""}</small>
-          <small>{groupData?.Course?.name || "General Group"}</small>
-        </Card>
-        <Card className="border-l-4 border-l-blue-600">
-          <h5 className="text-xl font-bold">Group Lead</h5>
-          <p className="text-4xl font-extrabold text-blue-600">
-            {groupLeader?.name || "No leader assigned"}
-          </p>
-          {groupLeader && user?.isRep && (
-            <Tooltip content="send message to group leader">
-              <span
-                className="cursor-pointer"
-                onClick={() =>
-                  setMessageModal({
-                    isOpen: true,
-                    studentId: groupLeader?.id ?? "",
-                  })
-                }
-              >
-                <SiGooglemessages size={32} color="blue" />{" "}
-              </span>
-            </Tooltip>
-          )}
-        </Card>
+        <DetailsCard
+          color="emerald"
+          title="Number Group Members"
+          value={groupData?.Students.length}
+        />
+
+        <DetailsCard
+          color="pink"
+          title="Group Details"
+          value={
+            <div className="flex flex-col items-start justify-start gap-3">
+              <p>{groupData?.name || ""}</p>
+              <small>{groupData?.description || ""}</small>
+              <small>{groupData?.Course?.name || "General Group"}</small>
+            </div>
+          }
+        />
+
+        <DetailsCard
+          color="blue"
+          title="Group Lead"
+          value={
+            <div className="flex flex-col items-start justify-start gap-3">
+              <p className="text-4xl font-extrabold text-blue-600">
+                {groupLeader?.name || "No leader assigned"}
+              </p>
+              {groupLeader && user?.isRep && (
+                <Tooltip content="send message to group leader">
+                  <span
+                    className="cursor-pointer"
+                    onClick={() =>
+                      setMessageModal({
+                        isOpen: true,
+                        studentId: groupLeader?.id ?? "",
+                      })
+                    }
+                  >
+                    <SiGooglemessages size={32} color="blue" />{" "}
+                  </span>
+                </Tooltip>
+              )}
+            </div>
+          }
+        />
       </div>
 
       {user?.isRep && (
         <Button
-          className="w-70 cursor-pointer"
+          className="w-sm cursor-pointer"
           onClick={() =>
             setDeleteAndModalState((prev) => ({ ...prev, openAddModal: true }))
           }
@@ -230,6 +217,46 @@ const GroupMembers = () => {
           Add new Member
         </Button>
       )}
+
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              // value={pagination.itemsPerPage}
+              // onChange={(e) =>
+              //   setPagination((prev) => ({
+              //     ...prev,
+              //     itemsPerPage: Number.parseInt(e.target.value),
+              //     currentPage: 1,
+              //   }))
+              // }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              {/* <option value={pagination?.totalItems}>All</option> */}
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Members
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Members..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </Card>
 
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
         Group Members

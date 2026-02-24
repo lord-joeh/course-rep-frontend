@@ -1,7 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import * as FeedbackService from "../../../services/feedbackService";
 import { isAxiosError } from "axios";
-import { Avatar, Button, Card, Pagination, Spinner } from "flowbite-react";
+import {
+  Avatar,
+  Button,
+  Card,
+  Label,
+  Pagination,
+  Select,
+  Spinner,
+  TextInput,
+} from "flowbite-react";
 import { VscFeedback } from "react-icons/vsc";
 import MessageToStudentModal from "../../common/MessageToStudentModal";
 import ToastMessage from "../../common/ToastMessage";
@@ -15,8 +24,8 @@ import {
   Feedback,
 } from "../../../utils/Interfaces";
 import { ViewFeedback } from "./ViewFeedback.tsx";
-import { MdRefresh } from "react-icons/md";
 import { useSearch } from "../../../hooks/useSearch";
+import { HiOutlineSearch } from "react-icons/hi";
 
 const Feedbacks = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -110,11 +119,7 @@ const Feedbacks = () => {
     return () => cleanup();
   }, [pagination.currentPage, pagination.itemsPerPage, debouncedFetch]);
 
-  const handleRefresh = () => {
-    fetchFeedbacksData(pagination.currentPage, pagination.itemsPerPage).catch(
-      (err) => console.log(err),
-    );
-  };
+
 
   const onPageChange = (pageNumber: number) => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
@@ -130,7 +135,7 @@ const Feedbacks = () => {
         response?.data?.message || "Feedback deleted successfully",
         "success",
       );
-      handleRefresh();
+      setFeedbacks((prev) => prev.filter((feed) => feed.id !== id));
     } catch (err) {
       if (isAxiosError(err)) {
         showToast(
@@ -159,28 +164,6 @@ const Feedbacks = () => {
         Feedbacks Management
       </h1>
 
-      <div className="flex w-full items-center gap-3">
-        <div className="flex min-w-0 flex-1">
-          <input
-            id="search"
-            type="search"
-            placeholder="Search feedback..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="Search feedback"
-            className="w-full min-w-0 rounded-lg border px-4 py-2 focus:outline-none"
-          />
-        </div>
-
-        <Button
-          onClick={handleRefresh}
-          className="flex shrink-0 items-center gap-2 px-3 py-2"
-          aria-label="Refresh feedback"
-        >
-          <MdRefresh size={18} className="me-1" /> Refresh
-        </Button>
-      </div>
-
       <Button
         onClick={() => {
           setModalState((prev) => ({
@@ -192,6 +175,46 @@ const Feedbacks = () => {
       >
         <VscFeedback className="me-2 h-4 w-4" /> Submit a Feedback
       </Button>
+
+      <Card>
+        <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12">
+          <div className="md:col-span-2">
+            <Label htmlFor="entries" className="mb-2 block font-medium">
+              Show
+            </Label>
+            <Select
+              id="entries"
+              className="rounded border-none text-gray-900 dark:text-white"
+              // value={pagination.itemsPerPage}
+              // onChange={(e) =>
+              //   setPagination((prev) => ({
+              //     ...prev,
+              //     itemsPerPage: Number.parseInt(e.target.value),
+              //     currentPage: 1,
+              //   }))
+              // }
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              {/* <option value={pagination?.totalItems}>All</option> */}
+            </Select>
+          </div>
+
+          <div className="md:col-span-5">
+            <Label htmlFor="search" className="mb-2 block font-medium">
+              Search Feedbacks
+            </Label>
+            <TextInput
+              id="search"
+              placeholder="Search Feedbacks..."
+              icon={HiOutlineSearch}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+      </Card>
 
       <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-white">
         Recent Feedbacks

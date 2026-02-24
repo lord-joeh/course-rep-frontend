@@ -112,7 +112,7 @@ export default function ChangePassword() {
   return (
     <div className="flex flex-col gap-2">
       <Card>
-        <h2 className="text-lg font-medium">Change Password</h2>
+        <h2 className="text-lg font-medium dark:text-neutral-100">Change Password</h2>
         <form
           className="grid grid-cols-1 items-center gap-4 lg:grid-cols-2 xl:grid-cols-3"
           onSubmit={handleSubmit}
