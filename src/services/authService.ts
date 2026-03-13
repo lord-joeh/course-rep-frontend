@@ -48,3 +48,15 @@ export const resetPassword = async (resetData: ResetInterface) => {
   if (!response.data) throw new Error("Failed resetting password");
   return response.data;
 };
+
+export async function grantAccessToGoogleDrive() {
+  const response = await api.get("/api/google/");
+  if (!response.data) throw new Error("Failed granting access");
+  return response.data;
+}
+
+export async function revokeAccessToGoogleDrive() {
+  const response = await api.post("/api/google/revoke");
+  if (!response.data) throw new Error("Failed revoking access");
+  return response.data;
+}

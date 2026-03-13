@@ -19,7 +19,7 @@ import {
   Notification,
 } from "../../services/notificationServices";
 import NotificationModal from "../../components/Notification Management/NotificationModal";
-import { DeleteConfirmationDialogue } from "../../components/common/DeleteConfirmationDialogue";
+import { DeleteConfirmationDialogue } from "../common/DeleteConfirmationDialogue.tsx";
 import ToastMessage from "../../components/common/ToastMessage";
 import { format } from "date-fns";
 import { isAxiosError } from "axios";

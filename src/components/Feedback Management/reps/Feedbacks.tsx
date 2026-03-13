@@ -119,8 +119,6 @@ const Feedbacks = () => {
     return () => cleanup();
   }, [pagination.currentPage, pagination.itemsPerPage, debouncedFetch]);
 
-
-
   const onPageChange = (pageNumber: number) => {
     setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
   };
@@ -185,19 +183,19 @@ const Feedbacks = () => {
             <Select
               id="entries"
               className="rounded border-none text-gray-900 dark:text-white"
-              // value={pagination.itemsPerPage}
-              // onChange={(e) =>
-              //   setPagination((prev) => ({
-              //     ...prev,
-              //     itemsPerPage: Number.parseInt(e.target.value),
-              //     currentPage: 1,
-              //   }))
-              // }
+              value={pagination.itemsPerPage}
+              onChange={(e) =>
+                setPagination((prev) => ({
+                  ...prev,
+                  itemsPerPage: Number.parseInt(e.target.value),
+                  currentPage: 1,
+                }))
+              }
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
-              {/* <option value={pagination?.totalItems}>All</option> */}
+              <option value={pagination?.totalItems}>All</option>
             </Select>
           </div>
 
@@ -220,8 +218,9 @@ const Feedbacks = () => {
         Recent Feedbacks
       </h1>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {isLoading && <Spinner size="lg" />}
+      {isLoading && <Spinner size="lg" />}
+
+      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-3">
         {filteredFeedbacks?.length > 0 ? (
           filteredFeedbacks.map((feedback: Feedback) => (
             <div
@@ -242,7 +241,7 @@ const Feedbacks = () => {
                   : feedback.content}
               </div>
               <div className="flex justify-center gap-4 p-2">
-                <Button
+                <Button className="md:w-sm"
                   disabled={feedback?.is_anonymous}
                   onClick={() => {
                     setCurrentStudentId(feedback?.studentId);
@@ -271,7 +270,7 @@ const Feedbacks = () => {
             </div>
           ))
         ) : (
-          <Card>No feedback</Card>
+          <span className="m-2 flex place-self-center sm:justify-center">No feedback</span>
         )}
       </div>
 
