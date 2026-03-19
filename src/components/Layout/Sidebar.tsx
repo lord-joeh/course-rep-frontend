@@ -153,7 +153,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
         </div>
         <SidebarItems>
           <SidebarItemGroup>
-            {authorizedRoute.slice(0, 4).map((item) => (
+            {authorizedRoute.slice(0, 5).map((item) => (
               <SidebarItem
                 key={item.name}
                 icon={item.icon}
@@ -169,7 +169,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
           </SidebarItemGroup>
 
           <SidebarItemGroup>
-            {authorizedRoute.slice(5, 8).map((item) => (
+            {authorizedRoute.slice(6, 9).map((item) => (
               <SidebarItem
                 key={item.name}
                 icon={item.icon}
@@ -185,7 +185,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
           </SidebarItemGroup>
 
           <SidebarItemGroup>
-            {authorizedRoute.slice(9).map((item) => (
+            {authorizedRoute.slice(10).map((item) => (
               <SidebarItem
                 key={item.name}
                 icon={item.icon}
