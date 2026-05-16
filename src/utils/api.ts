@@ -130,7 +130,6 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         dispatchHttpError("Session Expired. Please log in again.");
         localStorage.removeItem("user");
-        window.location.href = "/";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

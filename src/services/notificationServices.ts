@@ -29,7 +29,7 @@ export const getNotifications = async (page = 1, limit = 5) => {
   const response = await api.get(
     `/api/notifications/?page=${page}&limit=${limit}`,
   );
-  return response.data; 
+  return response.data;
 };
 
 export const markAsRead = async (id: string) => {
@@ -57,4 +57,15 @@ export const updateNotification = async (
 export const deleteNotification = async (id: string) => {
   const response = await api.delete(`/api/notifications/${id}`);
   return response.data;
+};
+
+export const subscribeToPushNotification = async (
+  studentId: string,
+  fcmToken: string,
+) => {
+  const response = await api.post("/api/notifications/push", {
+    studentId,
+    fcmToken,
+  });
+  return response?.data;
 };

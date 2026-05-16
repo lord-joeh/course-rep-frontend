@@ -124,6 +124,7 @@ const Slides = () => {
       setModalState((prev) => ({ ...prev, isDeleting: true }));
 
       await remove(slideId);
+      setSlides((prev) => prev.filter((slide) => slide.id !== slideId));
     } catch (error) {
     } finally {
       setModalState((prev) => ({
@@ -241,17 +242,14 @@ const Slides = () => {
       {loading && <Spinner size="lg" className="mr-4 place-self-center" />}
 
       {filteredSlides?.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
+        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filteredSlides.map((slide: SlideInterface) => (
-            <Card
-              key={slide?.id}
-              className="flex flex-col justify-end"
-            >
+            <Card key={slide?.id} className="flex flex-col justify-end">
               <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 {slide.fileName || "Untitled Slide"}
               </h5>
 
-              <div className="flex items-between gap-3">
+              <div className="items-between flex gap-3">
                 <Button
                   className="mt-4 flex-1 cursor-pointer"
                   rel="noopener noreferrer"

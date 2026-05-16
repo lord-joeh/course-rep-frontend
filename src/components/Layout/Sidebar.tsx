@@ -28,6 +28,7 @@ interface IsidebarItem {
   isRepRoute: boolean;
   repRoute: string;
   studentRoute: string;
+  groupId: number;
 }
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
@@ -49,6 +50,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/dashboard",
       studentRoute: "/students/dashboard",
+      groupId: 1,
     },
     {
       name: "Announcements",
@@ -56,6 +58,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: true,
       repRoute: "/reps/notifications",
       studentRoute: "",
+      groupId: 1,
     },
     {
       name: "Assignment",
@@ -63,6 +66,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/assignments",
       studentRoute: "/students/assignments",
+      groupId: 1,
     },
     {
       name: "Attendance",
@@ -70,6 +74,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/attendance",
       studentRoute: "/students/attendance",
+      groupId: 1,
     },
     {
       name: "Students",
@@ -77,13 +82,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: true,
       repRoute: "/reps/students",
       studentRoute: "",
+      groupId: 1,
     },
+
     {
-      name: "Slide",
+      name: "Slides",
       icon: MdLibraryBooks,
       isRepRoute: false,
       repRoute: "/reps/slides",
       studentRoute: "/students/slides",
+      groupId: 2,
     },
     {
       name: "Events",
@@ -91,6 +99,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/events",
       studentRoute: "/students/events",
+      groupId: 2,
     },
     {
       name: "Groups",
@@ -98,6 +107,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/groups",
       studentRoute: "/students/groups",
+      groupId: 2,
     },
     {
       name: "Lecturers",
@@ -105,13 +115,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/lecturers",
       studentRoute: "/students/lecturers",
+      groupId: 2,
     },
+
     {
       name: "Courses",
       icon: IoBookSharp,
       isRepRoute: false,
       repRoute: "/reps/courses",
       studentRoute: "/students/courses",
+      groupId: 3,
     },
     {
       name: "Feedback",
@@ -119,6 +132,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: false,
       repRoute: "/reps/feedbacks",
       studentRoute: "/students/feedbacks",
+      groupId: 3,
     },
     {
       name: "Security",
@@ -126,8 +140,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
       isRepRoute: true,
       repRoute: "/reps/security",
       studentRoute: "/students/security",
+      groupId: 3,
     },
   ];
+
   const authorizedRoute = navItems.filter(
     (route) => !(route?.isRepRoute && !user?.isRep),
   );
@@ -152,53 +168,29 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }: SidebarProps) => {
           </button>
         </div>
         <SidebarItems>
-          <SidebarItemGroup>
-            {authorizedRoute.slice(0, 5).map((item) => (
-              <SidebarItem
-                key={item.name}
-                icon={item.icon}
-                className={`cursor-pointer ${item.name === activeSideItem.current ? "bg-gray-300 dark:text-gray-800" : ""}`}
-                onClick={() => {
-                  handleRedirect(item.repRoute, item.studentRoute);
-                  activeSideItem.current = item.name;
-                }}
-              >
-                {item?.name}
-              </SidebarItem>
-            ))}
-          </SidebarItemGroup>
-
-          <SidebarItemGroup>
-            {authorizedRoute.slice(6, 9).map((item) => (
-              <SidebarItem
-                key={item.name}
-                icon={item.icon}
-                className={`cursor-pointer ${item.name === activeSideItem.current ? "bg-gray-300 dark:text-gray-800" : ""}`}
-                onClick={() => {
-                  handleRedirect(item.repRoute, item.studentRoute);
-                  activeSideItem.current = item.name;
-                }}
-              >
-                {item?.name}
-              </SidebarItem>
-            ))}
-          </SidebarItemGroup>
-
-          <SidebarItemGroup>
-            {authorizedRoute.slice(10).map((item) => (
-              <SidebarItem
-                key={item.name}
-                icon={item.icon}
-                className={`cursor-pointer ${item.name === activeSideItem.current ? "bg-gray-300 dark:text-gray-800" : ""}`}
-                onClick={() => {
-                  handleRedirect(item.repRoute, item.studentRoute);
-                  activeSideItem.current = item.name;
-                }}
-              >
-                {item?.name}
-              </SidebarItem>
-            ))}
-          </SidebarItemGroup>
+          {[1, 2, 3].map((groupId) => (
+            <SidebarItemGroup key={groupId}>
+              {authorizedRoute
+                .filter((item) => item.groupId === groupId)
+                .map((item) => (
+                  <SidebarItem
+                    key={item.name}
+                    icon={item.icon}
+                    className={`cursor-pointer ${
+                      item.name === activeSideItem.current
+                        ? "bg-gray-300 dark:text-gray-800"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      handleRedirect(item.repRoute, item.studentRoute);
+                      activeSideItem.current = item.name;
+                    }}
+                  >
+                    {item.name}
+                  </SidebarItem>
+                ))}
+            </SidebarItemGroup>
+          ))}
         </SidebarItems>
       </FlowbiteSidebar>
     </div>

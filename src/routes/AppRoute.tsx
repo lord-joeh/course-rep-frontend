@@ -34,6 +34,7 @@ import GlobalErrorHandler from "../components/common/GlobalErrorHandler.tsx";
 import DashboardPage from "../pages/Dashboard Page/DashboardPage.tsx";
 import RepNotificationPage from "../pages/Notification page/RepNotificationPage.tsx";
 import SettingsPage from "../pages/Auth Pages/SettingsPage.tsx";
+import PushNotificationManager from "../components/Notification Management/PushNotificationManager.tsx";
 
 const AppRoute = () => {
   return (
@@ -74,6 +75,7 @@ const AppRoute = () => {
                   </Route>
 
                   <Route path="mark" element={<ScanQrCodePage/>} />
+                  <Route path="push" element={<PushNotificationManager />} />
 
                   {/* Students */}
                   <Route path="students/*" element={<PrivateRoute />}>
