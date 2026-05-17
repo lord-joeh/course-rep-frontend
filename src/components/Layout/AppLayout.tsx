@@ -1,8 +1,7 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
-
 
 const AppLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,9 +26,7 @@ const AppLayout = () => {
   };
 
   return (
-    <div
-      className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900"
-    >
+    <div className="flex h-screen flex-col bg-gray-50 dark:bg-gray-900">
       <Navbar toggleSidebar={toggleSidebar} />
       <div className="flex flex-1 overflow-hidden">
         <div
@@ -40,7 +37,7 @@ const AppLayout = () => {
         />
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <Outlet  />
+          <Outlet />
         </div>
       </div>
     </div>

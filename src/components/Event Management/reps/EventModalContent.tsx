@@ -95,7 +95,12 @@ const EventModalContent: React.FC<EventModalContentProps> = ({
           />
         </div>
         <div className="mt-4 flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isAdding} color="green" className="w-sm">
+          <Button
+            type="submit"
+            disabled={modalState.isAdding}
+            color="green"
+            className="w-sm"
+          >
             {modalState.isAdding
               ? modalState.isEditing
                 ? "Updating Event..."

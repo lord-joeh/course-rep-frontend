@@ -241,7 +241,8 @@ const Feedbacks = () => {
                   : feedback.content}
               </div>
               <div className="flex justify-center gap-4 p-2">
-                <Button className="md:w-sm"
+                <Button
+                  className="md:w-sm"
                   disabled={feedback?.is_anonymous}
                   onClick={() => {
                     setCurrentStudentId(feedback?.studentId);
@@ -270,7 +271,9 @@ const Feedbacks = () => {
             </div>
           ))
         ) : (
-          <span className="m-2 flex place-self-center sm:justify-center">No feedback</span>
+          <span className="m-2 flex place-self-center sm:justify-center">
+            No feedback
+          </span>
         )}
       </div>
 

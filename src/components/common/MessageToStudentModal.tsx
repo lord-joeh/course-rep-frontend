@@ -119,7 +119,14 @@ const MessageToStudentModal = ({ isOpen, studentId, onClose }: MessageProp) => {
 
   return (
     <>
-      <Modal show={isOpen} size="lg" onClose={onClose} popup dismissible position="center">
+      <Modal
+        show={isOpen}
+        size="lg"
+        onClose={onClose}
+        popup
+        dismissible
+        position="center"
+      >
         <ModalHeader />
         <ModalBody>
           <div className="space-y-6">

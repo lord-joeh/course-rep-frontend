@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, Card, Spinner, Tooltip } from "flowbite-react";
 import { SiGooglemessages } from "react-icons/si";
 import { FaUserEdit } from "react-icons/fa";
@@ -156,7 +156,6 @@ const StudentInfo = ({ studentData, isLoading, error }: studentDataHook) => {
       }));
     }
   };
-
 
   return (
     <div className="flex flex-col justify-start gap-5">

@@ -1,4 +1,8 @@
-import { GroupInterface, MagicInterface, NewGroupMemberInterface } from "../utils/Interfaces";
+import {
+  GroupInterface,
+  MagicInterface,
+  NewGroupMemberInterface,
+} from "../utils/Interfaces";
 import api from "../utils/api";
 
 export const getGroups = async (

@@ -6,10 +6,8 @@ import {
   Select,
   Spinner,
   TextInput,
-  Tooltip,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { MdDeleteForever } from "react-icons/md";
 import {
   PaginationType,
   SubmittedAssignment,
@@ -24,13 +22,13 @@ import { useCrud } from "../../../hooks/useCrud";
 import ToastMessage from "../../common/ToastMessage";
 import { isAxiosError } from "axios";
 import useAuth from "../../../hooks/useAuth";
-import { FaArrowLeft, FaRegCalendarCheck } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { FaRegCalendarXmark } from "react-icons/fa6";
-import { FiDownload } from "react-icons/fi";
+
 import { downloadSlide as downloadSubmittedAssignment } from "../../../services/slidesServices";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import { HiOutlineSearch } from "react-icons/hi";
+import { SubmissionCard } from "./SubmissionCard";
 
 const StudentSubmittedAssignment = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -195,67 +193,22 @@ const StudentSubmittedAssignment = () => {
       {loading ? (
         <Spinner size="lg" className="mr-4" />
       ) : (filteredSubmissions?.length ?? 0) > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
-          {filteredSubmissions.map((submission, idx) => (
-            <Card key={idx}>
-              <div className="flex flex-col flex-wrap gap-3">
-                <h5 className="text-md font-medium tracking-tight text-gray-900 dark:text-white">
-                  {submission?.fileName ?? "Untitled"}
-                </h5>
-                <span className="flex gap-2">
-                  <FaRegCalendarCheck size={16} color="green" />
-                  <p className="text-sm">Submitted On: </p>
-                  <p className="text-sm font-bold">
-                    {submission?.submittedAt
-                      ? new Date(submission?.submittedAt).toDateString()
-                      : ""}{" "}
-                  </p>
-                </span>
-
-                <span className="flex gap-3">
-                  <FaRegCalendarXmark size={16} color="red" />
-                  <p className="text-sm">Due Date: </p>
-                  <p className="text-sm font-bold">
-                    {submission?.Assignment?.deadline
-                      ? new Date(
-                          submission?.Assignment?.deadline,
-                        ).toDateString()
-                      : ""}
-                  </p>
-                </span>
-
-                <small className="text-sm">
-                  {`${submission?.Assignment?.Course?.name} ${submission?.Assignment?.title}`}
-                </small>
-              </div>
-
-              <div className="flex justify-between">
-                <Tooltip content="Download">
-                  <FiDownload
-                    size={30}
-                    className="me-2 cursor-pointer"
-                    onClick={() => handleFileDownload(submission?.fileId)}
-                  />
-                </Tooltip>
-
-                <Tooltip content="Delete">
-                  <MdDeleteForever
-                    size={30}
-                    color="red"
-                    className="me-2 cursor-pointer"
-                    onClick={() => {
-                      setSubmissionToDelete(submission);
-                      setModalState((prev) => ({
-                        ...prev,
-                        itemToDelete: submission?.fileName,
-                        idToDelete: submission?.id,
-                        isDeleteDialogueOpen: true,
-                      }));
-                    }}
-                  />
-                </Tooltip>
-              </div>
-            </Card>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {filteredSubmissions.map((submission, _idx) => (
+            <SubmissionCard
+              key={submission.id}
+              submission={submission}
+              onDownload={handleFileDownload}
+              onDelete={(s: SubmittedAssignment) => {
+                setSubmissionToDelete(s);
+                setModalState((prev) => ({
+                  ...prev,
+                  itemToDelete: s.fileName,
+                  idToDelete: s.id,
+                  isDeleteDialogueOpen: true,
+                }));
+              }}
+            />
           ))}
         </div>
       ) : (

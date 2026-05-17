@@ -14,7 +14,6 @@ interface Notification {
 
 export default function PushNotificationManager() {
   const [notification, setNotification] = useState<Notification | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const initFCM = async () => {
@@ -46,8 +45,6 @@ export default function PushNotificationManager() {
         return () => unsubscribe;
       } catch (err) {
         console.error("FCM initialization error:", err);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -57,7 +54,11 @@ export default function PushNotificationManager() {
   return (
     <>
       {notification && (
-        <ToastMessage message={notification?.body} type="success" />
+        <ToastMessage
+          message={notification?.body}
+          type="success"
+          onClose={() => setNotification(null)}
+        />
       )}
     </>
   );

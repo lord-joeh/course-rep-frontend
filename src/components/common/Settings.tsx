@@ -1,15 +1,9 @@
 import ChangePassword from "../auth/ChangePassword";
 import GoogleDriveAction from "../auth/GoogleDriveActions";
 import useAuth from "../../hooks/useAuth";
-import { Button } from "flowbite-react";
-import { requestForToken } from "../../utils/firebase";
 
 export default function Settings() {
   const { user } = useAuth();
-
-  function subscribe() {
-    requestForToken();
-  }
 
   return (
     <div className="flex flex-col gap-5">

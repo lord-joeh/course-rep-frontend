@@ -6,6 +6,6 @@ const AssignmentPage = () => {
       <Assignments />
     </div>
   );
-}
+};
 
-export default AssignmentPage
+export default AssignmentPage;

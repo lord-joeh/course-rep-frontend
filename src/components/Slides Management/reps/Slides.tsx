@@ -14,9 +14,7 @@ import {
   Select,
   Spinner,
   TextInput,
-  Tooltip,
 } from "flowbite-react";
-import { MdDelete } from "react-icons/md";
 import {
   deleteSlide,
   downloadSlide,
@@ -26,13 +24,13 @@ import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage.tsx";
 import { courses as getCourses } from "../../../services/courseService.ts";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { FiDownload } from "react-icons/fi";
 import CommonModal from "../../common/CommonModal.tsx";
 import UploadSlide from "./UploadSlide.tsx";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue.tsx";
 import { useSearch } from "../../../hooks/useSearch.ts";
 import { useCrud } from "../../../hooks/useCrud.ts";
 import { HiOutlineSearch } from "react-icons/hi";
+import { SlideCard } from "./SlideCard.tsx";
 
 const Slides = () => {
   const [slides, setSlides] = useState<SlideInterface[]>([]);
@@ -242,42 +240,22 @@ const Slides = () => {
       {loading && <Spinner size="lg" className="mr-4 place-self-center" />}
 
       {filteredSlides?.length > 0 ? (
-        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredSlides.map((slide: SlideInterface) => (
-            <Card key={slide?.id} className="flex flex-col justify-end">
-              <h5 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
-                {slide.fileName || "Untitled Slide"}
-              </h5>
-
-              <div className="items-between flex gap-3">
-                <Button
-                  className="mt-4 flex-1 cursor-pointer"
-                  rel="noopener noreferrer"
-                  onClick={() => handleFileDownload(slide.driveFileID)}
-                >
-                  <FiDownload size={24} className="me-2" />
-                  Download Slide
-                </Button>
-
-                {user?.isRep && (
-                  <Tooltip content="Delete Slide">
-                    <MdDelete
-                      size={32}
-                      color="red"
-                      className="me-2 mt-4 cursor-pointer"
-                      onClick={() => {
-                        setModalState((prev) => ({
-                          ...prev,
-                          idToDelete: slide.id,
-                          itemToDelete: slide.fileName,
-                          isDeleteDialogueOpen: true,
-                        }));
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </div>
-            </Card>
+            <SlideCard
+              key={slide.id}
+              slide={slide}
+              isRep={user?.isRep ?? false}
+              onDownload={handleFileDownload}
+              onDelete={(id, fileName) =>
+                setModalState((prev) => ({
+                  ...prev,
+                  idToDelete: id,
+                  itemToDelete: fileName,
+                  isDeleteDialogueOpen: true,
+                }))
+              }
+            />
           ))}
         </div>
       ) : (

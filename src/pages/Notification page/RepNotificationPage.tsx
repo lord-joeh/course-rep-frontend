@@ -1,10 +1,10 @@
-import RepNotification from "../../components/Notification Management/RepNotification"
+import RepNotification from "../../components/Notification Management/RepNotification";
 const RepNotificationPage = () => {
   return (
     <div>
       <RepNotification />
     </div>
-  )
-}
+  );
+};
 
-export default RepNotificationPage
+export default RepNotificationPage;

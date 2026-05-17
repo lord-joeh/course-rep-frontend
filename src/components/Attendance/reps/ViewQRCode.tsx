@@ -20,7 +20,7 @@ const ViewQRCode = ({
     link.download = `${getCourseName(course_Id ?? "")} ${new Date(date ?? "").toDateString()} Attendance qr-code.png`;
     document.body.appendChild(link);
     link.click();
-    link.remove()
+    link.remove();
   };
 
   return (

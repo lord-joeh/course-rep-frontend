@@ -97,7 +97,12 @@ const LecturerModalContent: React.FC<LecturerModalContentProps> = ({
           />
         </div>
         <div className="flex justify-center gap-4">
-          <Button type="submit" disabled={modalState.isAdding} color="green" className="w-sm">
+          <Button
+            type="submit"
+            disabled={modalState.isAdding}
+            color="green"
+            className="w-sm"
+          >
             {modalState.isAdding
               ? modalState.isEditing
                 ? "Updating Lecturer..."

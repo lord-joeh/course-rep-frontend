@@ -1,4 +1,4 @@
-import GroupMembers from "../../components/Groups Management/GroupMembers.tsx"
+import GroupMembers from "../../components/Groups Management/GroupMembers.tsx";
 
 const GroupMembersPage = () => {
   return (
@@ -6,6 +6,6 @@ const GroupMembersPage = () => {
       <GroupMembers />
     </div>
   );
-}
+};
 
-export default GroupMembersPage
+export default GroupMembersPage;

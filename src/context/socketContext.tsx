@@ -33,7 +33,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         path: "/api/socket.io",
         withCredentials: true,
         auth: { token },
-        autoConnect: true, 
+        autoConnect: true,
       });
     }
 

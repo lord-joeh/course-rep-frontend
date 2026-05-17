@@ -13,26 +13,23 @@ import {
   Select,
   Spinner,
   TextInput,
-  Tooltip,
 } from "flowbite-react";
 import { MdAssignmentAdd, MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import useAuth from "../../../hooks/useAuth";
-import { FiDownload } from "react-icons/fi";
 import { useSearch } from "../../../hooks/useSearch";
 import { courses as getCourses } from "../../../services/courseService";
 import { useCrud } from "../../../hooks/useCrud";
 import { getAssignmentsByCourse } from "../../../services/assignmentService";
 import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { TbCalendarDue } from "react-icons/tb";
+
 import { downloadSlide as downloadAssignment } from "../../../services/slidesServices";
 import CommonModal from "../../common/CommonModal";
 import AddNewAssignment from "./AddNewAssignment";
 import SubmitAssignment from "./SubmitAssignment";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineSearch } from "react-icons/hi";
-import { BsFolder } from "react-icons/bs";
+import { AssignmentCard } from "./AssignmentCard";
 
 const Assignments = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -157,7 +154,7 @@ const Assignments = () => {
         </Button>
 
         <Card>
-          <div className="grid grid-cols-1 items-center md:gap-14 gap-3 md:grid-cols-12">
+          <div className="grid grid-cols-1 items-center gap-3 md:grid-cols-12 md:gap-14">
             <div className="md:col-span-2">
               <Label htmlFor="entries" className="mb-2 block font-medium">
                 Show
@@ -226,66 +223,25 @@ const Assignments = () => {
       {loading ? (
         <Spinner size="lg" className="mr-4 place-self-center" />
       ) : (filteredAssignments?.length ?? 0) > 0 ? (
-        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filteredAssignments.map((assignment, idx) => (
-            <Card key={idx}>
-              <div className="flex flex-col gap-2">
-                <h5 className="text-sm font-medium tracking-tight text-gray-900 dark:text-white">
-                  {assignment?.title || "Untitled Assignment"}
-                </h5>
-
-                <p className="line-clamp-3 text-sm">
-                  {assignment?.description || ""}
-                </p>
-                <span className="flex items-center gap-2">
-                  <TbCalendarDue size={24} color="red" />
-                  <p className="text-sm font-medium text-red-500">
-                    {assignment?.deadline
-                      ? new Date(assignment.deadline).toDateString()
-                      : ""}{" "}
-                  </p>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  className="mt-4 h-12 flex-1 cursor-pointer"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    setAssignmentTrack((prev) => ({
-                      ...prev,
-                      folderId: assignment?.submissionFolderID,
-                      assignmentId: assignment?.id,
-                    }));
-                    setModalState((prev) => ({ ...prev, isModalOpen: true }));
-                  }}
-                  disabled={new Date() > new Date(assignment?.deadline)}
-                >
-                  <IoCloudUploadOutline size={24} className="me-2" />
-                  Submit Assignment
-                </Button>
-
-                <Tooltip content="Download Assignment">
-                  <FiDownload
-                    size={32}
-                    className="me-2 mt-4 cursor-pointer"
-                    onClick={() => handleFileDownload(assignment?.fileId)}
-                  />
-                </Tooltip>
-
-                {user && user.isRep && (
-                  <Tooltip content="View Submission">
-                    <BsFolder
-                      size={32}
-                      className="me-2 mt-4 cursor-pointer"
-                      onClick={() =>
-                        navigate(`${assignment?.id}/submissions/details`)
-                      }
-                    />
-                  </Tooltip>
-                )}
-              </div>
-            </Card>
+        <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filteredAssignments.map((assignment, _idx) => (
+            <AssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              isRep={user?.isRep ?? false}
+              onSubmit={(folderId: string, assignmentId: string) => {
+                setAssignmentTrack((prev) => ({
+                  ...prev,
+                  folderId,
+                  assignmentId,
+                }));
+                setModalState((prev) => ({ ...prev, isModalOpen: true }));
+              }}
+              onDownload={handleFileDownload}
+              onViewSubmissions={(id: string) =>
+                navigate(`${id}/submissions/details`)
+              }
+            />
           ))}
         </div>
       ) : (

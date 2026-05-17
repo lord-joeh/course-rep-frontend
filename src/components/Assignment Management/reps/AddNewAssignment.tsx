@@ -30,14 +30,17 @@ interface AddNewAssignmentProps {
 }
 
 function AddNewAssignment({
-  assignment, onClose, isEditing,
-}:Readonly<AddNewAssignmentProps>) {
-  const [assignmentData, setAssignmentData] = useState<AssignmentCreationInterface>({
-    title: "",
-    description: "",
-    courseId: "",
-    deadline: "",
-  });
+  assignment,
+  onClose,
+  isEditing,
+}: Readonly<AddNewAssignmentProps>) {
+  const [assignmentData, setAssignmentData] =
+    useState<AssignmentCreationInterface>({
+      title: "",
+      description: "",
+      courseId: "",
+      deadline: "",
+    });
 
   const crudServices = {
     list: getCourses,
@@ -45,7 +48,13 @@ function AddNewAssignment({
     update: updateAssignmentDetails,
   };
   const {
-    items: courses, loading, toast, showToast, closeToast, add, update,
+    items: courses,
+    loading,
+    toast,
+    showToast,
+    closeToast,
+    add,
+    update,
   } = useCrud<CourseInterface>(crudServices);
 
   useEffect(() => {
@@ -74,13 +83,15 @@ function AddNewAssignment({
   async function handleSubmit(e: ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
-      if (!assignmentData?.courseId ||
+      if (
+        !assignmentData?.courseId ||
         !assignmentData?.title ||
         !assignmentData?.description ||
-        !assignmentData?.deadline) {
+        !assignmentData?.deadline
+      ) {
         return showToast(
           "All fields are required. Except the file field",
-          "error"
+          "error",
         );
       }
 
@@ -100,7 +111,7 @@ function AddNewAssignment({
         await add(transformedFormData);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
       setAssignmentData({
         title: "",
@@ -135,7 +146,7 @@ function AddNewAssignment({
                 ...prev,
                 courseId: e.target.value,
               }));
-            } }
+            }}
           >
             <option value="" disabled>
               Select Course
@@ -157,7 +168,8 @@ function AddNewAssignment({
             required
             placeholder="Title"
             value={assignmentData?.title}
-            onChange={handleChange} />
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-2 block max-w-md">
@@ -174,7 +186,8 @@ function AddNewAssignment({
                 ...prev,
                 description: e.target.value,
               }));
-            } } />
+            }}
+          />
         </div>
 
         {!isEditing && (
@@ -187,7 +200,8 @@ function AddNewAssignment({
               name="files"
               onChange={handleChange}
               accept=".pdf,.ppt,.pptx,.docx,.doc, .jpg, .png"
-              className="max-w-md" />
+              className="max-w-md"
+            />
             <HelperText>
               Supported Files: pdf, ppt, pptx, docx, doc, jpg, png. Max File
               Size: 10MB
@@ -204,7 +218,8 @@ function AddNewAssignment({
             value={assignmentData?.deadline}
             onChange={handleChange}
             required
-            className="max-w-md" />
+            className="max-w-md"
+          />
         </div>
 
         {/* Show selected file name and size */}
@@ -212,10 +227,12 @@ function AddNewAssignment({
           <div className="mt-2 max-w-md">
             <div className="text-sm font-medium">Selected file</div>
             <ul className="list-disc pl-5">
-              {<li key={assignmentData?.file.name} className="text-sm">
-                {assignmentData?.file.name} (
-                {Math.round(assignmentData?.file.size / 1024)} KB)
-              </li>}
+              {
+                <li key={assignmentData?.file.name} className="text-sm">
+                  {assignmentData?.file.name} (
+                  {Math.round(assignmentData?.file.size / 1024)} KB)
+                </li>
+              }
             </ul>
           </div>
         )}
@@ -240,7 +257,8 @@ function AddNewAssignment({
         <ToastMessage
           message={toast.message}
           type={toast.type}
-          onClose={closeToast} />
+          onClose={closeToast}
+        />
       )}
     </div>
   );

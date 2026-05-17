@@ -6,7 +6,6 @@ import {
   Select,
   Spinner,
   TextInput,
-  Tooltip,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { FaArrowLeft, FaRegCalendarCheck } from "react-icons/fa";
@@ -173,69 +172,71 @@ function AssignmentDetails() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
-        <Card className="bg-emerald-50 text-center">
-          <h5 className="text-lg font-medium text-emerald-500">
-            Number of Submitted Assignments
-          </h5>
-          <p className="text-4xl font-semibold text-emerald-500">
-            {pagination?.totalItems || 0}
+      {/* stat strip */}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        {/* count */}
+        <div className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+          <p className="text-[11px] font-medium tracking-wider text-gray-400 uppercase">
+            Total submissions
           </p>
-        </Card>
+          <p className="text-3xl font-medium text-emerald-600">
+            {pagination.totalItems || 0}
+          </p>
+        </div>
 
-        <Card className="bg-blue-50">
-          <h5 className="text-xl font-bold">Assignment Details</h5>
-          <p className="text-3xl font-extrabold text-blue-600">
-            {assignmentInfo?.title || ""}
+        {/* assignment info */}
+        <div className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+          <p className="text-[11px] font-medium tracking-wider text-gray-400 uppercase">
+            Assignment
           </p>
-          <small>{assignmentInfo?.Course?.name || ""}</small>
-          <span className="flex gap-3">
-            <TbCalendarDue size={24} color="red" />
-            <p className="text-lg font-semibold text-red-500">
-              {assignmentInfo?.deadline
-                ? new Date(assignmentInfo?.deadline).toDateString()
-                : ""}{" "}
+          <p className="text-sm font-medium text-gray-900 dark:text-white">
+            {assignmentInfo?.title || "—"}
+          </p>
+          <p className="text-xs text-gray-400">
+            {assignmentInfo?.Course?.name || ""}
+          </p>
+          <div className="flex items-center gap-1.5 text-xs font-medium text-red-500">
+            <TbCalendarDue size={13} />
+            {assignmentInfo?.deadline
+              ? new Date(assignmentInfo.deadline).toDateString()
+              : "—"}
+          </div>
+        </div>
+
+        {/* actions — rep only */}
+        {user?.isRep && (
+          <div className="flex flex-col gap-2 rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+            <p className="text-[11px] font-medium tracking-wider text-gray-400 uppercase">
+              Actions
             </p>
-          </span>
-        </Card>
-
-        {user && user?.isRep && (
-          <Card className="bg-red-50">
-            <h5 className="text-xl font-semibold">Assignment Actions</h5>
-
-            <div className="flex justify-between">
-              <Tooltip content="Update Assignment Info">
-                <span
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setModalState((prev) => ({
-                      ...prev,
-                      isModalOpen: true,
-                      isEditing: true,
-                    }))
-                  }
-                >
-                  <BiEditAlt size={32} color="green" />{" "}
-                </span>
-              </Tooltip>
-
-              <Tooltip content="Delete Assignment and all Data">
-                <span
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setModalState((prev) => ({
-                      ...prev,
-                      itemToDelete: assignmentInfo?.title ?? "",
-                      idToDelete: assignmentInfo?.id ?? "",
-                      isDeleteDialogueOpen: true,
-                    }))
-                  }
-                >
-                  <MdDeleteForever size={32} color="red" />{" "}
-                </span>
-              </Tooltip>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() =>
+                  setModalState((prev) => ({
+                    ...prev,
+                    isModalOpen: true,
+                    isEditing: true,
+                  }))
+                }
+                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                <BiEditAlt size={13} /> Edit
+              </button>
+              <button
+                onClick={() =>
+                  setModalState((prev) => ({
+                    ...prev,
+                    itemToDelete: assignmentInfo?.title ?? "",
+                    idToDelete: assignmentInfo?.id ?? "",
+                    isDeleteDialogueOpen: true,
+                  }))
+                }
+                className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950"
+              >
+                <MdDeleteForever size={13} /> Delete
+              </button>
             </div>
-          </Card>
+          </div>
         )}
       </div>
 
@@ -245,41 +246,57 @@ function AssignmentDetails() {
 
       {loading && <Spinner size="lg" />}
 
-      {filteredSubmissions?.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredSubmissions.map((submitted, idx) => (
-            <Card key={idx}>
-              <div className="flex flex-col flex-wrap gap-2">
-                <h5 className="text-md font-light tracking-tight text-gray-900 dark:text-white">
-                  {submitted?.fileName ?? "Untitled"}
-                </h5>
-                <span className="flex flex-row">
-                  <p className="text-sm">Student ID: </p>
-                  <p className="text-sm font-bold">
-                    {` ${submitted?.Student?.id || ""}`}
+      {filteredSubmissions.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {filteredSubmissions.map((submitted) => {
+            const initials = submitted?.Student?.name
+              .split(" ")
+              .map((n) => n.charAt(0).toUpperCase())
+              .join("");
+            return (
+              <div
+                key={submitted.id}
+                className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-medium text-blue-600 dark:bg-blue-950 dark:text-blue-300">
+                    {initials}
+                  </div>
+                  <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                    {submitted?.fileName ?? "Untitled"}
                   </p>
-                </span>
-                <span className="flex items-center gap-2 text-center">
-                  <FaRegCalendarCheck size={24} color="green" />
-                  <p className="text-sm">Submitted On: </p>
-                  <p className="text-sm font-bold">
+                </div>
+                <div className="flex flex-col gap-1.5 border-t border-gray-100 pt-3 dark:border-gray-800">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Student ID:
+                    </span>
+                    {submitted?.Student?.id || "—"}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <FaRegCalendarCheck
+                      size={12}
+                      className="text-emerald-500"
+                    />
                     {submitted?.submittedAt
-                      ? new Date(submitted?.submittedAt).toDateString()
-                      : ""}
-                  </p>
-                </span>
+                      ? new Date(submitted.submittedAt).toDateString()
+                      : "—"}
+                  </div>
+                </div>
               </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        <div className="text-center text-gray-500 dark:text-gray-400">
-          No Assignment Submitted.
-        </div>
+        !loading && (
+          <p className="text-center text-sm text-gray-400 dark:text-gray-500">
+            No submissions yet.
+          </p>
+        )
       )}
 
       {filteredSubmissions.length > 0 && (
-        <div className="m-2 flex place-self-center sm:justify-center">
+        <div className="flex justify-center">
           <Pagination
             layout="table"
             currentPage={pagination?.currentPage || 1}

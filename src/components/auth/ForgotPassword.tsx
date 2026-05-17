@@ -36,7 +36,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await forgotPassword(student);
       if (!response)
         setError("Password reset request failed. Please try again");
@@ -53,7 +53,7 @@ const ForgotPassword = () => {
       if (axios.isAxiosError(error)) {
         setToast((prev) => ({
           ...prev,
-          message:  error.response?.data?.error ,
+          message: error.response?.data?.error,
           type: "error",
           isVisible: true,
         }));

@@ -8,20 +8,18 @@ import {
   Spinner,
   TextInput,
 } from "flowbite-react";
-import { MdDeleteForever } from "react-icons/md";
-import { IoLocationOutline, IoTimeOutline } from "react-icons/io5";
-import { FiEdit3 } from "react-icons/fi";
+
 import useAuth from "../../../hooks/useAuth";
 import { TbTimelineEventPlus } from "react-icons/tb";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
-import { formatTimeWithOffset } from "../../../helpers/formatTime";
 import { ModalState, Event } from "../../../utils/Interfaces";
 import { useCrud } from "../../../hooks/useCrud";
 import { useSearch } from "../../../hooks/useSearch";
 import EventModalContent from "./EventModalContent";
 import { HiOutlineSearch } from "react-icons/hi";
+import { EventCard } from "../EventCard";
 
 const Events = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -127,21 +125,6 @@ const Events = () => {
     }
   };
 
-  const monthsInArr = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-  ];
-
   return (
     <div className="flex flex-col gap-6 font-sans">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -207,82 +190,41 @@ const Events = () => {
         Upcoming Events
       </h1>
 
-      {isLoading && (
-        <Card>
-          <Spinner size="lg" />
-        </Card>
-      )}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3 ">
+      {isLoading && <Spinner size="lg" />}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 2xl:grid-cols-3">
         {filteredEvents?.length > 0 ? (
-          filteredEvents.map((event: Event, idx) => (
-            <div
-              key={idx}
-              className="my-4 flex max-w-sm rounded-xl bg-white shadow-lg dark:bg-gray-800"
-            >
-              <div className="flex flex-col items-center justify-center rounded-l-xl bg-blue-900 p-6 text-white">
-                <span className="dark:text- text-6xl font-bold">
-                  {new Date(event?.date).getDate()}
-                </span>
-                <span className="mt-2 rounded-b-lg bg-yellow-500 px-4 py-4 font-semibold text-blue-900">
-                  {monthsInArr[new Date(event?.date).getMonth()]}
-                </span>
-              </div>
-
-              <div className="flex flex-col justify-center space-y-2 p-2">
-                <h2 className="text-xl leading-tight font-bold text-blue-900 dark:text-white">
-                  {event?.description}
-                </h2>
-                <div className="flex items-center text-gray-700 dark:text-gray-400">
-                  <IoTimeOutline className="me-2" />
-                  <span>{formatTimeWithOffset(event?.date, event?.time)}</span>
-                </div>
-                <div className="flex items-center text-gray-700 dark:text-gray-400">
-                  <IoLocationOutline className="me-2" />
-                  <span>{event?.venue}</span>
-                </div>
-                {user?.isRep && (
-                  <div className="mt-2 flex justify-evenly">
-                    <span
-                      onClick={() => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          description: event?.description,
-                          date: event?.date,
-                          time: event?.time,
-                          venue: event?.venue,
-                        }));
-                        setEditId(event?.id);
-                        setModalState((prev) => ({
-                          ...prev,
-                          isModalOpen: true,
-                          isEditing: true,
-                        }));
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <FiEdit3 size={24} color="green" />
-                    </span>
-                    <span
-                      onClick={() =>
-                        setModalState((prev) => ({
-                          ...prev,
-                          isDeleteDialogueOpen: true,
-                          itemToDelete:
-                            `${event?.description.slice(0, 30)}...` || "",
-                          idToDelete: event?.id || "",
-                        }))
-                      }
-                      className="cursor-pointer"
-                    >
-                      <MdDeleteForever size={24} color="red" />
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+          filteredEvents.map((event: Event, _idx) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              isRep={user?.isRep ?? false}
+              onEdit={(e: Event) => {
+                setFormData({
+                  id: e.id,
+                  description: e.description,
+                  date: e.date,
+                  time: e.time,
+                  venue: e.venue,
+                });
+                setEditId(e.id);
+                setModalState((prev) => ({
+                  ...prev,
+                  isModalOpen: true,
+                  isEditing: true,
+                }));
+              }}
+              onDelete={(id: string, label: string) =>
+                setModalState((prev) => ({
+                  ...prev,
+                  isDeleteDialogueOpen: true,
+                  itemToDelete: label,
+                  idToDelete: id,
+                }))
+              }
+            />
           ))
         ) : (
-          <Card> No Events </Card>
+          <p> No Events </p>
         )}
       </div>
 

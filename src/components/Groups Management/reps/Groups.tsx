@@ -5,20 +5,18 @@ import { isAxiosError } from "axios";
 import ToastMessage from "../../common/ToastMessage";
 import CommonModal from "../../common/CommonModal";
 import { DeleteConfirmationDialogue } from "../../common/DeleteConfirmationDialogue";
-import { MdDeleteForever, MdGroupAdd } from "react-icons/md";
+import { MdGroupAdd } from "react-icons/md";
 import {
   Button,
   Card,
   Pagination,
   Spinner,
   Label,
-  Tooltip,
   Select,
   TextInput,
 } from "flowbite-react";
-import { FaEdit, FaMagic } from "react-icons/fa";
+import { FaMagic } from "react-icons/fa";
 import AddNewGroup from "./AddNewGroup";
-import { IoEyeOutline } from "react-icons/io5";
 import {
   PaginationType,
   GroupInterface,
@@ -30,6 +28,7 @@ import CreateMagicGroups from "./CreateMagicGroups";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../../hooks/useSearch";
 import { HiOutlineSearch } from "react-icons/hi";
+import { GroupCard } from "./GroupCard";
 
 export interface ModalState {
   isAdding: boolean;
@@ -313,71 +312,32 @@ const Groups = () => {
           Showing Groups For {filterQuery || "All"}
         </h1>
       )}
-      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {isLoading && <Spinner size="lg" />}
 
         {filteredGroup?.length > 0 ? (
           filteredGroup.map((group: GroupInterface) => (
-            <Card key={group?.id} className="overscroll-x-auto">
-              <div className="flex flex-col gap-4 justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {group?.name || ""}
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    {group?.description || ""}
-                  </p>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    {group?.Course?.name || "General Group"}
-                  </p>
-                </div>
-
-                <div className="flex flex-row justify-between items-center gap-4 px-3">
-                  <Button
-                    color="gray"
-                    onClick={() => {
-                      setEditForm({ ...group });
-                      setModalState((prev) => ({
-                        ...prev,
-                        isModalOpen: true,
-                        isEditing: true,
-                      }));
-                    }}
-                  >
-                    <FaEdit className="me-2 h-4 w-4" />
-                    Edit
-                  </Button>
-
-                  <Button
-                    outline
-                    color="red"
-                    onClick={() =>
-                      setModalState((prev) => ({
-                        ...prev,
-                        isDeleteDialogueOpen: true,
-                        itemToDelete: `${group.name} from ${group?.Course?.name || "General Groups"}`,
-                        idToDelete: group.id,
-                      }))
-                    }
-                  >
-                    <MdDeleteForever
-                      size={24}
-                      color="red"
-                      className="me-2 h-4 w-4"
-                    />
-                    Delete
-                  </Button>
-
-                  <Tooltip content="View Group Members">
-                    <IoEyeOutline
-                      size={32}
-                      className="mt-2 cursor-pointer"
-                      onClick={() => navigate(`${group.id}`)}
-                    />
-                  </Tooltip>
-                </div>
-              </div>
-            </Card>
+            <GroupCard
+              key={group.id}
+              group={group}
+              onEdit={(g: GroupInterface) => {
+                setEditForm({ ...g });
+                setModalState((prev) => ({
+                  ...prev,
+                  isModalOpen: true,
+                  isEditing: true,
+                }));
+              }}
+              onDelete={(id: string, label: string) =>
+                setModalState((prev) => ({
+                  ...prev,
+                  isDeleteDialogueOpen: true,
+                  itemToDelete: label,
+                  idToDelete: id,
+                }))
+              }
+              onView={(id: string) => navigate(id)}
+            />
           ))
         ) : (
           <p className="dark:text-white">

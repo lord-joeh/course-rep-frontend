@@ -48,7 +48,9 @@ const useStudentData = (studentId: string | undefined) => {
         setIsLoading(false);
       }
     };
-    fetchStudent().catch((err) => {console.log(err)});
+    fetchStudent().catch((err) => {
+      console.log(err);
+    });
   }, [studentId]);
 
   return { studentData, isLoading, error };

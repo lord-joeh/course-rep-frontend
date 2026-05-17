@@ -1,11 +1,11 @@
-import Login from '../../components/auth/Login'
+import Login from "../../components/auth/Login";
 const LoginPage = () => {
-    return(
-        <div className='flex flex-col items-center justify-center min-h-screen  p-4 gap-5'>
-            <h1 className='text-2xl'>Login to Your Account</h1>
-        <Login/>
-        </div>
-    )
-}
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-5 p-4">
+      <h1 className="text-2xl">Login to Your Account</h1>
+      <Login />
+    </div>
+  );
+};
 
-export default LoginPage
+export default LoginPage;
