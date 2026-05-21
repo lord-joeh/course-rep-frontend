@@ -164,8 +164,8 @@ const Course = () => {
     e.preventDefault();
     const courseData = {
       ...formData,
-      start_time: `${formData.start_time}:00+01`,
-      end_time: `${formData.end_time}:00+01`,
+      start_time: `${formData.start_time}:00`,
+      end_time: `${formData.end_time}:00`,
     };
     try {
       setModalState((prev) => ({ ...prev, isAdding: true }));
@@ -325,8 +325,8 @@ const Course = () => {
                                   name: course?.name,
                                   lecturerId: course?.lecturerId,
                                   day: course?.day,
-                                  start_time: course?.start_time,
-                                  end_time: course?.end_time,
+                                  start_time: course?.start_time?.slice(0, 5), 
+                                  end_time: course?.end_time?.slice(0, 5), 
                                   semester: course?.semester,
                                   slidesFolderID: course?.slidesFolderID,
                                 }));
