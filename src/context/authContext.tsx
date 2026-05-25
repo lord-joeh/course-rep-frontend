@@ -8,6 +8,7 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { AuthContext } from "./authContextInstance";
+import { notifySocketAuthChanged } from "./socketContext";
 
 interface AuthContextType {
   user: UserType | null;
@@ -68,6 +69,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     } catch (e) {}
     setUser(null);
     clearAuthData();
+    notifySocketAuthChanged();
     navigate("/");
   }, [navigate, clearAuthData]);
 
@@ -98,6 +100,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
         setUser(loginResponse);
         localStorage.setItem("user", JSON.stringify(loginResponse));
+        notifySocketAuthChanged();
         navigate(
           loginResponse.isRep ? "/reps/dashboard" : "/students/dashboard",
         );
