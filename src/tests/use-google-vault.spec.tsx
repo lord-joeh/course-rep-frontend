@@ -171,3 +171,4 @@ describe('use-google-vault hooks', () => {
     expect(revokeObjectUrlMock).toHaveBeenCalledWith('blob:mock-url');
   });
 });
+
