@@ -169,3 +169,4 @@ describe('use-lecturers hooks', () => {
     expect(invalidateSpy).toHaveBeenCalled();
   });
 });
+

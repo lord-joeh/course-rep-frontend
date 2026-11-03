@@ -190,3 +190,4 @@ export function EditLecturerDialog({
     </Dialog>
   );
 }
+

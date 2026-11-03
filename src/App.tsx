@@ -24,6 +24,7 @@ import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
 import { StudentDirectoryPage } from '@/pages/reps/student-directory-page';
 import { StudentProfilePage } from '@/pages/students/student-profile-page';
 import { LecturerDirectoryPage } from '@/pages/lecturers/lecturer-directory-page';
+import { CourseCatalogPage } from '@/pages/courses/course-catalog-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -253,6 +254,7 @@ export function App() {
                   <Route path="/reps/dashboard" element={<DashboardView role="REP" />} />
                   <Route path="/reps/students" element={<StudentDirectoryPage />} />
                   <Route path="/reps/lecturers" element={<LecturerDirectoryPage />} />
+                  <Route path="/reps/courses" element={<CourseCatalogPage />} />
                   <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
@@ -262,6 +264,7 @@ export function App() {
                 <Route element={<AuthenticatedShell />}>
                   <Route path="/students/dashboard" element={<DashboardView role="STUDENT" />} />
                   <Route path="/students/lecturers" element={<LecturerDirectoryPage />} />
+                  <Route path="/students/courses" element={<CourseCatalogPage />} />
                   <Route path="/students/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>

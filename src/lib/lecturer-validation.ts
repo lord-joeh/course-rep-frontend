@@ -39,3 +39,4 @@ export const updateLecturerSchema = z.object({
 });
 
 export type UpdateLecturerFormValues = z.infer<typeof updateLecturerSchema>;
+

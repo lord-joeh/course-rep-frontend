@@ -24,3 +24,4 @@ export interface LecturerQueryDto {
   limit?: number;
   search?: string;
 }
+
