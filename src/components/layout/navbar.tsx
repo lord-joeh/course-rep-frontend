@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { Moon, Sun, Menu, Bell, User, LogOut, Settings } from 'lucide-react';
 import type { AuthenticatedUser } from '@/types';
 
@@ -41,11 +40,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <div className="hidden sm:flex items-center gap-2">
-          <Badge variant={user?.isRep ? 'default' : 'secondary'} className="text-xs font-semibold">
-            {user?.isRep ? 'Course Representative' : 'Student'}
-          </Badge>
-        </div>
       </div>
 
       {/* Right Controls */}

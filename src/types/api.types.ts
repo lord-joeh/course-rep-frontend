@@ -15,12 +15,22 @@ export interface ApiErrorResponse {
   path?: string;
 }
 
-export interface PaginatedResult<T> {
-  items: T[];
-  total: number;
+export interface PaginationMeta {
   page: number;
   limit: number;
+  total: number;
   totalPages: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  meta?: PaginationMeta;
+  total?: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
 }
 
 export interface PaginationQuery {
