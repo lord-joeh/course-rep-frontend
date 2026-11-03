@@ -299,3 +299,4 @@ export function CreateCourseDialog({
     </Dialog>
   );
 }
+

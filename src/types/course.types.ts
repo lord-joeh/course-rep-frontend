@@ -46,3 +46,4 @@ export interface CourseQueryDto {
 }
 
 export type CourseRosterStudent = Student;
+

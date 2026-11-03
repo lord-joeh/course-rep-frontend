@@ -86,3 +86,4 @@ export const updateCourseSchema = z.object({
 });
 
 export type UpdateCourseFormValues = z.infer<typeof updateCourseSchema>;
+

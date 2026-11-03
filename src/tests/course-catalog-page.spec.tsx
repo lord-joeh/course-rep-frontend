@@ -195,3 +195,4 @@ describe('CourseCatalogPage', () => {
     expect(screen.getByText('Schedule')).toBeInTheDocument();
   });
 });
+

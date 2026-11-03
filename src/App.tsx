@@ -25,6 +25,7 @@ import { StudentDirectoryPage } from '@/pages/reps/student-directory-page';
 import { StudentProfilePage } from '@/pages/students/student-profile-page';
 import { LecturerDirectoryPage } from '@/pages/lecturers/lecturer-directory-page';
 import { CourseCatalogPage } from '@/pages/courses/course-catalog-page';
+import { DriveVaultPage } from '@/pages/reps/drive-vault-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -255,6 +256,7 @@ export function App() {
                   <Route path="/reps/students" element={<StudentDirectoryPage />} />
                   <Route path="/reps/lecturers" element={<LecturerDirectoryPage />} />
                   <Route path="/reps/courses" element={<CourseCatalogPage />} />
+                  <Route path="/reps/drive-vault" element={<DriveVaultPage />} />
                   <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>

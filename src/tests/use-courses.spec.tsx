@@ -247,3 +247,4 @@ describe('use-courses hooks', () => {
     expect(invalidateSpy).toHaveBeenCalled();
   });
 });
+
