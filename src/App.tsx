@@ -21,6 +21,8 @@ import { RegisterPage } from '@/pages/auth/register-page';
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password-page';
 import { ResetPasswordPage } from '@/pages/auth/reset-password-page';
 import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
+import { StudentDirectoryPage } from '@/pages/reps/student-directory-page';
+import { StudentProfilePage } from '@/pages/students/student-profile-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -248,6 +250,8 @@ export function App() {
               <Route element={<RoleRoute requiredRole="REP" />}>
                 <Route element={<AuthenticatedShell />}>
                   <Route path="/reps/dashboard" element={<DashboardView role="REP" />} />
+                  <Route path="/reps/students" element={<StudentDirectoryPage />} />
+                  <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
 
@@ -255,6 +259,7 @@ export function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<AuthenticatedShell />}>
                   <Route path="/students/dashboard" element={<DashboardView role="STUDENT" />} />
+                  <Route path="/students/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
 

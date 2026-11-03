@@ -62,7 +62,7 @@ export function LoginPage() {
                 id="identifier"
                 type="text"
                 autoComplete="username"
-                placeholder="e.g. 10928374 or student@univ.edu"
+                placeholder="e.g. 10928374 or 10928374@live.gctu.edu.gh"
                 value={formData.identifier}
                 onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                 disabled={loginMutation.isPending}

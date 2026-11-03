@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRegisterMutation } from '@/hooks/use-auth-mutations';
 import { registerSchema, type RegisterFormData } from '@/lib/auth-validation';
-import { UserPlus, Eye, EyeOff, Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
+import { UserPlus, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 export function RegisterPage() {
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -124,7 +124,7 @@ export function RegisterPage() {
                 <Input
                   id="reg-email"
                   type="email"
-                  placeholder="student@univ.edu"
+                  placeholder="e.g 10928374@live.gctu.edu.gh"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={registerMutation.isPending}
@@ -212,15 +212,6 @@ export function RegisterPage() {
               {errors.confirmPassword && (
                 <p className="text-xs text-destructive font-medium">{errors.confirmPassword}</p>
               )}
-            </div>
-
-            {/* Security Notice */}
-            <div className="rounded-md bg-muted/60 p-3 border border-border flex items-start gap-2.5 text-xs text-muted-foreground">
-              <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-              <span>
-                All new registrations are enrolled as student accounts. Course representative privileges are
-                assigned by existing representatives through academic verification.
-              </span>
             </div>
           </CardContent>
 

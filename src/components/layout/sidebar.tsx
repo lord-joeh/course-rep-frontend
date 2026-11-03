@@ -47,6 +47,7 @@ export const REP_NAV_ITEMS: NavItem[] = [
 
 export const STUDENT_NAV_ITEMS: NavItem[] = [
   { title: 'Dashboard', href: '/students/dashboard', icon: LayoutDashboard },
+  { title: 'My Profile', href: '/students/profile', icon: Users },
   { title: 'My Courses', href: '/students/courses', icon: BookOpen },
   { title: 'Course Slides', href: '/students/slides', icon: FileText },
   { title: 'Assignments', href: '/students/assignments', icon: ClipboardList },

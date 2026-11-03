@@ -78,7 +78,7 @@ export function ForgotPasswordPage() {
                 </label>
                 <Input
                   id="reset-identifier"
-                  placeholder="e.g. 10928374 or student@univ.edu"
+                  placeholder="e.g. 10928374 or 10928374@live.gctu.edu.gh"
                   value={formData.identifier}
                   onChange={(e) => setFormData({ identifier: e.target.value })}
                   disabled={mutation.isPending}
