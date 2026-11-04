@@ -12,7 +12,6 @@ import { PendingFeedbackCard } from '@/components/dashboard/pending-feedback-car
 import { BullBoardLinkButton } from '@/components/queues/bull-board-link-button';
 import { InitializeSessionDialog } from '@/components/attendance/initialize-session-dialog';
 import { CreateAnnouncementDialog } from '@/components/notifications/create-announcement-dialog';
-import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
 import { useStudentsQuery } from '@/hooks/use-students';
 import { useCoursesQuery } from '@/hooks/use-courses';
 import { useFeedbacksQuery } from '@/hooks/use-feedback';
@@ -25,7 +24,6 @@ import { format } from 'date-fns';
 import {
   Sparkles,
   RefreshCw,
-  Key,
   Activity,
 } from 'lucide-react';
 
@@ -33,7 +31,6 @@ export function RepDashboardPage() {
   const { user } = useAuthStore();
 
   // Dialog States
-  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false);
   const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
 
@@ -117,16 +114,6 @@ export function RepDashboardPage() {
           >
             <RefreshCw className={`w-4 h-4 ${isRefetchingAll ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh All</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsPasswordOpen(true)}
-            className="h-9 gap-1.5 text-xs"
-          >
-            <Key className="w-4 h-4 text-muted-foreground" />
-            <span className="hidden sm:inline">Change Password</span>
           </Button>
         </div>
       </div>
@@ -225,11 +212,6 @@ export function RepDashboardPage() {
       </Card>
 
       {/* Modal Dialogs */}
-      <ChangePasswordDialog
-        open={isPasswordOpen}
-        onOpenChange={setIsPasswordOpen}
-      />
-
       <InitializeSessionDialog
         open={isAttendanceOpen}
         onOpenChange={setIsAttendanceOpen}

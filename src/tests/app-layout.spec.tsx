@@ -58,4 +58,17 @@ describe('AppLayout & Sidebar', () => {
 
     expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument();
   });
+
+  it('opens Change Password dialog from Navbar user menu', async () => {
+    renderWithProviders(<AppLayout user={dummyRep} />);
+
+    const userMenuTrigger = screen.getByLabelText('Open user menu');
+    fireEvent.pointerDown(userMenuTrigger, { button: 0, ctrlKey: false });
+
+    expect(await screen.findByText('Change Password')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Change Password'));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Update Password')).toBeInTheDocument();
+  });
 });

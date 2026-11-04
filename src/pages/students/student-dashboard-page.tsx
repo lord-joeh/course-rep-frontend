@@ -10,7 +10,6 @@ import { DeadlineTickerCard } from '@/components/dashboard/deadline-ticker-card'
 import { RecentAnnouncementsCard } from '@/components/dashboard/recent-announcements-card';
 import { QRScannerDialog } from '@/components/attendance/qr-scanner-dialog';
 import { SubmitFeedbackDialog } from '@/components/feedback/submit-feedback-dialog';
-import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
 import { useCoursesQuery } from '@/hooks/use-courses';
 import { useAssignmentsQuery } from '@/hooks/use-assignments';
 import { useNotificationsQuery, useUnreadNotificationCountQuery } from '@/hooks/use-notifications';
@@ -21,7 +20,6 @@ import { format } from 'date-fns';
 import {
   GraduationCap,
   RefreshCw,
-  Key,
   BookOpen,
   ChevronRight,
 } from 'lucide-react';
@@ -30,7 +28,6 @@ export function StudentDashboardPage() {
   const { user } = useAuthStore();
 
   // Dialog States
-  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
@@ -103,16 +100,6 @@ export function StudentDashboardPage() {
           >
             <RefreshCw className={`w-4 h-4 ${isRefetchingAll ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh All</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsPasswordOpen(true)}
-            className="h-9 gap-1.5 text-xs"
-          >
-            <Key className="w-4 h-4 text-muted-foreground" />
-            <span className="hidden sm:inline">Change Password</span>
           </Button>
         </div>
       </div>
@@ -217,11 +204,6 @@ export function StudentDashboardPage() {
       </div>
 
       {/* Modal Dialogs */}
-      <ChangePasswordDialog
-        open={isPasswordOpen}
-        onOpenChange={setIsPasswordOpen}
-      />
-
       <QRScannerDialog
         open={isScannerOpen}
         onOpenChange={setIsScannerOpen}

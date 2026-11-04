@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTheme } from '@/components/theme-provider';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,8 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Moon, Sun, Menu, User, LogOut, Settings } from 'lucide-react';
+import { Moon, Sun, Menu, User, LogOut, Key } from 'lucide-react';
 import { NotificationPopover } from '@/components/notifications/notification-popover';
+import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
 import type { AuthenticatedUser } from '@/types';
 
 interface NavbarProps {
@@ -25,6 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenMobileMenu,
   onLogout,
 }) => {
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
 
   return (
@@ -88,9 +91,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link to={user?.isRep ? '/reps/profile' : '/students/profile'}>
+                <User className="mr-2 h-4 w-4" />
+                <span>My Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setIsPasswordOpen(true)}
+              className="cursor-pointer"
+            >
+              <Key className="mr-2 h-4 w-4" />
+              <span>Change Password</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-destructive focus:text-destructive">
@@ -100,6 +112,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* User Settings - Change Password Dialog */}
+      <ChangePasswordDialog
+        open={isPasswordOpen}
+        onOpenChange={setIsPasswordOpen}
+      />
     </header>
   );
 };
