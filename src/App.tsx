@@ -27,6 +27,7 @@ import { LecturerDirectoryPage } from '@/pages/lecturers/lecturer-directory-page
 import { CourseCatalogPage } from '@/pages/courses/course-catalog-page';
 import { DriveVaultPage } from '@/pages/reps/drive-vault-page';
 import { CourseSlidesPage } from '@/pages/slides/course-slides-page';
+import { AssignmentsPage } from '@/pages/assignments/assignments-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -259,6 +260,7 @@ export function App() {
                   <Route path="/reps/courses" element={<CourseCatalogPage />} />
                   <Route path="/reps/drive-vault" element={<DriveVaultPage />} />
                   <Route path="/reps/slides" element={<CourseSlidesPage />} />
+                  <Route path="/reps/assignments" element={<AssignmentsPage />} />
                   <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
@@ -270,6 +272,7 @@ export function App() {
                   <Route path="/students/lecturers" element={<LecturerDirectoryPage />} />
                   <Route path="/students/courses" element={<CourseCatalogPage />} />
                   <Route path="/students/slides" element={<CourseSlidesPage />} />
+                  <Route path="/students/assignments" element={<AssignmentsPage />} />
                   <Route path="/students/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
