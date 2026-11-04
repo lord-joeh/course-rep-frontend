@@ -33,6 +33,7 @@ import { GroupsPage } from '@/pages/groups/groups-page';
 import { EventsPage } from '@/pages/events/events-page';
 import { NotificationsPage } from '@/pages/notifications/notifications-page';
 import { FeedbackPage } from '@/pages/feedback/feedback-page';
+import { AuditLogsPage } from '@/pages/reps/audit-logs-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -271,6 +272,7 @@ export function App() {
                   <Route path="/reps/groups" element={<GroupsPage />} />
                   <Route path="/reps/events" element={<EventsPage />} />
                   <Route path="/reps/feedback" element={<FeedbackPage />} />
+                  <Route path="/reps/audit-logs" element={<AuditLogsPage />} />
                   <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>

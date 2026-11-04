@@ -11,3 +11,4 @@ export * from './group.types';
 export * from './event.types';
 export * from './notification.types';
 export * from './feedback.types';
+export * from './audit.types';
