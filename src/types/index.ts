@@ -7,3 +7,4 @@ export * from './google.types';
 export * from './slide.types';
 export * from './assignment.types';
 export * from './attendance.types';
+export * from './group.types';
