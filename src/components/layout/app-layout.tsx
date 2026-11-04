@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { PwaInstallBanner } from '@/components/pwa/pwa-install-banner';
+import { OfflineIndicator } from '@/components/pwa/offline-indicator';
 import type { AuthenticatedUser } from '@/types';
 
 interface AppLayoutProps {
@@ -59,6 +61,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
         </main>
       </div>
+
+      {/* PWA In-App Install Banner & Offline Connectivity Indicator */}
+      <PwaInstallBanner />
+      <OfflineIndicator />
     </div>
   );
 };

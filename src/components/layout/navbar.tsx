@@ -10,9 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Moon, Sun, Menu, User, LogOut, Key } from 'lucide-react';
+import { Moon, Sun, Menu, User, LogOut, Key, Download, BellRing } from 'lucide-react';
 import { NotificationPopover } from '@/components/notifications/notification-popover';
 import { ChangePasswordDialog } from '@/components/auth/change-password-dialog';
+import { usePwaInstall } from '@/hooks/use-pwa-install';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 import type { AuthenticatedUser } from '@/types';
 
 interface NavbarProps {
@@ -29,6 +31,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
+  const { isInstallable, promptInstall } = usePwaInstall();
+  const { permission, requestPushPermission } = usePushNotifications();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/95 px-4 md:px-6 backdrop-blur-xs">
@@ -104,6 +108,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Key className="mr-2 h-4 w-4" />
               <span>Change Password</span>
             </DropdownMenuItem>
+
+            {/* PWA Install Trigger (Visible if app is installable) */}
+            {isInstallable && (
+              <DropdownMenuItem
+                onClick={() => promptInstall()}
+                className="cursor-pointer"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                <span>Install App</span>
+              </DropdownMenuItem>
+            )}
+
+            {/* Web Push Notification Quick Trigger */}
+            <DropdownMenuItem
+              onClick={() => requestPushPermission()}
+              className="cursor-pointer"
+              disabled={permission === 'granted' || permission === 'unsupported'}
+            >
+              <BellRing className="mr-2 h-4 w-4" />
+              <span>
+                {permission === 'granted'
+                  ? 'Push Alerts: Active'
+                  : permission === 'denied'
+                  ? 'Push Alerts: Blocked'
+                  : 'Enable Push Alerts'}
+              </span>
+            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-destructive focus:text-destructive">
               <LogOut className="mr-2 h-4 w-4" />
