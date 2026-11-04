@@ -79,7 +79,11 @@ export function useAttendanceStream({
 
     socket.on('attendeeMarked', (payload: AttendeeMarkedPayload) => {
       if (payload.instanceId === instanceId) {
-        setRecentAttendees((prev) => [payload, ...prev.slice(0, 9)]);
+        // Prevent duplicate student entries if student scans multiple times
+        setRecentAttendees((prev) => {
+          const filtered = prev.filter((att) => att.studentId !== payload.studentId);
+          return [payload, ...filtered].slice(0, 10);
+        });
         setLivePresentCount(payload.presentCount);
       }
     });

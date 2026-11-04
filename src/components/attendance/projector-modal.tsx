@@ -345,9 +345,9 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
                       Awaiting student scans...
                     </div>
                   ) : (
-                    stream.recentAttendees.map((att, idx) => (
+                    stream.recentAttendees.map((att) => (
                       <div
-                        key={`${att.studentId}-${idx}`}
+                        key={att.studentId}
                         className="flex items-center justify-between p-2 rounded bg-muted/40 border border-border text-xs animate-in fade-in slide-in-from-top-1"
                       >
                         <div className="flex items-center gap-2 min-w-0">
