@@ -88,3 +88,4 @@ export interface DirectMessagePayload {
 }
 
 export type PaginatedNotifications = PaginatedResult<Notification>;
+

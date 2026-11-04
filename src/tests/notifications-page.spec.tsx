@@ -111,7 +111,7 @@ describe('NotificationsPage', () => {
     renderWithProviders();
 
     expect(screen.getByText('Announcements & Notifications')).toBeInTheDocument();
-    expect(screen.getByText(/Live WebSocket Active/i)).toBeInTheDocument();
+    expect(screen.getByText(/Live Socket Connection/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText('Urgent: Room Change for CPEN 305')).toBeInTheDocument();

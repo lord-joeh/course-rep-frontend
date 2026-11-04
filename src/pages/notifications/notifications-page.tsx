@@ -160,7 +160,7 @@ export function NotificationsPage() {
             <span>Real-time cohort announcements, course notifications, and alerts.</span>
             <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
               <Radio className={`w-3 h-3 ${isConnected ? 'animate-pulse' : ''}`} />
-              {isConnected ? 'Live WebSocket Active' : 'Connecting to Stream...'}
+              {isConnected ? 'Live Socket Connection' : 'Connecting to Stream...'}
             </span>
           </div>
         </div>

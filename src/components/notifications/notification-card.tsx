@@ -173,3 +173,4 @@ export function NotificationCard({
     </Card>
   );
 }
+

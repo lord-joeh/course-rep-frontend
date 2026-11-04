@@ -9,7 +9,7 @@ import { EditAnnouncementDialog } from '@/components/notifications/edit-announce
 import { DirectMessageDialog } from '@/components/notifications/direct-message-dialog';
 import { NotificationPopover } from '@/components/notifications/notification-popover';
 import { apiClient } from '@/lib/api-client';
-import type { Notification } from '@/types';
+import type { Notification, Student } from '@/types';
 
 describe('Notification Dialogs & Components', () => {
   let queryClient: QueryClient;
@@ -31,7 +31,7 @@ describe('Notification Dialogs & Components', () => {
     id: 'notif-200',
     title: 'Midterm Room Rescheduled',
     message: 'Please proceed to Examination Hall B.',
-    type: 'announcement',
+    type: 'academic',
     priority: 'urgent',
     senderId: 'rep-01',
     sender: { id: 'rep-01', name: 'Course Rep', email: 'rep@univ.edu' },
@@ -40,6 +40,16 @@ describe('Notification Dialogs & Components', () => {
     isRead: false,
     createdAt: '2026-11-04T12:00:00.000Z',
     updatedAt: '2026-11-04T12:00:00.000Z',
+  };
+
+  const mockStudent: Student = {
+    id: '10982736',
+    name: 'Kwame Mensah',
+    email: 'kmensah@st.ug.edu.gh',
+    status: 'ACTIVE',
+    isRep: false,
+    createdAt: '2026-01-01',
+    updatedAt: '2026-01-01',
   };
 
   describe('NotificationCard', () => {
@@ -135,7 +145,7 @@ describe('Notification Dialogs & Components', () => {
   });
 
   describe('DirectMessageDialog', () => {
-    it('submits direct student message', async () => {
+    it('submits direct student message when pre-selected recipient is provided', async () => {
       vi.spyOn(apiClient, 'get').mockResolvedValueOnce({
         data: { success: true, statusCode: 200, data: { items: [], meta: { total: 0 } } },
       });
@@ -154,13 +164,14 @@ describe('Notification Dialogs & Components', () => {
         { wrapper },
       );
 
-      expect(screen.getByText(/Recipient:/i)).toBeInTheDocument();
+      expect(screen.getByText('Kwame Mensah')).toBeInTheDocument();
+      expect(screen.getByText(/ID: 10982736/i)).toBeInTheDocument();
 
       fireEvent.change(screen.getByLabelText(/Direct Message/i), {
         target: { value: 'Reminder to submit your lab assignment.' },
       });
 
-      const submitBtn = screen.getByRole('button', { name: /Send Message/i });
+      const submitBtn = screen.getByRole('button', { name: /Dispatch Alert/i });
       fireEvent.click(submitBtn);
 
       await waitFor(() => {
@@ -172,10 +183,47 @@ describe('Notification Dialogs & Components', () => {
       });
       expect(onClose).toHaveBeenCalled();
     });
+
+    it('searches students with debounced input and selects recipient', async () => {
+      vi.spyOn(apiClient, 'get').mockImplementation(async (url: string, config?: any) => {
+        if (config?.params?.search === 'Kwame') {
+          return {
+            data: {
+              success: true,
+              statusCode: 200,
+              data: { items: [mockStudent], meta: { total: 1 } },
+            },
+          };
+        }
+        return {
+          data: {
+            success: true,
+            statusCode: 200,
+            data: { items: [], meta: { total: 0 } },
+          },
+        };
+      });
+
+      render(<DirectMessageDialog isOpen={true} onClose={vi.fn()} />, { wrapper });
+
+      const searchInput = screen.getByPlaceholderText(/search by name, student id/i);
+      fireEvent.change(searchInput, { target: { value: 'Kwame' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('Kwame Mensah')).toBeInTheDocument();
+      });
+
+      // Click on student result to select
+      fireEvent.click(screen.getByText('Kwame Mensah'));
+
+      // Recipient card is now active
+      expect(screen.getByText(/ID: 10982736/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Change/i })).toBeInTheDocument();
+    });
   });
 
   describe('NotificationPopover', () => {
-    it('renders unread count badge and notification items', async () => {
+    it('renders unread count badge and notification items with responsive layout', async () => {
       vi.spyOn(apiClient, 'get').mockImplementation(async (url: string) => {
         if (url.includes('/notifications/unread-count')) {
           return { data: { success: true, statusCode: 200, data: { unreadCount: 3 } } };
