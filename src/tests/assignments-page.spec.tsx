@@ -324,3 +324,4 @@ describe('AssignmentsPage', () => {
     expect(screen.getByText('Submissions')).toBeInTheDocument();
   });
 });
+

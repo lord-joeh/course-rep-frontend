@@ -6,3 +6,4 @@ export * from './course.types';
 export * from './google.types';
 export * from './slide.types';
 export * from './assignment.types';
+export * from './attendance.types';

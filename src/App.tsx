@@ -28,6 +28,7 @@ import { CourseCatalogPage } from '@/pages/courses/course-catalog-page';
 import { DriveVaultPage } from '@/pages/reps/drive-vault-page';
 import { CourseSlidesPage } from '@/pages/slides/course-slides-page';
 import { AssignmentsPage } from '@/pages/assignments/assignments-page';
+import { AttendancePage } from '@/pages/attendance/attendance-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -261,6 +262,7 @@ export function App() {
                   <Route path="/reps/drive-vault" element={<DriveVaultPage />} />
                   <Route path="/reps/slides" element={<CourseSlidesPage />} />
                   <Route path="/reps/assignments" element={<AssignmentsPage />} />
+                  <Route path="/reps/attendance" element={<AttendancePage />} />
                   <Route path="/reps/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>
@@ -273,6 +275,7 @@ export function App() {
                   <Route path="/students/courses" element={<CourseCatalogPage />} />
                   <Route path="/students/slides" element={<CourseSlidesPage />} />
                   <Route path="/students/assignments" element={<AssignmentsPage />} />
+                  <Route path="/students/attendance" element={<AttendancePage />} />
                   <Route path="/students/profile" element={<StudentProfilePage />} />
                 </Route>
               </Route>

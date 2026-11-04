@@ -84,3 +84,4 @@ export interface AssignmentQueryDto {
 }
 
 export type AssignmentFilterStatus = 'all' | 'active' | 'submitted' | 'past';
+
