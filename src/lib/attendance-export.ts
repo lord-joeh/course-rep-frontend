@@ -1,10 +1,10 @@
 import { apiClient } from '@/lib/api-client';
-import type { ApiResponse, AttendanceDetailResponse, AttendanceInstance, AttendanceRecord } from '@/types';
-import type { CourseRosterStudent } from '@/types/course.types';
+import type { AttendanceInstance, AttendanceRecord } from '@/types';
 import { toast } from 'sonner';
 
 /**
  * Generates an RFC-4180 compliant CSV string with UTF-8 BOM from session and attendee records.
+ * Used for client-side generation or offline export fallbacks.
  */
 export function generateAttendanceCsv(
   session: AttendanceInstance,
@@ -100,54 +100,46 @@ export function downloadAttendanceCsv(
 }
 
 /**
- * Fetches attendance instance details (if needed) and downloads the CSV with verified student names.
+ * Triggers an optimized server-side streaming CSV download.
+ * Streams directly from the backend database join to eliminate massive JSON payloads
+ * and client-side processing overhead. Falls back to in-memory generation if provided.
  */
 export async function exportAttendanceSessionCsv(
   session: AttendanceInstance,
   existingAttendees?: AttendanceRecord[],
 ): Promise<void> {
   try {
-    let attendees: AttendanceRecord[] = existingAttendees ? [...existingAttendees] : [];
+    toast.loading('Preparing attendance export...', { id: 'export-csv' });
 
-    if (attendees.length === 0) {
-      toast.loading('Preparing attendance export...', { id: 'export-csv' });
-      const res = await apiClient.get<ApiResponse<AttendanceDetailResponse>>(
-        `/attendance/instances/${session.id}`,
-        { params: { limit: 1000 } },
-      );
-      attendees = res.data?.data?.attendees?.items || [];
-    }
-
-    // Defensively fetch course roster if any attendee record lacks student name
-    let studentNamesMap: Record<string, string> | undefined;
-    const hasMissingNames = attendees.some(
-      (a) => !a.student?.name && !(a as any).studentName && !(a as any).name,
+    // Stream CSV directly from the server
+    const response = await apiClient.get(
+      `/attendance/instances/${session.id}/export-csv`,
+      { responseType: 'blob' },
     );
 
-    if (hasMissingNames && session.courseId) {
-      try {
-        const rosterRes = await apiClient.get<ApiResponse<CourseRosterStudent[]>>(
-          `/courses/${session.courseId}/roster`,
-        );
-        const roster = rosterRes.data?.data || [];
-        if (roster.length > 0) {
-          studentNamesMap = {};
-          for (const s of roster) {
-            if (s.id && s.name) {
-              studentNamesMap[s.id] = s.name;
-            }
-          }
-        }
-      } catch {
-        // Non-blocking fallback: proceed with whatever names are present
-      }
-    }
+    const safeCourseId = session.courseId.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const dateStr = new Date(session.date).toISOString().slice(0, 10);
+    const fileName = `attendance_${safeCourseId}_${dateStr}.csv`;
 
-    downloadAttendanceCsv(session, attendees, studentNamesMap);
-    toast.success(`Exported attendance roster (${attendees.length} records)`, {
-      id: 'export-csv',
-    });
+    const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success('Attendance CSV downloaded successfully', { id: 'export-csv' });
   } catch (error: any) {
+    if (existingAttendees && existingAttendees.length > 0) {
+      downloadAttendanceCsv(session, existingAttendees);
+      toast.success(`Exported ${existingAttendees.length} records (offline fallback)`, {
+        id: 'export-csv',
+      });
+      return;
+    }
     toast.error(error.message || 'Failed to export attendance CSV', { id: 'export-csv' });
   }
 }

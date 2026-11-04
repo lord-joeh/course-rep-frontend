@@ -117,18 +117,13 @@ describe('attendance-export utility', () => {
     expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:http://localhost/mock-blob-id');
   });
 
-  it('fetches attendee records from API if none are passed and downloads CSV', async () => {
+  it('streams CSV directly from backend export-csv endpoint and downloads file', async () => {
+    const mockCsvBlob = new Blob(['\uFEFF"Student ID","Student Name"\r\n"10928374","Ada Lovelace"'], {
+      type: 'text/csv;charset=utf-8;',
+    });
+
     const getSpy = vi.spyOn(apiClient, 'get').mockResolvedValueOnce({
-      data: {
-        success: true,
-        data: {
-          ...mockSession,
-          attendees: {
-            items: mockAttendees,
-            meta: { total: 2 },
-          },
-        },
-      },
+      data: mockCsvBlob,
     });
 
     const createObjectURLSpy = vi.fn().mockReturnValue('blob:http://localhost/mock-blob-id');
@@ -147,59 +142,21 @@ describe('attendance-export utility', () => {
 
     await exportAttendanceSessionCsv(mockSession);
 
-    expect(getSpy).toHaveBeenCalledWith(`/attendance/instances/${mockSession.id}`, {
-      params: { limit: 1000 },
+    expect(getSpy).toHaveBeenCalledWith(`/attendance/instances/${mockSession.id}/export-csv`, {
+      responseType: 'blob',
     });
+    expect(createObjectURLSpy).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
+    expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:http://localhost/mock-blob-id');
   });
 
-  it('enriches student actual name via course roster fallback if attendee record lacks student name', async () => {
-    const attendeesWithoutName: AttendanceRecord[] = [
-      {
-        id: 'att-3',
-        instanceId: 'inst-101',
-        courseId: 'SENG401',
-        studentId: '1706188403',
-        status: 'present',
-        date: '2026-11-04T10:05:00.000Z',
-      },
-    ];
-
-    const getSpy = vi.spyOn(apiClient, 'get').mockImplementation(async (url: string) => {
-      if (url.includes('/attendance/instances/')) {
-        return {
-          data: {
-            success: true,
-            data: {
-              ...mockSession,
-              attendees: {
-                items: attendeesWithoutName,
-                meta: { total: 1 },
-              },
-            },
-          },
-        };
-      }
-      if (url.includes('/courses/SENG401/roster')) {
-        return {
-          data: {
-            success: true,
-            data: [
-              {
-                id: '1706188403',
-                name: 'JOSEPH TETTEH MENSAH',
-                email: 'joseph@knust.edu.gh',
-              },
-            ],
-          },
-        };
-      }
-      return { data: { success: true, data: [] } };
-    });
+  it('falls back to in-memory generation if server export fails but attendees are provided', async () => {
+    vi.spyOn(apiClient, 'get').mockRejectedValueOnce(new Error('Network error'));
 
     const createObjectURLSpy = vi.fn().mockReturnValue('blob:http://localhost/mock-blob-id');
+    const revokeObjectURLSpy = vi.fn();
     globalThis.URL.createObjectURL = createObjectURLSpy;
-    globalThis.URL.revokeObjectURL = vi.fn();
+    globalThis.URL.revokeObjectURL = revokeObjectURLSpy;
 
     const clickSpy = vi.fn();
     vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
@@ -210,10 +167,11 @@ describe('attendance-export utility', () => {
       return el;
     });
 
-    await exportAttendanceSessionCsv(mockSession);
+    await exportAttendanceSessionCsv(mockSession, mockAttendees);
 
-    expect(getSpy).toHaveBeenCalledWith('/courses/SENG401/roster');
+    expect(createObjectURLSpy).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
+    expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:http://localhost/mock-blob-id');
   });
 });
 

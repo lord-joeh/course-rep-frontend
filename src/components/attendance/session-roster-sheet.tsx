@@ -41,7 +41,7 @@ export function SessionRosterSheet({
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | AttendanceStatus>('all');
 
-  const { data: detailData, isLoading } = useAttendanceInstanceDetailQuery(session?.id, { limit: 1000 });
+  const { data: detailData, isLoading } = useAttendanceInstanceDetailQuery(session?.id);
   const manualMarkMutation = useManualMarkAttendeeMutation();
 
   const attendees = detailData?.attendees?.items || [];
