@@ -147,7 +147,72 @@ describe('attendance-export utility', () => {
 
     await exportAttendanceSessionCsv(mockSession);
 
-    expect(getSpy).toHaveBeenCalledWith(`/attendance/instances/${mockSession.id}`);
+    expect(getSpy).toHaveBeenCalledWith(`/attendance/instances/${mockSession.id}`, {
+      params: { limit: 1000 },
+    });
+    expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('enriches student actual name via course roster fallback if attendee record lacks student name', async () => {
+    const attendeesWithoutName: AttendanceRecord[] = [
+      {
+        id: 'att-3',
+        instanceId: 'inst-101',
+        courseId: 'SENG401',
+        studentId: '1706188403',
+        status: 'present',
+        date: '2026-11-04T10:05:00.000Z',
+      },
+    ];
+
+    const getSpy = vi.spyOn(apiClient, 'get').mockImplementation(async (url: string) => {
+      if (url.includes('/attendance/instances/')) {
+        return {
+          data: {
+            success: true,
+            data: {
+              ...mockSession,
+              attendees: {
+                items: attendeesWithoutName,
+                meta: { total: 1 },
+              },
+            },
+          },
+        };
+      }
+      if (url.includes('/courses/SENG401/roster')) {
+        return {
+          data: {
+            success: true,
+            data: [
+              {
+                id: '1706188403',
+                name: 'JOSEPH TETTEH MENSAH',
+                email: 'joseph@knust.edu.gh',
+              },
+            ],
+          },
+        };
+      }
+      return { data: { success: true, data: [] } };
+    });
+
+    const createObjectURLSpy = vi.fn().mockReturnValue('blob:http://localhost/mock-blob-id');
+    globalThis.URL.createObjectURL = createObjectURLSpy;
+    globalThis.URL.revokeObjectURL = vi.fn();
+
+    const clickSpy = vi.fn();
+    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
+      const el = document.createElementNS('http://www.w3.org/1999/xhtml', tagName);
+      if (tagName === 'a') {
+        el.click = clickSpy;
+      }
+      return el;
+    });
+
+    await exportAttendanceSessionCsv(mockSession);
+
+    expect(getSpy).toHaveBeenCalledWith('/courses/SENG401/roster');
     expect(clickSpy).toHaveBeenCalled();
   });
 });

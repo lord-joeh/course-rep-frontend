@@ -13,7 +13,7 @@ import {
   useAttendanceInstanceDetailQuery,
   useManualMarkAttendeeMutation,
 } from '@/hooks/use-attendance';
-import { downloadAttendanceCsv } from '@/lib/attendance-export';
+import { exportAttendanceSessionCsv } from '@/lib/attendance-export';
 import type { AttendanceInstance, AttendanceStatus } from '@/types';
 import {
   Users,
@@ -41,7 +41,7 @@ export function SessionRosterSheet({
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | AttendanceStatus>('all');
 
-  const { data: detailData, isLoading } = useAttendanceInstanceDetailQuery(session?.id);
+  const { data: detailData, isLoading } = useAttendanceInstanceDetailQuery(session?.id, { limit: 1000 });
   const manualMarkMutation = useManualMarkAttendeeMutation();
 
   const attendees = detailData?.attendees?.items || [];
@@ -93,7 +93,7 @@ export function SessionRosterSheet({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => downloadAttendanceCsv(session, attendees)}
+                onClick={() => exportAttendanceSessionCsv(session, attendees)}
                 disabled={attendees.length === 0}
                 className="h-8 text-xs border-border"
                 title="Export Attendance CSV"
