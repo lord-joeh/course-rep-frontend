@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { exportAttendanceSessionCsv } from '@/lib/attendance-export';
 import type { AttendanceInstance } from '@/types';
 import {
   Calendar,
@@ -11,6 +12,7 @@ import {
   Users,
   PowerOff,
   Trash2,
+  FileDown,
 } from 'lucide-react';
 
 interface SessionCardProps {
@@ -122,6 +124,16 @@ export function SessionCard({
         </div>
 
         <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportAttendanceSessionCsv(session)}
+            className="h-8 text-xs border-border text-foreground hover:text-primary"
+            title="Download Attendance CSV"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+          </Button>
+
           {!isClosed && (
             <Button
               variant="outline"

@@ -35,6 +35,8 @@ export function QRScannerDialog({
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const animationFrameId = useRef<number | null>(null);
+  const isOpenRef = useRef(open);
+  isOpenRef.current = open;
 
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -54,8 +56,15 @@ export function QRScannerDialog({
       animationFrameId.current = null;
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop();
+        track.enabled = false;
+      });
       streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
     }
   }, []);
 
@@ -72,6 +81,9 @@ export function QRScannerDialog({
     },
     [coords, markMutation, scanResult, stopCamera],
   );
+
+  const handleDetectedTokenRef = useRef(handleDetectedToken);
+  handleDetectedTokenRef.current = handleDetectedToken;
 
   const startCamera = useCallback(async () => {
     stopCamera();
@@ -100,6 +112,15 @@ export function QRScannerDialog({
         audio: false,
       });
 
+      // Abort and stop tracks immediately if dialog was closed while awaiting permission/hardware
+      if (!isOpenRef.current) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          track.enabled = false;
+        });
+        return;
+      }
+
       streamRef.current = stream;
 
       if (videoRef.current) {
@@ -116,11 +137,11 @@ export function QRScannerDialog({
           });
 
           const scanLoop = async () => {
-            if (!videoRef.current || !streamRef.current) return;
+            if (!videoRef.current || !streamRef.current || !isOpenRef.current) return;
             try {
               const barcodes = await barcodeDetector.detect(videoRef.current);
               if (barcodes.length > 0 && barcodes[0].rawValue) {
-                handleDetectedToken(barcodes[0].rawValue);
+                handleDetectedTokenRef.current(barcodes[0].rawValue);
                 return;
               }
             } catch {
@@ -135,13 +156,14 @@ export function QRScannerDialog({
         }
       }
     } catch (err: any) {
+      if (!isOpenRef.current) return;
       setCameraError(
         err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
           ? 'Camera permission denied. Please allow camera access in browser site settings.'
           : err.message || 'Unable to access camera hardware.',
       );
     }
-  }, [handleDetectedToken, stopCamera]);
+  }, [stopCamera]);
 
   useEffect(() => {
     if (open) {
@@ -154,13 +176,13 @@ export function QRScannerDialog({
     };
   }, [open, startCamera, stopCamera]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     stopCamera();
     onOpenChange(false);
-  };
+  }, [stopCamera, onOpenChange]);
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose(); }}>
       <DialogContent className="max-w-md bg-card text-card-foreground p-6 border border-border shadow-xl">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
@@ -272,11 +294,20 @@ export function QRScannerDialog({
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-            <span>
-              Tokens change every 20 seconds.
-            </span>
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+              <span>Tokens rotate dynamically every 20s.</span>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClose}
+              className="h-7 text-xs border-border"
+            >
+              Close Scanner
+            </Button>
           </div>
 
           {markMutation.isError && (

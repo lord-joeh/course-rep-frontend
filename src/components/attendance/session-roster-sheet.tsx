@@ -13,6 +13,7 @@ import {
   useAttendanceInstanceDetailQuery,
   useManualMarkAttendeeMutation,
 } from '@/hooks/use-attendance';
+import { downloadAttendanceCsv } from '@/lib/attendance-export';
 import type { AttendanceInstance, AttendanceStatus } from '@/types';
 import {
   Users,
@@ -23,6 +24,7 @@ import {
   Clock,
   Loader2,
   Calendar,
+  FileDown,
 } from 'lucide-react';
 
 interface SessionRosterSheetProps {
@@ -87,16 +89,29 @@ export function SessionRosterSheet({
                 {session.courseId} — Attendance Roster
               </SheetTitle>
             </div>
-            <Badge
-              variant="outline"
-              className={
-                session.isClose
-                  ? 'bg-muted text-muted-foreground'
-                  : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-              }
-            >
-              {session.isClose ? 'Closed' : 'Active'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => downloadAttendanceCsv(session, attendees)}
+                disabled={attendees.length === 0}
+                className="h-8 text-xs border-border"
+                title="Export Attendance CSV"
+              >
+                <FileDown className="w-3.5 h-3.5 mr-1" />
+                Export CSV
+              </Button>
+              <Badge
+                variant="outline"
+                className={
+                  session.isClose
+                    ? 'bg-muted text-muted-foreground'
+                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                }
+              >
+                {session.isClose ? 'Closed' : 'Active'}
+              </Badge>
+            </div>
           </div>
           <SheetDescription className="text-xs text-muted-foreground flex items-center gap-2">
             <Calendar className="w-3.5 h-3.5" />

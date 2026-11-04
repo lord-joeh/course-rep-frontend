@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAttendanceStream } from '@/hooks/use-attendance-stream';
 import { useCloseAttendanceMutation } from '@/hooks/use-attendance';
+import { exportAttendanceSessionCsv } from '@/lib/attendance-export';
 import type { AttendanceInstance } from '@/types';
 import {
   Maximize2,
@@ -22,6 +23,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertTriangle,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  FileDown,
 } from 'lucide-react';
 
 interface ProjectorModalProps {
@@ -33,6 +38,8 @@ interface ProjectorModalProps {
 export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [qrSize, setQrSize] = useState<number>(280);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const stream = useAttendanceStream({
     instanceId: session?.id,
@@ -44,6 +51,16 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
   const closeMutation = useCloseAttendanceMutation(() => {
     // Session closed
   });
+
+  const handleExportCsv = async () => {
+    if (!session) return;
+    setIsExporting(true);
+    try {
+      await exportAttendanceSessionCsv(session);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -152,6 +169,18 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
               <Button
                 variant="outline"
                 size="sm"
+                onClick={handleExportCsv}
+                disabled={isExporting}
+                className="h-8 text-xs border-border"
+                title="Download Attendance CSV"
+              >
+                <FileDown className="w-3.5 h-3.5 mr-1" />
+                Export CSV
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={toggleFullscreen}
                 className="h-8 text-xs border-border"
                 title="Toggle Fullscreen Projector Mode"
@@ -198,15 +227,72 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
                 </div>
               ) : stream.qrImage ? (
                 <>
+                  {/* QR Code Zoom / Scale Controls */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      QR Size:
+                    </span>
+                    <div className="flex items-center gap-1 bg-muted/40 p-1 rounded border border-border">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => setQrSize((s) => Math.max(160, s - 40))}
+                        disabled={qrSize <= 160}
+                        title="Decrease QR Code Size"
+                        aria-label="Decrease QR Code Size"
+                      >
+                        <ZoomOut className="w-3.5 h-3.5" />
+                      </Button>
+                      <span
+                        className="text-xs font-mono font-bold px-2 min-w-[52px] text-center"
+                        data-testid="qr-size-indicator"
+                      >
+                        {qrSize}px
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => setQrSize((s) => Math.min(520, s + 40))}
+                        disabled={qrSize >= 520}
+                        title="Increase QR Code Size"
+                        aria-label="Increase QR Code Size"
+                      >
+                        <ZoomIn className="w-3.5 h-3.5" />
+                      </Button>
+                      {qrSize !== 280 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                          onClick={() => setQrSize(280)}
+                          title="Reset to default 280px"
+                          aria-label="Reset QR Code Size"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" /> Reset
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
                   {/* High Contrast Solid QR Container */}
-                  <div className="relative p-4 bg-white rounded border-2 border-primary/20 shadow-lg">
+                  <div
+                    className="relative p-4 bg-white rounded border-2 border-primary/20 shadow-lg flex items-center justify-center transition-all duration-150"
+                    style={{ width: `${qrSize + 32}px`, height: `${qrSize + 32}px` }}
+                  >
                     <img
                       src={stream.qrImage}
                       alt="Rotating Attendance QR Code"
-                      className="w-64 h-64 sm:w-72 sm:h-72 object-contain"
+                      style={{ width: `${qrSize}px`, height: `${qrSize}px` }}
+                      className="object-contain"
+                      data-testid="projector-qr-image"
                     />
-                    <div className="absolute inset-x-0 bottom-1 flex justify-center">
-                      <span className="text-[10px] font-mono tracking-wider font-semibold text-slate-800 bg-white/90 px-2 py-0.5 rounded">
+                    <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none">
+                      <span className="text-[10px] font-mono tracking-wider font-semibold text-slate-800 bg-white/90 px-2 py-0.5 rounded shadow-xs">
                         ROTATING DYNAMIC TOKEN
                       </span>
                     </div>

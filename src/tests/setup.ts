@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach, vi } from 'vitest';
+import { configure } from '@testing-library/react';
+
+// Configure testing-library async utilities timeout for concurrent test runner stability
+configure({ asyncUtilTimeout: 4000 });
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

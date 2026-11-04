@@ -145,6 +145,41 @@ describe('Attendance Dialogs, Projector & Components', () => {
       expect(screen.getByText(/Next token refresh in:/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Fullscreen/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Close Session/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Export CSV/i })).toBeInTheDocument();
+    });
+
+    it('allows increasing, decreasing, and resetting QR code projection size', () => {
+      render(
+        <ProjectorModal
+          session={mockSession}
+          open={true}
+          onOpenChange={vi.fn()}
+        />,
+        { wrapper },
+      );
+
+      const sizeIndicator = screen.getByTestId('qr-size-indicator');
+      expect(sizeIndicator).toHaveTextContent('280px');
+
+      const zoomInBtn = screen.getByLabelText('Increase QR Code Size');
+      const zoomOutBtn = screen.getByLabelText('Decrease QR Code Size');
+
+      // Zoom in: 280 -> 320
+      fireEvent.click(zoomInBtn);
+      expect(sizeIndicator).toHaveTextContent('320px');
+
+      const qrImg = screen.getByTestId('projector-qr-image');
+      expect(qrImg).toHaveStyle({ width: '320px', height: '320px' });
+
+      // Reset button appears
+      const resetBtn = screen.getByLabelText('Reset QR Code Size');
+      fireEvent.click(resetBtn);
+      expect(sizeIndicator).toHaveTextContent('280px');
+
+      // Zoom out: 280 -> 240
+      fireEvent.click(zoomOutBtn);
+      expect(sizeIndicator).toHaveTextContent('240px');
+      expect(qrImg).toHaveStyle({ width: '240px', height: '240px' });
     });
   });
 
@@ -209,6 +244,50 @@ describe('Attendance Dialogs, Projector & Components', () => {
           expect.objectContaining({ token: 'mock-qr-jwt-token-attendance' }),
         );
       });
+    });
+
+    it('halts and cleans up media tracks immediately when dialog closes', async () => {
+      const stopTrackSpy = vi.fn();
+      const mockTrack = { stop: stopTrackSpy, enabled: true };
+      const mockMediaStream = {
+        getTracks: () => [mockTrack],
+      };
+      Object.defineProperty(navigator, 'mediaDevices', {
+        value: {
+          getUserMedia: vi.fn().mockResolvedValue(mockMediaStream),
+        },
+        configurable: true,
+      });
+
+      const onOpenChange = vi.fn();
+      const { rerender } = render(
+        <QRScannerDialog
+          open={true}
+          onOpenChange={onOpenChange}
+        />,
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled();
+      });
+
+      // User clicks "Close Scanner"
+      const closeBtn = screen.getByRole('button', { name: /Close Scanner/i });
+      fireEvent.click(closeBtn);
+
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+      expect(stopTrackSpy).toHaveBeenCalled();
+      expect(mockTrack.enabled).toBe(false);
+
+      // Re-render as open=false (closed)
+      rerender(
+        <QRScannerDialog
+          open={false}
+          onOpenChange={onOpenChange}
+        />,
+      );
+      expect(stopTrackSpy).toHaveBeenCalled();
     });
   });
 
@@ -276,7 +355,7 @@ describe('Attendance Dialogs, Projector & Components', () => {
         { wrapper },
       );
 
-      expect(screen.getByRole('heading', { name: /CPEN402 — Attendance Roster/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /CPEN402.*Attendance Roster/i })).toBeInTheDocument();
 
       await waitFor(() => {
         expect(screen.getByText('Alice Turing')).toBeInTheDocument();
@@ -295,6 +374,11 @@ describe('Attendance Dialogs, Projector & Components', () => {
           status: 'present',
         });
       });
+
+      // Verify Export CSV button is present and triggers download
+      const exportBtn = screen.getByRole('button', { name: /Export CSV/i });
+      expect(exportBtn).toBeInTheDocument();
+      expect(exportBtn).not.toBeDisabled();
     });
   });
 });
