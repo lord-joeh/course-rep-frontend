@@ -5,7 +5,6 @@ import { apiClient } from '@/lib/api-client';
 export function BullBoardLinkButton() {
   const getBullBoardUrl = (): string => {
     const base = apiClient.defaults.baseURL || 'http://localhost:5000/api';
-    // const origin = base.replace(/\/api\/?$/, '');
     return `${base}/admin/queues/ui`;
   };
 
