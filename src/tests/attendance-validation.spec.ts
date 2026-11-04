@@ -3,6 +3,7 @@ import {
   initializeAttendanceSchema,
   calculateHaversineDistance,
   isSessionActive,
+  queryAttendancePermissions,
 } from '@/lib/attendance-validation';
 import type { AttendanceInstance } from '@/types';
 
@@ -105,6 +106,42 @@ describe('attendance-validation', () => {
         durationMinutes: 45,
       });
       expect(result.success).toBe(true);
+    });
+  });
+
+  describe('queryAttendancePermissions', () => {
+    it('gracefully inspects camera and geolocation permissions', async () => {
+      const status = await queryAttendancePermissions();
+      expect(status).toHaveProperty('camera');
+      expect(status).toHaveProperty('geolocation');
+      expect(['granted', 'prompt', 'denied', 'unsupported']).toContain(status.camera);
+      expect(['granted', 'prompt', 'denied', 'unsupported']).toContain(status.geolocation);
+    });
+
+    it('returns granted when permissions.query reports granted', async () => {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        value: { getUserMedia: vi.fn() },
+        configurable: true,
+      });
+      Object.defineProperty(navigator, 'geolocation', {
+        value: { getCurrentPosition: vi.fn() },
+        configurable: true,
+      });
+      Object.defineProperty(navigator, 'permissions', {
+        value: {
+          query: vi.fn().mockImplementation(async ({ name }) => {
+            if (name === 'geolocation' || name === 'camera') {
+              return { state: 'granted' };
+            }
+            return { state: 'prompt' };
+          }),
+        },
+        configurable: true,
+      });
+
+      const status = await queryAttendancePermissions();
+      expect(status.geolocation).toBe('granted');
+      expect(status.camera).toBe('granted');
     });
   });
 });

@@ -60,6 +60,63 @@ export const initializeAttendanceSchema = z
 
 export type InitializeAttendanceFormValues = z.infer<typeof initializeAttendanceSchema>;
 
+export type PermissionStateCheck = 'granted' | 'prompt' | 'denied' | 'unsupported';
+
+export interface AttendancePermissionsStatus {
+  camera: PermissionStateCheck;
+  geolocation: PermissionStateCheck;
+}
+
+/**
+ * Safely inspects current browser permission status for camera and geolocation.
+ * Handles browsers that do not support navigator.permissions or camera querying (e.g. Safari).
+ */
+export async function queryAttendancePermissions(): Promise<AttendancePermissionsStatus> {
+  const result: AttendancePermissionsStatus = {
+    camera: 'prompt',
+    geolocation: 'prompt',
+  };
+
+  if (typeof window === 'undefined') {
+    return { camera: 'unsupported', geolocation: 'unsupported' };
+  }
+
+  // Modern browsers require HTTPS or localhost for sensors
+  if (window.isSecureContext === false) {
+    return { camera: 'unsupported', geolocation: 'unsupported' };
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    result.camera = 'unsupported';
+  }
+
+  if (!navigator.geolocation) {
+    result.geolocation = 'unsupported';
+  }
+
+  if (navigator.permissions && typeof navigator.permissions.query === 'function') {
+    try {
+      if (result.geolocation !== 'unsupported') {
+        const geoStatus = await navigator.permissions.query({ name: 'geolocation' });
+        result.geolocation = (geoStatus.state as PermissionStateCheck) || 'prompt';
+      }
+    } catch {
+      // Ignore query failure
+    }
+
+    try {
+      if (result.camera !== 'unsupported') {
+        const camStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
+        result.camera = (camStatus.state as PermissionStateCheck) || 'prompt';
+      }
+    } catch {
+      // Browser does not support querying 'camera' (e.g. Safari, Firefox)
+    }
+  }
+
+  return result;
+}
+
 /**
  * Promise-based HTML5 Geolocation API wrapper with timeout and high accuracy.
  */

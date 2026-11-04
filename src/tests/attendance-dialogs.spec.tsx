@@ -289,6 +289,80 @@ describe('Attendance Dialogs, Projector & Components', () => {
       );
       expect(stopTrackSpy).toHaveBeenCalled();
     });
+
+    it('displays user-initiated permission prompt view when permission is ungranted and starts stream on click', async () => {
+      const mockStream = {
+        getTracks: () => [{ stop: vi.fn(), enabled: true }],
+      };
+
+      // First call throws NotAllowedError (detached from gesture)
+      // Second call (triggered by user button click) resolves with mockStream
+      const getUserMediaMock = vi
+        .fn()
+        .mockRejectedValueOnce({ name: 'NotAllowedError', message: 'Permission denied' })
+        .mockResolvedValueOnce(mockStream);
+
+      Object.defineProperty(navigator, 'mediaDevices', {
+        value: { getUserMedia: getUserMediaMock },
+        configurable: true,
+      });
+
+      render(
+        <QRScannerDialog
+          open={true}
+          onOpenChange={vi.fn()}
+        />,
+        { wrapper },
+      );
+
+      // Verify that user-friendly permission onboarding card is rendered
+      const promptView = await screen.findByTestId('permission-request-view');
+      expect(promptView).toBeInTheDocument();
+      expect(screen.getByText(/Sensor Access Required/i)).toBeInTheDocument();
+
+      const grantBtn = screen.getByTestId('grant-permissions-btn');
+      expect(grantBtn).toBeInTheDocument();
+
+      // User clicks "Enable Camera & Location"
+      fireEvent.click(grantBtn);
+
+      await waitFor(() => {
+        expect(getUserMediaMock).toHaveBeenCalledTimes(2);
+      });
+
+      // Camera video feed is now active
+      expect(await screen.findByTestId('camera-video-feed')).toBeInTheDocument();
+    });
+
+    it('displays permissions blocked screen with retry button when explicitly denied by user', async () => {
+      const getUserMediaMock = vi.fn().mockRejectedValue({
+        name: 'NotAllowedError',
+        message: 'Permission denied',
+      });
+
+      Object.defineProperty(navigator, 'mediaDevices', {
+        value: { getUserMedia: getUserMediaMock },
+        configurable: true,
+      });
+
+      render(
+        <QRScannerDialog
+          open={true}
+          onOpenChange={vi.fn()}
+        />,
+        { wrapper },
+      );
+
+      // Should show prompt view first
+      const grantBtn = await screen.findByTestId('grant-permissions-btn');
+      fireEvent.click(grantBtn);
+
+      // Now it transitions to denied view
+      const deniedView = await screen.findByTestId('permission-denied-view');
+      expect(deniedView).toBeInTheDocument();
+      expect(screen.getByText(/Permissions Blocked/i)).toBeInTheDocument();
+      expect(screen.getByTestId('retry-permissions-btn')).toBeInTheDocument();
+    });
   });
 
   describe('SessionRosterSheet', () => {
