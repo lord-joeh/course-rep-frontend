@@ -46,6 +46,7 @@ export function SlideCard({
   const { downloadSlide, isDownloading, downloadingSlideId } = useDownloadSlide();
   const isVideo = isVideoFile(slide.fileName);
   const isCurrentDownloading = downloadingSlideId === slide.id;
+  const isPending = !slide.driveFileId || slide.driveFileId === 'pending';
 
   return (
     <Card className="flex flex-col justify-between border-border bg-card transition-shadow hover:shadow-md">
@@ -64,6 +65,12 @@ export function SlideCard({
                 {isVideo && (
                   <Badge variant="secondary" className="text-[10px] bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-medium">
                     Video Lecture
+                  </Badge>
+                )}
+                {isPending && (
+                  <Badge variant="outline" className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 font-medium animate-pulse">
+                    <Loader2 className="mr-1 h-2.5 w-2.5 animate-spin inline" />
+                    Syncing...
                   </Badge>
                 )}
               </div>
@@ -112,16 +119,19 @@ export function SlideCard({
             size="sm"
             className="text-xs font-semibold h-8"
             onClick={() => onPreview?.(slide)}
+            disabled={isPending}
+            title={isPending ? 'Syncing to cloud storage...' : undefined}
           >
             <Eye className="mr-1.5 h-3.5 w-3.5" />
-            {isVideo ? 'Watch Video' : 'Preview'}
+            {isPending ? 'Syncing...' : isVideo ? 'Watch Video' : 'Preview'}
           </Button>
 
           <Button
             size="sm"
             className="text-xs font-semibold h-8"
             onClick={() => downloadSlide(slide.id, slide.fileName)}
-            disabled={isDownloading}
+            disabled={isDownloading || isPending}
+            title={isPending ? 'Syncing to cloud storage...' : undefined}
           >
             {isCurrentDownloading ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />

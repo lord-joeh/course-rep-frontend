@@ -27,6 +27,7 @@ export function MaterialPreviewDialog({
   if (!slide) return null;
 
   const isVideo = isVideoFile(slide.fileName);
+  const isPending = !slide.driveFileId || slide.driveFileId === 'pending';
   const previewUrl = `https://drive.google.com/file/d/${slide.driveFileId}/preview`;
   const isCurrentDownloading = downloadingSlideId === slide.id;
 
@@ -49,7 +50,11 @@ export function MaterialPreviewDialog({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {isVideo ? 'Interactive Video Player' : 'Document & Slide Presentation Viewer'}
+                {isPending
+                  ? 'Processing cloud sync...'
+                  : isVideo
+                  ? 'Interactive Video Player'
+                  : 'Document & Slide Presentation Viewer'}
               </p>
             </div>
           </div>
@@ -60,7 +65,8 @@ export function MaterialPreviewDialog({
               size="sm"
               className="text-xs h-8"
               onClick={() => window.open(previewUrl, '_blank', 'noopener,noreferrer')}
-              title="Open full view in new tab"
+              disabled={isPending}
+              title={isPending ? 'Syncing to cloud storage...' : 'Open full view in new tab'}
             >
               <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
               <span className="hidden sm:inline">Open in Tab</span>
@@ -69,7 +75,7 @@ export function MaterialPreviewDialog({
               size="sm"
               className="text-xs h-8"
               onClick={() => downloadSlide(slide.id, slide.fileName)}
-              disabled={isDownloading}
+              disabled={isDownloading || isPending}
             >
               {isCurrentDownloading ? (
                 <>
@@ -88,13 +94,23 @@ export function MaterialPreviewDialog({
 
         {/* Embedded In-Browser Viewer Frame */}
         <div className="flex-1 w-full rounded-lg border border-border bg-black/5 dark:bg-black/40 overflow-hidden relative">
-          <iframe
-            src={previewUrl}
-            title={slide.fileName}
-            className="w-full h-full border-0"
-            allow="autoplay; fullscreen"
-            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-          />
+          {isPending ? (
+            <div className="flex flex-col items-center justify-center h-full text-center p-6 space-y-3">
+              <Loader2 className="h-9 w-9 animate-spin text-primary" />
+              <h4 className="font-semibold text-sm text-foreground">Syncing to Cloud Storage...</h4>
+              <p className="text-xs text-muted-foreground max-w-sm">
+                This material is currently being uploaded to Google Drive in the background. The interactive preview will become available automatically as soon as sync completes.
+              </p>
+            </div>
+          ) : (
+            <iframe
+              src={previewUrl}
+              title={slide.fileName}
+              className="w-full h-full border-0"
+              allow="autoplay; fullscreen"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

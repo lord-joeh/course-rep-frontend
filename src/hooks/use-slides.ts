@@ -37,6 +37,12 @@ export function useCourseSlidesQuery(query: SlideQueryDto) {
     enabled: Boolean(query.courseId && query.courseId.trim()),
     placeholderData: (previousData) => previousData,
     staleTime: 30 * 1000,
+    refetchInterval: (query) => {
+      const items = query.state.data?.items;
+      return items && items.some((s: Slide) => !s.driveFileId || s.driveFileId === 'pending')
+        ? 2500
+        : false;
+    },
   });
 }
 
