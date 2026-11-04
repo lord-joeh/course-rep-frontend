@@ -185,4 +185,36 @@ describe('AttendancePage', () => {
       expect(screen.getByText('Total Recorded Lectures: 1')).toBeInTheDocument();
     });
   });
+
+  it('allows Course Rep to toggle between Classroom Sessions and My Personal Attendance', async () => {
+    authStore.setSession(
+      {
+        id: 'rep-user-1',
+        name: 'Alex Rep',
+        email: 'rep@ug.edu.gh',
+        isRep: true,
+      },
+      { accessToken: 'token-rep' },
+    );
+
+    render(<AttendancePage />, { wrapper });
+
+    // Initial Rep View
+    expect(screen.getByRole('button', { name: /Classroom Sessions/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /My Personal Attendance/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Initialize Session/i })).toBeInTheDocument();
+
+    // Toggle to Personal Attendance
+    const personalTab = screen.getByRole('button', { name: /My Personal Attendance/i });
+    fireEvent.click(personalTab);
+
+    // Should switch to student portal view
+    expect(screen.getByText('My Attendance Portal')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Scan Classroom QR/i })).toBeInTheDocument();
+    expect(screen.getByText('Attendance Rate')).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('Course Attendance History')).toBeInTheDocument();
+    });
+  });
 });

@@ -194,5 +194,56 @@ describe('CourseCatalogPage', () => {
     expect(screen.getByText('Assigned Faculty')).toBeInTheDocument();
     expect(screen.getByText('Schedule')).toBeInTheDocument();
   });
+
+  it('allows Course Rep to switch to My Enrolled Courses tab and enroll in courses', async () => {
+    authStore.setSession(
+      {
+        id: 'rep-1',
+        name: 'Lead Representative',
+        email: 'rep@univ.edu',
+        isRep: true,
+        status: 'active',
+      },
+      'fake-token',
+    );
+
+    const enrollSpy = vi.spyOn(apiClient, 'post').mockResolvedValueOnce({
+      data: { success: true, data: { message: 'Enrolled', courseId: 'CPEN401' } },
+    });
+
+    vi.spyOn(apiClient, 'get').mockImplementation(async (url: string) => {
+      if (url === '/courses') {
+        return {
+          data: {
+            success: true,
+            data: { items: mockCourses, meta: { page: 1, limit: 20, total: 2, totalPages: 1 } },
+          },
+        } as any;
+      }
+      if (url === '/courses/my-courses') {
+        return { data: { success: true, data: [] } } as any;
+      }
+      return { data: { success: true, data: {} } } as any;
+    });
+
+    renderComponent();
+
+    // Course Rep should now have access to both Course Catalog and My Enrolled Courses tabs
+    expect(screen.getByRole('button', { name: /Course Catalog/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /My Enrolled Courses/i })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText('CPEN401')).toBeInTheDocument();
+    });
+
+    // Course Rep can enroll directly into CPEN401
+    const enrollButtons = screen.getAllByRole('button', { name: /Enroll in Course/i });
+    expect(enrollButtons.length).toBeGreaterThan(0);
+    fireEvent.click(enrollButtons[0]);
+
+    await waitFor(() => {
+      expect(enrollSpy).toHaveBeenCalledWith('/courses/CPEN401/enroll');
+    });
+  });
 });
 

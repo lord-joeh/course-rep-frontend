@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAttendanceStream } from '@/hooks/use-attendance-stream';
 import { useCloseAttendanceMutation } from '@/hooks/use-attendance';
 import { exportAttendanceSessionCsv } from '@/lib/attendance-export';
+import { isSessionActive } from '@/lib/attendance-validation';
 import type { AttendanceInstance } from '@/types';
 import {
   Maximize2,
@@ -26,7 +27,7 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
-  FileDown,
+  Download,
 } from 'lucide-react';
 
 interface ProjectorModalProps {
@@ -39,10 +40,11 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [qrSize, setQrSize] = useState<number>(280);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  const isSessionCurrentlyActive = isSessionActive(session);
 
   const stream = useAttendanceStream({
-    instanceId: session?.id,
+    instanceId: open && session && isSessionCurrentlyActive ? session.id : undefined,
     initialQrImage: session?.qrImage,
     initialToken: session?.qrToken,
     initialPresentCount: 0,
@@ -51,16 +53,6 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
   const closeMutation = useCloseAttendanceMutation(() => {
     // Session closed
   });
-
-  const handleExportCsv = async () => {
-    if (!session) return;
-    setIsExporting(true);
-    try {
-      await exportAttendanceSessionCsv(session);
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -93,7 +85,7 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
 
   if (!session) return null;
 
-  const isClosed = session.isClose || stream.isSessionClosed;
+  const isClosed = !isSessionCurrentlyActive || stream.isSessionClosed;
   const countdownPercent = Math.min(100, Math.max(0, (stream.countdown / 20) * 100));
 
   return (
@@ -149,7 +141,7 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
                 }`}
                 title={
                   stream.isConnected
-                    ? 'WebSocket stream active'
+                    ? 'QR code streaming active'
                     : stream.connectionError
                       ? `Connection Error: ${stream.connectionError}`
                       : 'Connecting to stream...'
@@ -169,18 +161,6 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleExportCsv}
-                disabled={isExporting}
-                className="h-8 text-xs border-border"
-                title="Download Attendance CSV"
-              >
-                <FileDown className="w-3.5 h-3.5 mr-1" />
-                Export CSV
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={toggleFullscreen}
                 className="h-8 text-xs border-border"
                 title="Toggle Fullscreen Projector Mode"
@@ -194,6 +174,16 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
                     <Maximize2 className="w-3.5 h-3.5 mr-1" /> Fullscreen
                   </>
                 )}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportAttendanceSessionCsv(session)}
+                className="h-8 text-xs border-border"
+                title="Export Attendance CSV"
+              >
+                <Download className="w-3.5 h-3.5 mr-1" /> Export CSV
               </Button>
 
               {!isClosed && (

@@ -207,36 +207,34 @@ export function CourseCatalogPage() {
         )}
       </PageHeader>
 
-      {/* Student Scope Tabs (All Catalog vs My Enrolled Courses) */}
-      {!isRep && (
-        <div className="flex border-b border-border">
-          <button
-            type="button"
-            onClick={() => setTabMode('all')}
-            className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px ${
-              tabMode === 'all'
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Course Catalog
-          </button>
-          <button
-            type="button"
-            onClick={() => setTabMode('my-courses')}
-            className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex items-center gap-2 ${
-              tabMode === 'my-courses'
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <span>My Enrolled Courses</span>
-            <Badge variant="secondary" className="px-1.5 py-0.2 text-xs">
-              {myCourses.length}
-            </Badge>
-          </button>
-        </div>
-      )}
+      {/* Scope Tabs (All Catalog vs My Enrolled Courses) */}
+      <div className="flex border-b border-border">
+        <button
+          type="button"
+          onClick={() => setTabMode('all')}
+          className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px ${
+            tabMode === 'all'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Course Catalog
+        </button>
+        <button
+          type="button"
+          onClick={() => setTabMode('my-courses')}
+          className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex items-center gap-2 ${
+            tabMode === 'my-courses'
+              ? 'border-primary text-foreground'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <span>My Enrolled Courses</span>
+          <Badge variant="secondary" className="px-1.5 py-0.2 text-xs">
+            {myCourses.length}
+          </Badge>
+        </button>
+      </div>
 
       {/* Filter and Control Toolbar */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -461,8 +459,8 @@ export function CourseCatalogPage() {
                 <TableHead>Semester</TableHead>
                 <TableHead>Assigned Faculty</TableHead>
                 <TableHead>Schedule</TableHead>
-                <TableHead className="w-[140px] text-right">
-                  {isRep ? 'Actions' : 'Status / Action'}
+                <TableHead className="w-[180px] text-right">
+                  Status / Actions
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -514,67 +512,71 @@ export function CourseCatalogPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {isRep ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                              <span className="sr-only">Course actions</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setRosterCourse(course)}>
-                              <Users className="mr-2 h-4 w-4" />
-                              View Enrolled Roster
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setEditCourse(course)}>
-                              <Edit2 className="mr-2 h-4 w-4" />
-                              Edit Course
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => setDeleteCourse(course)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete Course
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : isEnrolled ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs h-7 hover:border-destructive hover:text-destructive"
-                          onClick={() => handleUnenroll(course)}
-                          disabled={isEnrolling}
-                        >
-                          {isEnrolling ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <>
-                              <Check className="mr-1 h-3 w-3 text-primary" />
-                              Enrolled
-                            </>
-                          )}
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          className="text-xs h-7"
-                          onClick={() => handleEnroll(course)}
-                          disabled={isEnrolling}
-                        >
-                          {isEnrolling ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <>
-                              <UserPlus className="mr-1 h-3 w-3" />
-                              Enroll
-                            </>
-                          )}
-                        </Button>
-                      )}
+                      <div className="flex items-center justify-end gap-1.5">
+                        {isEnrolled ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-7 hover:border-destructive hover:text-destructive"
+                            onClick={() => handleUnenroll(course)}
+                            disabled={isEnrolling}
+                          >
+                            {isEnrolling ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <Check className="mr-1 h-3 w-3 text-primary" />
+                                Enrolled
+                              </>
+                            )}
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            className="text-xs h-7"
+                            onClick={() => handleEnroll(course)}
+                            disabled={isEnrolling}
+                          >
+                            {isEnrolling ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <UserPlus className="mr-1 h-3 w-3" />
+                                Enroll
+                              </>
+                            )}
+                          </Button>
+                        )}
+
+                        {isRep && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreVertical className="h-4 w-4" />
+                                <span className="sr-only">Course actions</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => setRosterCourse(course)}>
+                                <Users className="mr-2 h-4 w-4" />
+                                View Enrolled Roster
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setEditCourse(course)}>
+                                <Edit2 className="mr-2 h-4 w-4" />
+                                Edit Course
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => setDeleteCourse(course)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete Course
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );

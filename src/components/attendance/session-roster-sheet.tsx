@@ -86,7 +86,7 @@ export function SessionRosterSheet({
                 <Users className="w-4 h-4" />
               </div>
               <SheetTitle className="text-xl font-bold tracking-tight">
-                {session.courseId} — Attendance Roster
+                {session.courseId} Attendance Roster
               </SheetTitle>
             </div>
             <div className="flex items-center gap-2">

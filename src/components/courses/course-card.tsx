@@ -87,6 +87,19 @@ export function CourseCard({
                   <Users className="mr-2 h-4 w-4" />
                   View Enrolled Roster
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => (isEnrolled ? onUnenroll?.(course) : onEnroll?.(course))}>
+                  {isEnrolled ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4 text-primary" />
+                      Unenroll from Course
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Enroll in Course
+                    </>
+                  )}
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onEdit?.(course)}>
                   <Edit2 className="mr-2 h-4 w-4" />
                   Edit Course Details
@@ -139,59 +152,59 @@ export function CourseCard({
 
         {/* Bottom Actions Row */}
         <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-2">
-          {isRep ? (
+          {isRep && (
             <Button
               variant="outline"
               size="sm"
-              className="w-full text-xs font-semibold"
+              className="flex-1 text-xs font-semibold"
               onClick={() => onViewRoster?.(course)}
             >
               <Users className="mr-1.5 h-3.5 w-3.5" />
-              View Roster
+              Roster
+            </Button>
+          )}
+
+          {isEnrolled ? (
+            <Button
+              variant={hoverUnenroll ? 'destructive' : 'secondary'}
+              size="sm"
+              className={`${isRep ? 'flex-1' : 'w-full'} text-xs font-semibold transition-colors`}
+              onMouseEnter={() => setHoverUnenroll(true)}
+              onMouseLeave={() => setHoverUnenroll(false)}
+              onClick={() => onUnenroll?.(course)}
+              disabled={isEnrolling}
+            >
+              {isEnrolling ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : hoverUnenroll ? (
+                'Unenroll'
+              ) : (
+                <>
+                  <Check className="mr-1.5 h-3.5 w-3.5 text-primary" />
+                  Enrolled
+                </>
+              )}
             </Button>
           ) : (
-            isEnrolled ? (
-              <Button
-                variant={hoverUnenroll ? 'destructive' : 'secondary'}
-                size="sm"
-                className="w-full text-xs font-semibold transition-colors"
-                onMouseEnter={() => setHoverUnenroll(true)}
-                onMouseLeave={() => setHoverUnenroll(false)}
-                onClick={() => onUnenroll?.(course)}
-                disabled={isEnrolling}
-              >
-                {isEnrolling ? (
+            <Button
+              variant="default"
+              size="sm"
+              className={`${isRep ? 'flex-1' : 'w-full'} text-xs font-semibold`}
+              onClick={() => onEnroll?.(course)}
+              disabled={isEnrolling}
+            >
+              {isEnrolling ? (
+                <>
                   <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                ) : hoverUnenroll ? (
-                  'Unenroll from Course'
-                ) : (
-                  <>
-                    <Check className="mr-1.5 h-3.5 w-3.5 text-primary" />
-                    Enrolled
-                  </>
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                size="sm"
-                className="w-full text-xs font-semibold"
-                onClick={() => onEnroll?.(course)}
-                disabled={isEnrolling}
-              >
-                {isEnrolling ? (
-                  <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Enrolling...
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-                    Enroll in Course
-                  </>
-                )}
-              </Button>
-            )
+                  Enrolling...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                  Enroll in Course
+                </>
+              )}
+            </Button>
           )}
         </div>
       </CardContent>

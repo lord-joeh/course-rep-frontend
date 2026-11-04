@@ -93,6 +93,13 @@ export function useAttendanceStream({
     });
 
     return () => {
+      try {
+        if (socket.connected) {
+          socket.emit('leaveSession', { instanceId });
+        }
+      } catch (err) {
+        console.warn('[AttendanceStream] Error emitting leaveSession', err);
+      }
       if (typeof socket.off === 'function') {
         socket.off('connect');
         socket.off('disconnect');

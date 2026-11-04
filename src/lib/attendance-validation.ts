@@ -1,4 +1,11 @@
 import { z } from 'zod';
+import type { AttendanceInstance } from '@/types';
+
+export function isSessionActive(session: AttendanceInstance | null | undefined): boolean {
+  if (!session || session.isClose) return false;
+  if (session.expiresAt && new Date() > new Date(session.expiresAt)) return false;
+  return true;
+}
 
 export const initializeAttendanceSchema = z
   .object({

@@ -22,6 +22,7 @@ import { InitializeSessionDialog } from '@/components/attendance/initialize-sess
 import { ProjectorModal } from '@/components/attendance/projector-modal';
 import { QRScannerDialog } from '@/components/attendance/qr-scanner-dialog';
 import { SessionRosterSheet } from '@/components/attendance/session-roster-sheet';
+import { isSessionActive } from '@/lib/attendance-validation';
 import type { AttendanceInstance, ClassType } from '@/types';
 import {
   QrCode,
@@ -47,6 +48,7 @@ export function AttendancePage() {
   const isRep = Boolean(user?.isRep);
 
   // Common View States
+  const [repViewTab, setRepViewTab] = useState<'management' | 'personal'>('management');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed'>('all');
@@ -94,8 +96,8 @@ export function AttendancePage() {
 
       const matchesStatus =
         statusFilter === 'all' ||
-        (statusFilter === 'active' && !instance.isClose) ||
-        (statusFilter === 'closed' && instance.isClose);
+        (statusFilter === 'active' && isSessionActive(instance)) ||
+        (statusFilter === 'closed' && !isSessionActive(instance));
 
       const matchesClassType =
         classTypeFilter === 'all' || instance.classType === classTypeFilter;
@@ -105,6 +107,7 @@ export function AttendancePage() {
   }, [allInstances, search, statusFilter, classTypeFilter]);
 
   // Student Attendance Stats
+  const showStudentView = !isRep || repViewTab === 'personal';
   const myRecords = myRecordsData?.items || [];
   const studentStats = useMemo(() => {
     const total = myRecords.length;
@@ -122,17 +125,17 @@ export function AttendancePage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <QrCode className="w-6 h-6 text-primary" />
-            {isRep ? 'Classroom Attendance Management' : 'My Attendance Portal'}
+            {!showStudentView ? 'Classroom Attendance Management' : 'My Attendance Portal'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {isRep
+            {!showStudentView
               ? 'Manage dynamic QR attendance sessions, fullscreen projector screens, and geofence verification.'
               : 'View your verified lecture attendance records and scan classroom QR codes.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          {isRep ? (
+          {!showStudentView ? (
             <>
               <Button
                 variant="outline"
@@ -174,8 +177,44 @@ export function AttendancePage() {
         </div>
       </div>
 
+      {/* Scope Switcher Tabs for Course Rep */}
+      {isRep && (
+        <div className="flex border-b border-border">
+          <button
+            type="button"
+            onClick={() => setRepViewTab('management')}
+            className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex items-center gap-2 ${
+              repViewTab === 'management'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Tv className="w-4 h-4" />
+            <span>Classroom Sessions</span>
+            <Badge variant="secondary" className="px-1.5 py-0.2 text-xs">
+              {allInstances.length}
+            </Badge>
+          </button>
+          <button
+            type="button"
+            onClick={() => setRepViewTab('personal')}
+            className={`pb-3 px-4 text-sm font-semibold transition-colors border-b-2 -mb-px flex items-center gap-2 ${
+              repViewTab === 'personal'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>My Personal Attendance</span>
+            <Badge variant="secondary" className="px-1.5 py-0.2 text-xs">
+              {myRecords.length}
+            </Badge>
+          </button>
+        </div>
+      )}
+
       {/* STUDENT VIEW METRICS */}
-      {!isRep && (
+      {showStudentView && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 rounded border border-border bg-card">
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -226,7 +265,7 @@ export function AttendancePage() {
       )}
 
       {/* REPS FILTER & SEARCH BAR */}
-      {isRep && (
+      {!showStudentView && (
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 bg-card rounded border border-border">
           <div className="flex flex-1 items-center gap-2">
             <div className="relative flex-1 max-w-sm">
@@ -315,7 +354,7 @@ export function AttendancePage() {
       )}
 
       {/* MAIN CONTENT AREA */}
-      {isRep ? (
+      {!showStudentView ? (
         /* COURSE REP SESSIONS */
         isLoadingInstances ? (
           <div className="py-20 text-center text-muted-foreground text-xs flex flex-col items-center justify-center space-y-2">
@@ -389,12 +428,12 @@ export function AttendancePage() {
                         <Badge
                           variant="outline"
                           className={
-                            session.isClose
+                            !isSessionActive(session)
                               ? 'bg-muted text-muted-foreground text-[11px]'
                               : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[11px]'
                           }
                         >
-                          {session.isClose ? 'Closed' : 'Active'}
+                          {!isSessionActive(session) ? 'Closed' : 'Active'}
                         </Badge>
                       </td>
                       <td className="p-3 text-right">
@@ -414,7 +453,7 @@ export function AttendancePage() {
                           >
                             <Users className="w-3 h-3 mr-1" /> Roster
                           </Button>
-                          {!session.isClose && (
+                          {isSessionActive(session) && (
                             <Button
                               variant="outline"
                               size="sm"
