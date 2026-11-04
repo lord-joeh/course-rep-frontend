@@ -95,7 +95,7 @@ export function EventDetailDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-2 text-sm">
-          <div className="rounded-lg border border-border bg-zinc-50 dark:bg-zinc-900/60 p-3.5 space-y-2.5">
+          <div className="rounded-lg border border-border bg-muted/40 p-3.5 space-y-2.5">
             <div className="flex items-center gap-2 text-xs">
               <Calendar className="w-4 h-4 text-primary shrink-0" />
               <span className="font-semibold text-foreground">
@@ -124,10 +124,10 @@ export function EventDetailDialog({
           </div>
 
           {event.meetingLink && (
-            <div className="flex items-center justify-between p-3 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40">
-              <div className="flex items-center gap-2 text-xs text-blue-950 dark:text-blue-200 min-w-0">
-                <Video className="w-4 h-4 text-blue-600 shrink-0" />
-                <span className="font-medium truncate">{event.meetingLink}</span>
+            <div className="flex items-center justify-between p-3 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
+              <div className="flex items-center gap-2 text-xs min-w-0">
+                <Video className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                <span className="font-medium truncate text-foreground">{event.meetingLink}</span>
               </div>
               <a
                 href={event.meetingLink}
@@ -213,3 +213,4 @@ export function EventDetailDialog({
     </Dialog>
   );
 }
+

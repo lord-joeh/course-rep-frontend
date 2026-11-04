@@ -155,3 +155,4 @@ export const updateEventSchema = z
   });
 
 export type UpdateEventFormValues = z.infer<typeof updateEventSchema>;
+

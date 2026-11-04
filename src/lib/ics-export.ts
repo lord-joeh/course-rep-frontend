@@ -78,3 +78,4 @@ export function downloadEventIcs(event: Event): void {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+

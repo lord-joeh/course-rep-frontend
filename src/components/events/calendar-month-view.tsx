@@ -48,7 +48,7 @@ export function CalendarMonthView({
   return (
     <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden" data-testid="calendar-month-view">
       {/* Month Navigation Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border bg-zinc-50/50 dark:bg-zinc-900/50">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-border bg-muted/40">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-bold text-foreground">
             {format(currentMonth, 'MMMM yyyy')}
@@ -107,7 +107,7 @@ export function CalendarMonthView({
             <div
               key={day.toISOString()}
               className={`min-h-[110px] p-1.5 transition-colors flex flex-col group relative ${
-                !isCurrentMonth ? 'bg-zinc-50/40 dark:bg-zinc-950/40 text-muted-foreground/60' : 'bg-card'
+                !isCurrentMonth ? 'bg-muted/30 text-muted-foreground/50' : 'bg-card'
               }`}
             >
               {/* Day Header */}
@@ -151,7 +151,7 @@ export function CalendarMonthView({
                       onClick={() => onSelectEvent(event)}
                       className={`w-full text-left px-1.5 py-0.5 rounded text-[11px] truncate flex items-center gap-1 border transition-all ${
                         event.isCancelled
-                          ? 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 border-red-200 line-through opacity-70'
+                          ? 'bg-destructive/10 text-destructive border-destructive/20 line-through opacity-70'
                           : `${typeConfig.badgeClass} hover:opacity-85 shadow-xs`
                       }`}
                       title={`${event.title} (${timeStr})`}
@@ -169,3 +169,4 @@ export function CalendarMonthView({
     </div>
   );
 }
+

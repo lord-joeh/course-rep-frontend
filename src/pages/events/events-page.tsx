@@ -188,7 +188,7 @@ export function EventsPage() {
 
       {/* Upcoming Highlights Strip */}
       {upcomingEvents.length > 0 && (
-        <div className="rounded-xl border border-border bg-zinc-50/70 dark:bg-zinc-900/50 p-4 space-y-3">
+        <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <Sparkles className="w-4 h-4 text-primary" />
@@ -209,7 +209,7 @@ export function EventsPage() {
                   onClick={() => setSelectedEventDetail(evt)}
                   className={`p-3 rounded-lg border bg-card hover:border-primary/50 transition-all cursor-pointer shadow-xs flex flex-col justify-between ${
                     isUrgent
-                      ? 'border-red-300 dark:border-red-900/60 bg-red-50/20 dark:bg-red-950/20'
+                      ? 'border-destructive/30 bg-destructive/5'
                       : 'border-border'
                   }`}
                 >
@@ -327,8 +327,8 @@ export function EventsPage() {
               onClick={() => setSelectedType(type)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors flex items-center gap-1 ${
                 isSelected
-                  ? 'bg-foreground text-background font-semibold'
-                  : 'bg-muted/40 text-muted-foreground hover:bg-muted'
+                  ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
+                  : 'bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
               <span>{cfg.label}</span>

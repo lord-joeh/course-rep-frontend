@@ -46,7 +46,7 @@ export function CancelEventDialog({ event, isOpen, onClose }: CancelEventDialogP
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/60 mb-2">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/20 mb-2">
             <Ban className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
           <DialogTitle className="text-center text-lg font-bold">
@@ -59,8 +59,8 @@ export function CancelEventDialog({ event, isOpen, onClose }: CancelEventDialogP
         </DialogHeader>
 
         <div className="space-y-3 py-2 text-sm">
-          <div className="flex items-start gap-2.5 p-3 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40 text-amber-900 dark:text-amber-200 text-xs">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2.5 p-3 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs">
+            <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
               Cancelled events remain visible on student calendars with a cancelled badge so
               students know not to attend.
@@ -68,7 +68,7 @@ export function CancelEventDialog({ event, isOpen, onClose }: CancelEventDialogP
           </div>
 
           {isSeriesMember && event?.recurrenceSeriesId && (
-            <div className="p-3 bg-zinc-50 dark:bg-zinc-900 border border-border rounded-md space-y-2">
+            <div className="p-3 bg-muted/40 border border-border rounded-md space-y-2">
               <label className="flex items-center gap-2 cursor-pointer font-medium text-xs text-foreground">
                 <input
                   type="checkbox"
@@ -103,3 +103,4 @@ export function CancelEventDialog({ event, isOpen, onClose }: CancelEventDialogP
     </Dialog>
   );
 }
+

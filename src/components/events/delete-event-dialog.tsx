@@ -46,7 +46,7 @@ export function DeleteEventDialog({ event, isOpen, onClose }: DeleteEventDialogP
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/60 mb-2">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 border border-destructive/20 mb-2">
             <Trash2 className="h-6 w-6 text-destructive" />
           </div>
           <DialogTitle className="text-center text-lg font-bold">
@@ -60,7 +60,7 @@ export function DeleteEventDialog({ event, isOpen, onClose }: DeleteEventDialogP
         </DialogHeader>
 
         <div className="space-y-3 py-2 text-sm">
-          <div className="flex items-start gap-2.5 p-3 rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 text-red-900 dark:text-red-200 text-xs">
+          <div className="flex items-start gap-2.5 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs">
             <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
             <div>
               This will completely remove this event from the academic database. Students will no
@@ -69,7 +69,7 @@ export function DeleteEventDialog({ event, isOpen, onClose }: DeleteEventDialogP
           </div>
 
           {isSeriesMember && event?.recurrenceSeriesId && (
-            <div className="p-3 bg-zinc-50 dark:bg-zinc-900 border border-border rounded-md space-y-2">
+            <div className="p-3 bg-muted/40 border border-border rounded-md space-y-2">
               <label className="flex items-center gap-2 cursor-pointer font-medium text-xs text-foreground">
                 <input
                   type="checkbox"
@@ -104,3 +104,4 @@ export function DeleteEventDialog({ event, isOpen, onClose }: DeleteEventDialogP
     </Dialog>
   );
 }
+

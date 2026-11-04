@@ -87,3 +87,4 @@ export type CreateEventResponse =
       recurrenceSeriesId: string;
       events: Event[];
     };
+

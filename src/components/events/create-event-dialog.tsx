@@ -171,18 +171,18 @@ export function CreateEventDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           {collisionWarning && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-900 rounded-md text-sm text-red-800 dark:text-red-200 space-y-2">
+            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm text-destructive space-y-2">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                <div className="font-semibold">Venue Booking Conflict</div>
+                <div className="font-semibold text-foreground">Venue Booking Conflict</div>
               </div>
-              <p className="text-xs">{collisionWarning}</p>
-              <label className="flex items-center gap-2 pt-1 font-medium cursor-pointer text-xs">
+              <p className="text-xs text-muted-foreground">{collisionWarning}</p>
+              <label className="flex items-center gap-2 pt-1 font-medium cursor-pointer text-xs text-foreground">
                 <input
                   type="checkbox"
                   checked={allowOverlap}
                   onChange={(e) => setAllowOverlap(e.target.checked)}
-                  className="rounded border-red-400 text-destructive focus:ring-destructive"
+                  className="rounded border-destructive/40 text-destructive focus:ring-destructive"
                 />
                 Force schedule anyway (Allow Overlap)
               </label>
@@ -326,7 +326,7 @@ export function CreateEventDialog({
           </div>
 
           {/* Recurring Event Configuration */}
-          <div className="p-3 bg-zinc-50 dark:bg-zinc-900 border border-border rounded-lg space-y-3">
+          <div className="p-3 bg-muted/40 border border-border rounded-lg space-y-3">
             <label className="flex items-center gap-2 cursor-pointer font-medium text-sm">
               <input
                 type="checkbox"
@@ -413,3 +413,4 @@ export function CreateEventDialog({
     </Dialog>
   );
 }
+

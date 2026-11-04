@@ -36,37 +36,37 @@ export const EVENT_TYPE_CONFIG: Record<
 > = {
   lecture: {
     label: 'Lecture',
-    badgeClass: 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-200 border-blue-200',
+    badgeClass: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
     icon: BookOpen,
   },
   tutorial: {
     label: 'Tutorial',
-    badgeClass: 'bg-cyan-100 text-cyan-900 dark:bg-cyan-950 dark:text-cyan-200 border-cyan-200',
+    badgeClass: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20',
     icon: GraduationCap,
   },
   exam: {
     label: 'Exam',
-    badgeClass: 'bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-200 border-red-200 font-semibold',
+    badgeClass: 'bg-destructive/10 text-destructive border-destructive/20 font-semibold',
     icon: AlertCircle,
   },
   deadline: {
     label: 'Deadline',
-    badgeClass: 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border-amber-200 font-semibold',
+    badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 font-semibold',
     icon: Clock,
   },
   meeting: {
     label: 'Meeting',
-    badgeClass: 'bg-purple-100 text-purple-900 dark:bg-purple-950 dark:text-purple-200 border-purple-200',
+    badgeClass: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
     icon: Users,
   },
   seminar: {
     label: 'Seminar',
-    badgeClass: 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 border-emerald-200',
+    badgeClass: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     icon: Sparkles,
   },
   other: {
     label: 'Other',
-    badgeClass: 'bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-200 border-zinc-200',
+    badgeClass: 'bg-muted text-muted-foreground border-border',
     icon: Calendar,
   },
 };
@@ -105,7 +105,7 @@ export function EventCard({
   return (
     <Card
       className={`flex flex-col justify-between hover:shadow-md transition-shadow border-border bg-card cursor-pointer ${
-        event.isCancelled ? 'opacity-70 bg-zinc-50/50 dark:bg-zinc-900/50 border-red-200 dark:border-red-900/40' : ''
+        event.isCancelled ? 'opacity-75 bg-muted/30 border-destructive/20' : ''
       }`}
       onClick={() => onViewDetail(event)}
       data-testid={`event-card-${event.id}`}
@@ -246,3 +246,4 @@ export function EventCard({
     </Card>
   );
 }
+
