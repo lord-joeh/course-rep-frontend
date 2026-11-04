@@ -166,7 +166,7 @@ export function InitializeSessionDialog({
               <option value="">Select a course...</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
-                  {course.id} — {course.name}
+                  {course.id} - {course.name}
                 </option>
               ))}
             </select>
@@ -357,3 +357,4 @@ export function InitializeSessionDialog({
     </Dialog>
   );
 }
+

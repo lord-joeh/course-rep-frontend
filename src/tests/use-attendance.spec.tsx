@@ -261,3 +261,4 @@ describe('use-attendance hooks', () => {
     expect(onSuccess).toHaveBeenCalled();
   });
 });
+

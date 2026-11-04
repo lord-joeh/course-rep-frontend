@@ -1,15 +1,24 @@
 import { io, Socket } from 'socket.io-client';
 import { tokenStore } from './token-store';
 
-const SOCKET_BASE_URL =
-  import.meta.env.VITE_WS_URL ||
-  (import.meta.env.VITE_API_BASE_URL
-    ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, '')
-    : 'http://localhost:5000');
+export function getSocketBaseUrl(): string {
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
+  }
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, '');
+  }
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    return `http://${window.location.hostname}:3000`;
+  }
+  return 'http://localhost:3000';
+}
 
 export function createNamespaceSocket(namespace: string): Socket {
   const token = tokenStore.getAccessToken();
-  const url = `${SOCKET_BASE_URL}${namespace.startsWith('/') ? '' : '/'}${namespace}`;
+  const baseUrl = getSocketBaseUrl();
+  const cleanNamespace = namespace.startsWith('/') ? namespace : `/${namespace}`;
+  const url = `${baseUrl}${cleanNamespace}`;
 
   return io(url, {
     auth: {

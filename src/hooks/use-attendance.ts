@@ -238,3 +238,4 @@ export function useDeleteAttendanceRecordMutation(onSuccessCallback?: () => void
     },
   });
 }
+

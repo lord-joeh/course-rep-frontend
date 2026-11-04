@@ -275,7 +275,7 @@ export function QRScannerDialog({
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
             <span>
-              Tokens change every 20 seconds. Manual code entry is prohibited to ensure in-person attendance.
+              Tokens change every 20 seconds.
             </span>
           </div>
 

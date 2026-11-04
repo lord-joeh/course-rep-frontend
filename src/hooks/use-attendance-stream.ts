@@ -21,6 +21,7 @@ export function useAttendanceStream({
   initialPresentCount = 0,
 }: UseAttendanceStreamOptions) {
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [qrImage, setQrImage] = useState<string | null>(initialQrImage);
   const [token, setToken] = useState<string | null>(initialToken);
   const [countdown, setCountdown] = useState<number>(20);
@@ -51,12 +52,21 @@ export function useAttendanceStream({
     socket.connect();
 
     socket.on('connect', () => {
+      console.log(`[AttendanceStream] Connected to namespace: ${socket.id}`);
       setIsConnected(true);
+      setConnectionError(null);
       socket.emit('joinSession', { instanceId });
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.warn(`[AttendanceStream] Disconnected: ${reason}`);
       setIsConnected(false);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error(`[AttendanceStream] Connection error: ${error.message}`);
+      setIsConnected(false);
+      setConnectionError(error.message);
     });
 
     socket.on('qrRotate', (payload: QRRotatePayload) => {
@@ -83,6 +93,14 @@ export function useAttendanceStream({
     });
 
     return () => {
+      if (typeof socket.off === 'function') {
+        socket.off('connect');
+        socket.off('disconnect');
+        socket.off('connect_error');
+        socket.off('qrRotate');
+        socket.off('attendeeMarked');
+        socket.off('sessionClosed');
+      }
       socket.disconnect();
       socketRef.current = null;
     };
@@ -101,6 +119,7 @@ export function useAttendanceStream({
 
   return {
     isConnected,
+    connectionError,
     qrImage,
     token,
     countdown,

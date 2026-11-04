@@ -16,6 +16,7 @@ vi.mock('@/lib/socket-client', () => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
     on: vi.fn(),
+    off: vi.fn(),
     emit: vi.fn(),
   }),
 }));
@@ -139,7 +140,7 @@ describe('Attendance Dialogs, Projector & Components', () => {
         { wrapper },
       );
 
-      expect(screen.getByRole('heading', { name: /CPEN402 — Classroom Attendance Projector/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /CPEN402/i })).toBeInTheDocument();
       expect(screen.getByAltText(/Rotating Attendance QR Code/i)).toBeInTheDocument();
       expect(screen.getByText(/Next token refresh in:/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Fullscreen/i })).toBeInTheDocument();

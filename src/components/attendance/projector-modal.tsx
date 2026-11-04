@@ -92,7 +92,7 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
               <div>
                 <div className="flex items-center gap-2">
                   <DialogTitle className="text-xl font-bold tracking-tight">
-                    {session.courseId} — Classroom Attendance Projector
+                    {session.courseId} Classroom Attendance Projector
                   </DialogTitle>
                   <Badge
                     variant="outline"
@@ -130,7 +130,13 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
                     ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                     : 'border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400'
                 }`}
-                title={stream.isConnected ? 'WebSocket stream active' : 'Connecting to stream...'}
+                title={
+                  stream.isConnected
+                    ? 'WebSocket stream active'
+                    : stream.connectionError
+                      ? `Connection Error: ${stream.connectionError}`
+                      : 'Connecting to stream...'
+                }
               >
                 {stream.isConnected ? (
                   <>
@@ -255,7 +261,6 @@ export function ProjectorModal({ session, open, onOpenChange }: ProjectorModalPr
               <div className="flex-1 p-4 bg-card rounded border border-border flex flex-col min-h-[220px]">
                 <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                   <span>Live Stream Feed</span>
-                  <span className="text-[10px] text-primary font-mono">SOCKET.IO</span>
                 </div>
 
                 <div className="flex-1 space-y-2 overflow-y-auto max-h-[260px] pr-1">

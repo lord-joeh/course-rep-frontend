@@ -13,6 +13,7 @@ vi.mock('@/lib/socket-client', () => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
     on: vi.fn(),
+    off: vi.fn(),
     emit: vi.fn(),
   }),
 }));

@@ -3,7 +3,10 @@ import { tokenStore } from './token-store';
 import type { ApiResponse, RefreshTokenResponse } from '@/types';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== 'undefined' && window.location.hostname
+    ? `http://${window.location.hostname}:3000/api`
+    : 'http://localhost:3000/api');
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
