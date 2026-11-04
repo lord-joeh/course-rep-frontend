@@ -1,10 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ThemeProvider } from '@/components/theme-provider';
 
 describe('AppLayout & Sidebar', () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
   const dummyRep = {
     id: 'REP-101',
     name: 'Alexander Rep',
@@ -19,14 +24,17 @@ describe('AppLayout & Sidebar', () => {
     isRep: false,
   };
 
-  it('renders Rep navigation items when user is a course representative', () => {
+  const renderWithProviders = (ui: React.ReactElement) =>
     render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <AppLayout user={dummyRep} />
-        </BrowserRouter>
-      </ThemeProvider>,
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <BrowserRouter>{ui}</BrowserRouter>
+        </ThemeProvider>
+      </QueryClientProvider>,
     );
+
+  it('renders Rep navigation items when user is a course representative', () => {
+    renderWithProviders(<AppLayout user={dummyRep} />);
 
     expect(screen.getAllByText('CourseRep')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Dashboard')[0]).toBeInTheDocument();
@@ -35,13 +43,7 @@ describe('AppLayout & Sidebar', () => {
   });
 
   it('hides rep-only navigation items when user is a student', () => {
-    render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <AppLayout user={dummyStudent} />
-        </BrowserRouter>
-      </ThemeProvider>,
-    );
+    renderWithProviders(<AppLayout user={dummyStudent} />);
 
     expect(screen.queryByText('Security Audit')).not.toBeInTheDocument();
     expect(screen.queryByText('Queue Admin')).not.toBeInTheDocument();
@@ -49,13 +51,7 @@ describe('AppLayout & Sidebar', () => {
   });
 
   it('toggles desktop sidebar collapse state', () => {
-    render(
-      <ThemeProvider>
-        <BrowserRouter>
-          <AppLayout user={dummyRep} />
-        </BrowserRouter>
-      </ThemeProvider>,
-    );
+    renderWithProviders(<AppLayout user={dummyRep} />);
 
     const collapseBtn = screen.getByLabelText('Collapse sidebar');
     fireEvent.click(collapseBtn);

@@ -31,6 +31,7 @@ import { AssignmentsPage } from '@/pages/assignments/assignments-page';
 import { AttendancePage } from '@/pages/attendance/attendance-page';
 import { GroupsPage } from '@/pages/groups/groups-page';
 import { EventsPage } from '@/pages/events/events-page';
+import { NotificationsPage } from '@/pages/notifications/notifications-page';
 import type { ApiResponse } from '@/types';
 
 interface HealthData {
@@ -258,6 +259,7 @@ export function App() {
               <Route element={<RoleRoute requiredRole="REP" />}>
                 <Route element={<AuthenticatedShell />}>
                   <Route path="/reps/dashboard" element={<DashboardView role="REP" />} />
+                  <Route path="/reps/notifications" element={<NotificationsPage />} />
                   <Route path="/reps/students" element={<StudentDirectoryPage />} />
                   <Route path="/reps/lecturers" element={<LecturerDirectoryPage />} />
                   <Route path="/reps/courses" element={<CourseCatalogPage />} />
@@ -275,6 +277,7 @@ export function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<AuthenticatedShell />}>
                   <Route path="/students/dashboard" element={<DashboardView role="STUDENT" />} />
+                  <Route path="/students/notifications" element={<NotificationsPage />} />
                   <Route path="/students/lecturers" element={<LecturerDirectoryPage />} />
                   <Route path="/students/courses" element={<CourseCatalogPage />} />
                   <Route path="/students/slides" element={<CourseSlidesPage />} />

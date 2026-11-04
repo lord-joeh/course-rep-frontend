@@ -49,6 +49,7 @@ export const REP_NAV_ITEMS: NavItem[] = [
 
 export const STUDENT_NAV_ITEMS: NavItem[] = [
   { title: 'Dashboard', href: '/students/dashboard', icon: LayoutDashboard },
+  { title: 'Announcements', href: '/students/notifications', icon: Bell },
   { title: 'My Profile', href: '/students/profile', icon: Users },
   { title: 'Lecturers', href: '/students/lecturers', icon: GraduationCap },
   { title: 'My Courses', href: '/students/courses', icon: BookOpen },

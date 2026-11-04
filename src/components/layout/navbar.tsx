@@ -9,7 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Moon, Sun, Menu, Bell, User, LogOut, Settings } from 'lucide-react';
+import { Moon, Sun, Menu, User, LogOut, Settings } from 'lucide-react';
+import { NotificationPopover } from '@/components/notifications/notification-popover';
 import type { AuthenticatedUser } from '@/types';
 
 interface NavbarProps {
@@ -23,7 +24,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   user,
   onOpenMobileMenu,
   onLogout,
-  unreadNotificationCount = 0,
 }) => {
   const { setTheme, resolvedTheme } = useTheme();
 
@@ -59,20 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </Button>
 
-        {/* Notifications Icon */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative"
-          aria-label="View notifications"
-        >
-          <Bell className="h-4 w-4 text-foreground" />
-          {unreadNotificationCount > 0 && (
-            <span className="absolute top-2 right-2 flex h-2 w-2">
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
-            </span>
-          )}
-        </Button>
+        {/* Interactive Notifications Popover */}
+        <NotificationPopover isRep={user?.isRep} />
 
         {/* User Profile Dropdown */}
         <DropdownMenu>
