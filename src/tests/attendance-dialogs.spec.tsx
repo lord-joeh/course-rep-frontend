@@ -41,7 +41,7 @@ describe('Attendance Dialogs, Projector & Components', () => {
     date: '2026-11-04T10:00:00.000Z',
     qrToken: 'mock-token-xyz',
     qrImage: 'data:image/png;base64,mockqrimage',
-    expiresAt: '2026-11-04T11:00:00.000Z',
+    expiresAt: '2099-11-04T11:00:00.000Z',
     latitude: 5.6037,
     longitude: -0.1870,
     classType: 'in-person',
