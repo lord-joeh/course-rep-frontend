@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: ghcr.io/lord-joeh/course-rep-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,8 +17,8 @@ services:
       retries: 3
       start_period: 5s
     networks:
-      - v2_course-rep-network
+      - course-rep-network
 
 networks:
-  v2_course-rep-network:
+  course-rep-network:
     external: true
