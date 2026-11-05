@@ -109,3 +109,4 @@ export async function getFcmToken(): Promise<string | null> {
     return null;
   }
 }
+

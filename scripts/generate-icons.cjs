@@ -140,3 +140,4 @@ fs.writeFileSync(path.join(publicDir, 'pwa-512x512.png'), generatePng(512, 512, 
 fs.writeFileSync(path.join(publicDir, 'pwa-maskable-512x512.png'), generatePng(512, 512, true));
 fs.writeFileSync(path.join(publicDir, 'apple-touch-icon.png'), generatePng(180, 180, false));
 console.log('PWA icons created successfully in public directory');
+

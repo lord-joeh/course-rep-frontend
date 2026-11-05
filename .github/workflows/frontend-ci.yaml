@@ -1,0 +1,60 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, master, develop, v2]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main, master, develop, v2]
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  PNPM_VERSION: "9"
+
+jobs:
+  test:
+    name: Frontend Lint, Type-Check, Vitest & PWA Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Code Quality & Lint Check (Oxlint)
+        run: pnpm run lint
+
+      - name: Strict TypeScript Verification
+        run: pnpm run type-check
+
+      - name: Run Vitest Unit & Component Suite
+        run: pnpm run test
+
+      - name: Build Production Bundle & PWA Assets
+        run: pnpm run build
+        env:
+          VITE_API_BASE_URL: https://rep.dev-joseph.me
+          VITE_SSL: true
+
+      - name: Verify PWA Artifacts
+        run: |
+          test -f dist/index.html || { echo "Missing index.html"; exit 1; }
+          test -f dist/manifest.webmanifest || { echo "Missing manifest.webmanifest"; exit 1; }
+          echo "PWA build and assets successfully verified."
