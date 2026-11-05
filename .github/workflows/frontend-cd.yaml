@@ -83,7 +83,11 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             cd /opt/course-rep
-            docker compose up -d --no-deps frontend
+            if [ -f "docker-compose.prod.yaml" ]; then
+              docker compose -f docker-compose.prod.yaml up -d --no-deps frontend
+            else
+              docker compose up -d --no-deps frontend
+            fi
             # Verify Nginx container healthcheck
             for i in {1..10}; do
               if docker exec rep-frontend wget --spider -q http://localhost/; then
