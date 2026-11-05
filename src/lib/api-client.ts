@@ -5,7 +5,7 @@ import type { ApiResponse, RefreshTokenResponse } from '@/types';
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   (typeof window !== 'undefined' && window.location.hostname
-    ? `http://${window.location.hostname}:3000`
+    ? `https://${window.location.hostname}:5000`
     : 'http://localhost:3000');
 
 export const apiClient = axios.create({
