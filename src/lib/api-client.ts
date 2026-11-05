@@ -2,14 +2,28 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { tokenStore } from './token-store';
 import type { ApiResponse, RefreshTokenResponse } from '@/types';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (typeof window !== 'undefined' && window.location.hostname
-    ? `https://${window.location.hostname}:5000`
-    : 'http://localhost:3000');
+export function getApiBaseUrl(): string {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    const raw = import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  }
+
+  if (typeof window !== 'undefined') {
+    // In local development directly against localhost backend
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:5000/api';
+    }
+    // In production or custom domain, route through same-origin reverse proxy
+    return `${window.location.origin}/api`;
+  }
+
+  return 'http://localhost:5000/api';
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 15000,
   headers: {
