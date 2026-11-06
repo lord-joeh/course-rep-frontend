@@ -90,7 +90,7 @@ jobs:
             fi
             # Verify Nginx container healthcheck
             for i in {1..10}; do
-              if docker exec rep-frontend wget --spider -q http://localhost/; then
+              if docker exec rep-frontend wget --spider -q http://127.0.0.1; then
                 echo "Frontend container verified healthy."
                 exit 0
               fi
