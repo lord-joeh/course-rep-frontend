@@ -57,7 +57,5 @@ jobs:
         run: |
           test -f dist/index.html || { echo "Missing index.html"; exit 1; }
           test -f dist/manifest.webmanifest || { echo "Missing manifest.webmanifest"; exit 1; }
-          test -f dist/runtime-config.js || { echo "Missing runtime-config.js"; exit 1; }
           grep -q "firebase-messaging-sw.js" dist/sw.js || { echo "Missing FCM handler in service worker"; exit 1; }
-          if grep -q "runtime-config.js" dist/sw.js; then echo "Runtime config must not be precached"; exit 1; fi
-          echo "PWA, runtime config, and FCM worker assets successfully verified."
+          echo "PWA and FCM worker assets successfully verified."

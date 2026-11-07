@@ -18,8 +18,6 @@ FROM nginx:alpine
 
 WORKDIR /usr/share/nginx/html
 
-ENV NGINX_ENVSUBST_OUTPUT_DIR=/usr/share/nginx/html
-
 # Remove all default configs
 RUN rm -rf /etc/nginx/conf.d/*
 
@@ -28,7 +26,6 @@ RUN printf 'user nginx;\nworker_processes auto;\nerror_log /var/log/nginx/error.
 
 # Copy your nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY docker/runtime-config.js.template /etc/nginx/templates/runtime-config.js.template
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist .

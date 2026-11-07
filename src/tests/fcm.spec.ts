@@ -24,6 +24,7 @@ describe('FCM token acquisition', () => {
     vi.resetModules();
     vi.clearAllMocks();
     vi.unstubAllEnvs();
+    vi.stubEnv('DEV', true);
     for (const key of [
       'VITE_FIREBASE_API_KEY',
       'VITE_FIREBASE_AUTH_DOMAIN',
@@ -35,7 +36,6 @@ describe('FCM token acquisition', () => {
     ]) {
       vi.stubEnv(key, '');
     }
-    window.__FIREBASE_CONFIG__ = undefined;
 
     Object.defineProperty(window, 'Notification', {
       configurable: true,
@@ -65,14 +65,18 @@ describe('FCM token acquisition', () => {
     vi.unstubAllEnvs();
   });
 
+  const setFirebaseEnv = (includeVapidKey = true) => {
+    vi.stubEnv('VITE_FIREBASE_API_KEY', 'test-api-key');
+    vi.stubEnv('VITE_FIREBASE_PROJECT_ID', 'test-project');
+    vi.stubEnv('VITE_FIREBASE_MESSAGING_SENDER_ID', 'test-sender');
+    vi.stubEnv('VITE_FIREBASE_APP_ID', 'test-app');
+    if (includeVapidKey) {
+      vi.stubEnv('VITE_FIREBASE_VAPID_KEY', 'test-vapid-key');
+    }
+  };
+
   it('uses the Firebase SDK and supplies the registered messaging worker', async () => {
-    window.__FIREBASE_CONFIG__ = {
-      apiKey: 'test-api-key',
-      projectId: 'test-project',
-      messagingSenderId: 'test-sender',
-      appId: 'test-app',
-      vapidKey: 'test-vapid-key',
-    };
+    setFirebaseEnv();
 
     const { getFcmToken } = await import('@/lib/fcm');
     await expect(getFcmToken()).resolves.toBe('valid-fcm-registration-token');
@@ -84,13 +88,7 @@ describe('FCM token acquisition', () => {
 
   it('uses the active PWA registration in production', async () => {
     vi.stubEnv('DEV', false);
-    window.__FIREBASE_CONFIG__ = {
-      apiKey: 'test-api-key',
-      projectId: 'test-project',
-      messagingSenderId: 'test-sender',
-      appId: 'test-app',
-      vapidKey: 'test-vapid-key',
-    };
+    setFirebaseEnv();
 
     const { getFcmToken } = await import('@/lib/fcm');
     await expect(getFcmToken()).resolves.toBe('valid-fcm-registration-token');
@@ -102,7 +100,7 @@ describe('FCM token acquisition', () => {
   });
 
   it('does not create or return a fake token when Firebase config is incomplete', async () => {
-    window.__FIREBASE_CONFIG__ = { apiKey: 'test-api-key' };
+    vi.stubEnv('VITE_FIREBASE_API_KEY', 'test-api-key');
 
     const { getFcmToken } = await import('@/lib/fcm');
     await expect(getFcmToken()).resolves.toBeNull();
@@ -112,12 +110,7 @@ describe('FCM token acquisition', () => {
   });
 
   it('does not attempt token acquisition without a VAPID key', async () => {
-    window.__FIREBASE_CONFIG__ = {
-      apiKey: 'test-api-key',
-      projectId: 'test-project',
-      messagingSenderId: 'test-sender',
-      appId: 'test-app',
-    };
+    setFirebaseEnv(false);
 
     const { getFcmToken } = await import('@/lib/fcm');
     await expect(getFcmToken()).resolves.toBeNull();
@@ -126,13 +119,7 @@ describe('FCM token acquisition', () => {
   });
 
   it('returns null rather than a fake token when Firebase rejects token acquisition', async () => {
-    window.__FIREBASE_CONFIG__ = {
-      apiKey: 'test-api-key',
-      projectId: 'test-project',
-      messagingSenderId: 'test-sender',
-      appId: 'test-app',
-      vapidKey: 'test-vapid-key',
-    };
+    setFirebaseEnv();
     firebaseMocks.getToken.mockRejectedValue(new Error('Firebase token request failed'));
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 

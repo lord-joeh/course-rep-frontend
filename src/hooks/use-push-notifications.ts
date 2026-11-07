@@ -93,7 +93,7 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       if (result === 'granted') {
         const deviceToken = await getFcmToken();
         if (!deviceToken) {
-          toast.error('Could not get a valid push token. Check Firebase configuration and try again.');
+          toast.error('Could not get a valid push token.');
           setIsLoading(false);
           return false;
         }

@@ -1,39 +1,16 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getMessaging, getToken, type Messaging } from 'firebase/messaging';
 
-interface FirebaseClientConfig {
-  apiKey?: string;
-  authDomain?: string;
-  projectId?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  appId?: string;
-  vapidKey?: string;
-}
-
-declare global {
-  interface Window {
-    __FIREBASE_CONFIG__?: FirebaseClientConfig;
-  }
-}
-
-const runtimeFirebaseConfig =
-  typeof window !== 'undefined' ? window.__FIREBASE_CONFIG__ : undefined;
-
 const firebaseConfig = {
-  apiKey: runtimeFirebaseConfig?.apiKey || import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:
-    runtimeFirebaseConfig?.authDomain || import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: runtimeFirebaseConfig?.projectId || import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:
-    runtimeFirebaseConfig?.storageBucket || import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId:
-    runtimeFirebaseConfig?.messagingSenderId ||
-    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: runtimeFirebaseConfig?.appId || import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const vapidKey = runtimeFirebaseConfig?.vapidKey || import.meta.env.VITE_FIREBASE_VAPID_KEY;
+const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
 
 let messaging: Messaging | null = null;
 
