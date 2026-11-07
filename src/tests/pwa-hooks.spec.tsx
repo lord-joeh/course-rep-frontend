@@ -7,6 +7,11 @@ import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { authStore } from '@/lib/auth-store';
 import { apiClient } from '@/lib/api-client';
 
+vi.mock('@/lib/fcm', () => ({
+  isPushSupported: () => true,
+  getFcmToken: () => Promise.resolve('test-fcm-registration-token'),
+}));
+
 describe('PWA & Push Notification Hooks', () => {
   let queryClient: QueryClient;
 
@@ -168,4 +173,3 @@ describe('PWA & Push Notification Hooks', () => {
     });
   });
 });
-

@@ -92,10 +92,14 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
       if (result === 'granted') {
         const deviceToken = await getFcmToken();
-        if (deviceToken) {
-          setToken(deviceToken);
-          await syncToken(deviceToken);
+        if (!deviceToken) {
+          toast.error('Could not get a valid push token. Check Firebase configuration and try again.');
+          setIsLoading(false);
+          return false;
         }
+
+        setToken(deviceToken);
+        await syncToken(deviceToken);
         toast.success('Push Notifications Enabled', {
           description: 'You will receive real-time alerts for schedule changes and deadlines.',
         });
