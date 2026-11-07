@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">GCTU favicon</title>
+  <desc id="desc">Simplified Ghana Communication Technology University emblem in navy, gold and cream.</desc>
+  <defs>
+    <clipPath id="inner">
+      <circle cx="256" cy="256" r="204"/>
+    </clipPath>
+  </defs>
+  <!-- Circular university seal -->
+  <circle cx="256" cy="256" r="248" fill="#F8C51C"/>
+  <circle cx="256" cy="256" r="238" fill="#252B68"/>
+  <circle cx="256" cy="256" r="190" fill="#FFF8CC" stroke="#E9AA20" stroke-width="14"/>
+  <g clip-path="url(#inner)">
+    <text x="256" y="190" text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif" font-size="88"
+          font-weight="800" letter-spacing="-4" fill="#252B68">GCTU</text>
+    <!-- Shield -->
+    <path d="M148 224 Q256 205 364 224 L364 345
+             Q360 405 256 451 Q152 405 148 345 Z"
+          fill="#252B68" stroke="#E9AA20" stroke-width="9" stroke-linejoin="round"/>
+    <!-- Checkerboard crown -->
+    <path d="M155 230 Q256 213 357 230 L357 279 L155 279 Z" fill="#F8C51C"/>
+    <g fill="#252B68">
+      <path d="M160 233h19v20h-19z M198 230h19v20h-19z M236 228h19v20h-19z M274 228h19v20h-19z M312 230h19v20h-19z M350 233h7v20h-7z"/>
+      <path d="M179 253h19v20h-19z M217 250h19v23h-19z M255 250h19v23h-19z M293 250h19v23h-19z M331 253h19v20h-19z"/>
+    </g>
+    <path d="M256 282v148" stroke="#FFF8CC" stroke-width="6"/>
+    <!-- Left abstract communications motif -->
+    <g fill="none" stroke="#F8C51C" stroke-width="8" stroke-linecap="square">
+      <path d="M183 311h44v12h-32v17h32v12h-44v18h44v12h-44"/>
+      <path d="M183 311v71 M205 323v17 M227 311v71"/>
+    </g>
+    <!-- Right radio mast and signal waves -->
+    <g fill="none" stroke="#F8C51C" stroke-width="8" stroke-linecap="round">
+      <path d="M306 314q-22 24 0 48 M330 314q22 24 0 48"/>
+    </g>
+    <g fill="none" stroke="#FFF8CC" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M318 348L292 397h52z M305 373h27 M310 386h17"/>
+    </g>
+    <circle cx="318" cy="340" r="11" fill="#FFF8CC"/>
+  </g>
+</svg>
