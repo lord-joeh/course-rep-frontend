@@ -7,6 +7,10 @@ import { toast } from 'sonner';
 import type {
   ApiResponse,
   LoginResponse,
+  OAuthLoginResponse,
+  GoogleAuthDto,
+  AppleAuthDto,
+  CompleteOAuthRegistrationDto,
 } from '@/types';
 import type {
   LoginFormData,
@@ -202,6 +206,124 @@ export function useChangePasswordMutation(onSuccessCallback?: () => void) {
         error.response?.data?.message ||
         'Failed to change password. Please verify your current password.';
       toast.error('Update Failed', { description: message });
+    },
+  });
+}
+
+export function useGoogleLoginMutation(onNeedsCompletion?: (data: any) => void) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dto: GoogleAuthDto) => {
+      const response = await apiClient.post<ApiResponse<OAuthLoginResponse>>('/auth/google', dto);
+      return response.data?.data;
+    },
+    onSuccess: (data) => {
+      if (!data) return;
+      if (data.requiresCompletion) {
+        if (onNeedsCompletion) {
+          onNeedsCompletion(data);
+        }
+        return;
+      }
+
+      if (data.student && data.accessToken) {
+        authStore.setSession(data.student, {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        queryClient.setQueryData(['current-user'], data.student);
+        toast.success(`Welcome back, ${data.student.name.split(' ')[0]}`, {
+          description: 'Successfully authenticated via Google.',
+        });
+        if (data.student.isRep) {
+          navigate('/reps/dashboard', { replace: true });
+        } else {
+          navigate('/students/dashboard', { replace: true });
+        }
+      }
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      const message = error.response?.data?.message || 'Google sign-in failed. Please try again.';
+      toast.error('Google Sign-In Failed', { description: message });
+    },
+  });
+}
+
+export function useAppleLoginMutation(onNeedsCompletion?: (data: any) => void) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dto: AppleAuthDto) => {
+      const response = await apiClient.post<ApiResponse<OAuthLoginResponse>>('/auth/apple', dto);
+      return response.data?.data;
+    },
+    onSuccess: (data) => {
+      if (!data) return;
+      if (data.requiresCompletion) {
+        if (onNeedsCompletion) {
+          onNeedsCompletion(data);
+        }
+        return;
+      }
+
+      if (data.student && data.accessToken) {
+        authStore.setSession(data.student, {
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        queryClient.setQueryData(['current-user'], data.student);
+        toast.success(`Welcome back, ${data.student.name.split(' ')[0]}`, {
+          description: 'Successfully authenticated via Apple.',
+        });
+        if (data.student.isRep) {
+          navigate('/reps/dashboard', { replace: true });
+        } else {
+          navigate('/students/dashboard', { replace: true });
+        }
+      }
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      const message = error.response?.data?.message || 'Apple sign-in failed. Please try again.';
+      toast.error('Apple Sign-In Failed', { description: message });
+    },
+  });
+}
+
+export function useCompleteOAuthRegistrationMutation() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dto: CompleteOAuthRegistrationDto) => {
+      const response = await apiClient.post<ApiResponse<LoginResponse>>(
+        '/auth/oauth/complete-registration',
+        dto,
+      );
+      return response.data?.data;
+    },
+    onSuccess: (data) => {
+      if (!data?.student || !data?.accessToken) {
+        toast.error('Registration Error', { description: 'Invalid response from server' });
+        return;
+      }
+
+      authStore.setSession(data.student, {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      });
+      queryClient.setQueryData(['current-user'], data.student);
+      toast.success('Registration Complete', {
+        description: `Welcome to Course Rep, ${data.student.name.split(' ')[0]}!`,
+      });
+      navigate('/students/dashboard', { replace: true });
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      const message =
+        error.response?.data?.message || 'Could not complete registration. Please check your details.';
+      toast.error('Registration Failed', { description: message });
     },
   });
 }
