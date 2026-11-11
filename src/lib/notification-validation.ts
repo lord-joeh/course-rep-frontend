@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Info,
   Flame,
+  FileText,
 } from 'lucide-react';
 
 export const notificationTypeEnum = z.enum([
@@ -20,6 +21,7 @@ export const notificationTypeEnum = z.enum([
   'event',
   'feedback',
   'system',
+  'slide',
 ]);
 
 export const notificationPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent']);
@@ -123,6 +125,12 @@ export function getNotificationTypeMeta(
         label: 'Assignment',
         badgeClass: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
         icon: ClipboardList,
+      };
+    case 'slide':
+      return {
+        label: 'Slide',
+        badgeClass: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+        icon: FileText,
       };
     case 'attendance':
       return {

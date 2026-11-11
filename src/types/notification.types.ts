@@ -6,7 +6,8 @@ export type NotificationType =
   | 'attendance'
   | 'event'
   | 'feedback'
-  | 'system';
+  | 'system'
+  | 'slide';
 
 export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
 

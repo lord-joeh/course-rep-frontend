@@ -109,6 +109,24 @@ describe('notification-validation schemas & helpers', () => {
 
       const attendanceMeta = getNotificationTypeMeta('attendance');
       expect(attendanceMeta.label).toBe('Attendance');
+
+      const slideMeta = getNotificationTypeMeta('slide');
+      expect(slideMeta.label).toBe('Slide');
+      expect(slideMeta.badgeClass).toContain('bg-indigo-500/10');
+    });
+
+    it('validates slide notification type in createNotificationSchema', () => {
+      const slideNotif = {
+        title: 'New Slides Uploaded',
+        message: 'Week 4 slides on Binary Trees have been posted.',
+        type: 'slide',
+        priority: 'normal',
+      };
+      const result = createNotificationSchema.safeParse(slideNotif);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.type).toBe('slide');
+      }
     });
   });
 });
