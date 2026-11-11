@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { isPushSupported, getFcmToken } from '@/lib/fcm';
-import { useRegisterPushTokenMutation } from '@/hooks/use-notifications';
+import {
+  useRegisterPushTokenMutation,
+  useUnregisterPushTokenMutation,
+} from '@/hooks/use-notifications';
 import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'sonner';
 
@@ -10,10 +13,15 @@ export interface UsePushNotificationsReturn {
   permission: PushPermissionState;
   isSupported: boolean;
   isSubscribed: boolean;
+  isEnabled: boolean;
   isLoading: boolean;
   token: string | null;
   requestPushPermission: () => Promise<boolean>;
+  disablePushNotifications: () => Promise<boolean>;
+  togglePushNotifications: () => Promise<boolean>;
 }
+
+const STORAGE_KEY = 'cr_push_enabled';
 
 export function usePushNotifications(): UsePushNotificationsReturn {
   const { isAuthenticated } = useAuthStore();
@@ -21,8 +29,13 @@ export function usePushNotifications(): UsePushNotificationsReturn {
   const [isSupported, setIsSupported] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isEnabled, setIsEnabled] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(STORAGE_KEY) !== 'false';
+  });
 
   const registerTokenMutation = useRegisterPushTokenMutation();
+  const unregisterTokenMutation = useUnregisterPushTokenMutation();
   const lastRegisteredTokenRef = useRef<string | null>(null);
   const isSyncingRef = useRef<boolean>(false);
 
@@ -33,10 +46,19 @@ export function usePushNotifications(): UsePushNotificationsReturn {
 
     if (!supported) {
       setPermission('unsupported');
+      setIsEnabled(false);
       return;
     }
 
-    setPermission(Notification.permission);
+    const currentPerm = Notification.permission;
+    setPermission(currentPerm);
+
+    if (currentPerm !== 'granted') {
+      setIsEnabled(false);
+    } else {
+      const storedPref = localStorage.getItem(STORAGE_KEY);
+      setIsEnabled(storedPref !== 'false');
+    }
   }, []);
 
   // Centralized token sync function that prevents duplicate concurrent requests
@@ -69,16 +91,16 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     [isAuthenticated, registerTokenMutation],
   );
 
-  // Sync token with backend when user is logged in and permission is granted
+  // Sync token with backend when user is logged in, permission is granted, and push is enabled
   useEffect(() => {
-    if (!isAuthenticated || permission !== 'granted' || !isSupported) {
+    if (!isAuthenticated || permission !== 'granted' || !isSupported || !isEnabled) {
       return;
     }
 
     syncToken();
-  }, [isAuthenticated, permission, isSupported, syncToken]);
+  }, [isAuthenticated, permission, isSupported, isEnabled, syncToken]);
 
-  // Request browser push notification permission
+  // Request browser push notification permission and turn push ON
   const requestPushPermission = useCallback(async (): Promise<boolean> => {
     if (!isSupported) {
       toast.error('Push notifications are not supported on this device/browser.');
@@ -91,6 +113,9 @@ export function usePushNotifications(): UsePushNotificationsReturn {
       setPermission(result);
 
       if (result === 'granted') {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        setIsEnabled(true);
+
         const deviceToken = await getFcmToken();
         if (!deviceToken) {
           toast.error('Could not get a valid push token.');
@@ -106,6 +131,8 @@ export function usePushNotifications(): UsePushNotificationsReturn {
         setIsLoading(false);
         return true;
       } else if (result === 'denied') {
+        localStorage.setItem(STORAGE_KEY, 'false');
+        setIsEnabled(false);
         toast.error('Push Notifications Blocked', {
           description: 'Please enable notifications in your browser site permissions to receive alerts.',
         });
@@ -123,12 +150,51 @@ export function usePushNotifications(): UsePushNotificationsReturn {
     }
   }, [isSupported, syncToken]);
 
+  // Turn push notifications OFF and unregister device token from backend
+  const disablePushNotifications = useCallback(async (): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      localStorage.setItem(STORAGE_KEY, 'false');
+      setIsEnabled(false);
+
+      await unregisterTokenMutation.mutateAsync(
+        token ? { token } : undefined,
+      );
+
+      setToken(null);
+      lastRegisteredTokenRef.current = null;
+
+      toast.success('Push Notifications Disabled', {
+        description: 'You will no longer receive push notifications on this device.',
+      });
+      setIsLoading(false);
+      return true;
+    } catch (err: any) {
+      console.error('[PushNotifications] Error disabling push notifications:', err);
+      toast.error('Failed to disable push notifications.');
+      setIsLoading(false);
+      return false;
+    }
+  }, [token, unregisterTokenMutation]);
+
+  // Toggle push notifications ON or OFF
+  const togglePushNotifications = useCallback(async (): Promise<boolean> => {
+    if (isEnabled && permission === 'granted') {
+      return disablePushNotifications();
+    } else {
+      return requestPushPermission();
+    }
+  }, [isEnabled, permission, disablePushNotifications, requestPushPermission]);
+
   return {
     permission,
     isSupported,
-    isSubscribed: permission === 'granted' && !!token,
+    isSubscribed: permission === 'granted' && isEnabled && !!token,
+    isEnabled,
     isLoading,
     token,
     requestPushPermission,
+    disablePushNotifications,
+    togglePushNotifications,
   };
 }

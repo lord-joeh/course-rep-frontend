@@ -32,7 +32,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
   const { isInstallable, promptInstall } = usePwaInstall();
-  const { permission, requestPushPermission } = usePushNotifications();
+  const {
+    permission,
+    isEnabled,
+    isLoading: isPushLoading,
+    togglePushNotifications,
+  } = usePushNotifications();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-background/95 px-4 md:px-6 backdrop-blur-xs">
@@ -120,19 +125,21 @@ export const Navbar: React.FC<NavbarProps> = ({
               </DropdownMenuItem>
             )}
 
-            {/* Web Push Notification Quick Trigger */}
+            {/* Web Push Notification Quick Toggle */}
             <DropdownMenuItem
-              onClick={() => requestPushPermission()}
+              onClick={() => togglePushNotifications()}
               className="cursor-pointer"
-              disabled={permission === 'granted' || permission === 'unsupported'}
+              disabled={permission === 'unsupported' || isPushLoading}
             >
-              <BellRing className="mr-2 h-4 w-4" />
+              <BellRing className={`mr-2 h-4 w-4 ${isEnabled && permission === 'granted' ? 'text-emerald-500' : ''}`} />
               <span>
-                {permission === 'granted'
-                  ? 'Push Alerts: Active'
+                {permission === 'unsupported'
+                  ? 'Push Alerts: Unsupported'
                   : permission === 'denied'
                   ? 'Push Alerts: Blocked'
-                  : 'Enable Push Alerts'}
+                  : isEnabled && permission === 'granted'
+                  ? 'Push Alerts: On (Click to turn off)'
+                  : 'Push Alerts: Off (Click to turn on)'}
               </span>
             </DropdownMenuItem>
 

@@ -171,5 +171,45 @@ describe('PWA & Push Notification Hooks', () => {
       expect(granted).toBe(false);
       expect(result.current.permission).toBe('denied');
     });
+
+    it('disables push notifications and calls DELETE /notifications/push-token', async () => {
+      authStore.setSession(
+        {
+          id: 'stu-1',
+          name: 'Student One',
+          email: 'student1@univ.edu',
+          studentId: 'STU001',
+          isRep: false,
+          createdAt: '2026-01-01',
+          updatedAt: '2026-01-01',
+        },
+        { accessToken: 'token-123' },
+      );
+
+      const deleteSpy = vi.spyOn(apiClient, 'delete').mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            message: 'Push notifications turned off successfully',
+            enabled: false,
+            unregisteredCount: 1,
+          },
+        },
+      });
+
+      const { result } = renderHook(() => usePushNotifications(), { wrapper });
+
+      let disabled = false;
+      await act(async () => {
+        disabled = await result.current.disablePushNotifications();
+      });
+
+      expect(disabled).toBe(true);
+      expect(result.current.isEnabled).toBe(false);
+      expect(deleteSpy).toHaveBeenCalledWith(
+        '/notifications/push-token',
+        expect.anything(),
+      );
+    });
   });
 });

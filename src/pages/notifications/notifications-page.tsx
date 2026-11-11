@@ -10,6 +10,7 @@ import {
   useDeleteNotificationMutation,
 } from '@/hooks/use-notifications';
 import { useCoursesQuery } from '@/hooks/use-courses';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { useNotificationStream } from '@/hooks/use-notification-stream';
 import { NotificationCard } from '@/components/notifications/notification-card';
 import { CreateAnnouncementDialog } from '@/components/notifications/create-announcement-dialog';
@@ -18,6 +19,7 @@ import { DirectMessageDialog } from '@/components/notifications/direct-message-d
 import type { Notification, NotificationPriority, NotificationType } from '@/types';
 import {
   Bell,
+  BellRing,
   Plus,
   Send,
   RefreshCw,
@@ -52,6 +54,14 @@ export function NotificationsPage() {
   const [isDirectOpen, setIsDirectOpen] = useState(false);
   const [notifToEdit, setNotifToEdit] = useState<Notification | null>(null);
   const [notifToDelete, setNotifToDelete] = useState<Notification | null>(null);
+
+  // Push Notifications State
+  const {
+    permission,
+    isEnabled,
+    isLoading: isPushLoading,
+    togglePushNotifications,
+  } = usePushNotifications();
 
   // Queries
   const {
@@ -166,6 +176,36 @@ export function NotificationsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => togglePushNotifications()}
+            disabled={permission === 'unsupported' || isPushLoading}
+            className="h-9 gap-1.5 text-xs"
+            title={
+              permission === 'unsupported'
+                ? 'Push notifications unsupported'
+                : isEnabled && permission === 'granted'
+                ? 'Turn push notifications off'
+                : 'Turn push notifications on'
+            }
+          >
+            <BellRing
+              className={`w-3.5 h-3.5 ${
+                isEnabled && permission === 'granted'
+                  ? 'text-emerald-500'
+                  : 'text-muted-foreground'
+              }`}
+            />
+            <span className="hidden sm:inline">
+              {permission === 'unsupported'
+                ? 'Push Unavailable'
+                : isEnabled && permission === 'granted'
+                ? 'Push: On'
+                : 'Push: Off'}
+            </span>
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
