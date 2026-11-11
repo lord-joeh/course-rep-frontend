@@ -60,6 +60,15 @@ export interface RegisterFcmTokenDto {
   deviceType?: string;
 }
 
+export interface UnregisterFcmTokenDto {
+  token?: string;
+}
+
+export interface PushNotificationStatusResponse {
+  enabled: boolean;
+  tokenCount: number;
+}
+
 export interface NotificationQueryDto {
   type?: NotificationType;
   priority?: NotificationPriority;

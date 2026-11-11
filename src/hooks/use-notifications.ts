@@ -6,6 +6,8 @@ import type {
   UpdateNotificationDto,
   DirectNotificationDto,
   RegisterFcmTokenDto,
+  UnregisterFcmTokenDto,
+  PushNotificationStatusResponse,
   NotificationQueryDto,
   PaginatedNotifications,
   UnreadNotificationCountResponse,
@@ -19,6 +21,7 @@ export const notificationKeys = {
   lists: () => [...notificationKeys.all, 'list'] as const,
   list: (params: NotificationQueryDto = {}) => [...notificationKeys.lists(), params] as const,
   unreadCount: () => [...notificationKeys.all, 'unread-count'] as const,
+  pushStatus: () => [...notificationKeys.all, 'push-status'] as const,
   details: () => [...notificationKeys.all, 'detail'] as const,
   detail: (id: string) => [...notificationKeys.details(), id] as const,
 };
@@ -242,6 +245,8 @@ export function useSendDirectNotificationMutation() {
  * Register or refresh FCM push token.
  */
 export function useRegisterPushTokenMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (dto: RegisterFcmTokenDto) => {
       const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
@@ -250,5 +255,45 @@ export function useRegisterPushTokenMutation() {
       );
       return data.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.pushStatus() });
+    },
+  });
+}
+
+/**
+ * Unregister FCM push token(s) (turn push notifications off).
+ */
+export function useUnregisterPushTokenMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (dto?: UnregisterFcmTokenDto) => {
+      const { data } = await apiClient.delete<
+        ApiResponse<{ message: string; enabled: boolean; unregisteredCount: number }>
+      >('/notifications/push-token', {
+        data: dto,
+      });
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.pushStatus() });
+    },
+  });
+}
+
+/**
+ * Query current push notification subscription status.
+ */
+export function usePushStatusQuery() {
+  return useQuery({
+    queryKey: notificationKeys.pushStatus(),
+    queryFn: async () => {
+      const { data } = await apiClient.get<ApiResponse<PushNotificationStatusResponse>>(
+        '/notifications/push-status',
+      );
+      return data.data;
+    },
+    staleTime: 60_000,
   });
 }
