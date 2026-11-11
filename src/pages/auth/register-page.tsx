@@ -3,8 +3,16 @@ import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useRegisterMutation } from '@/hooks/use-auth-mutations';
+import {
+  useRegisterMutation,
+  useGoogleLoginMutation,
+  useAppleLoginMutation,
+} from '@/hooks/use-auth-mutations';
 import { registerSchema, type RegisterFormData } from '@/lib/auth-validation';
+import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
+import { AppleSignInButton } from '@/components/auth/apple-sign-in-button';
+import { CompleteOAuthDialog } from '@/components/auth/complete-oauth-dialog';
+import type { OAuthCompletionRequiredResponse } from '@/types';
 import { UserPlus, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 export function RegisterPage() {
@@ -19,8 +27,11 @@ export function RegisterPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
+  const [completionData, setCompletionData] = useState<OAuthCompletionRequiredResponse | null>(null);
 
   const registerMutation = useRegisterMutation();
+  const googleLoginMutation = useGoogleLoginMutation((data) => setCompletionData(data));
+  const appleLoginMutation = useAppleLoginMutation((data) => setCompletionData(data));
 
   const getPasswordStrength = (pass: string) => {
     if (!pass) return { score: 0, label: 'Empty', color: 'bg-muted' };
@@ -105,7 +116,7 @@ export function RegisterPage() {
                 </label>
                 <Input
                   id="reg-name"
-                  placeholder="e.g. Jane Doe"
+                  placeholder="e.g. Kwame Mensah"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   disabled={registerMutation.isPending}
@@ -234,7 +245,33 @@ export function RegisterPage() {
               )}
             </Button>
 
-            <div className="text-center text-xs text-muted-foreground">
+            {/* Divider */}
+            <div className="relative w-full my-1">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-[11px] uppercase">
+                <span className="bg-card px-2 text-muted-foreground font-semibold">
+                  Or register with
+                </span>
+              </div>
+            </div>
+
+            {/* OAuth Sign-In Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+              <GoogleSignInButton
+                onSuccess={(idToken) => googleLoginMutation.mutate({ idToken })}
+                disabled={googleLoginMutation.isPending || appleLoginMutation.isPending}
+                text="Google"
+              />
+              <AppleSignInButton
+                onSuccess={(idToken, user) => appleLoginMutation.mutate({ idToken, user })}
+                disabled={googleLoginMutation.isPending || appleLoginMutation.isPending}
+                text="Apple"
+              />
+            </div>
+
+            <div className="text-center text-xs text-muted-foreground pt-1">
               Already have an account?{' '}
               <Link to="/login" className="font-semibold text-primary hover:underline">
                 Sign in
@@ -243,6 +280,12 @@ export function RegisterPage() {
           </CardFooter>
         </form>
       </Card>
+
+      <CompleteOAuthDialog
+        isOpen={Boolean(completionData)}
+        onClose={() => setCompletionData(null)}
+        data={completionData}
+      />
     </div>
   );
 }

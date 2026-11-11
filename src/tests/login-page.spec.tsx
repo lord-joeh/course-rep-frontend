@@ -30,7 +30,7 @@ describe('LoginPage', () => {
     expect(screen.getByRole('heading', { name: /Sign In to CourseRep/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Student ID or University Email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Sign In$/i })).toBeInTheDocument();
   });
 
   it('toggles password visibility when eye button is clicked', () => {
@@ -48,7 +48,7 @@ describe('LoginPage', () => {
   it('displays client-side validation errors when submitting empty form', () => {
     renderLoginPage();
 
-    const submitBtn = screen.getByRole('button', { name: /Sign In/i });
+    const submitBtn = screen.getByRole('button', { name: /^Sign In$/i });
     fireEvent.click(submitBtn);
 
     expect(
@@ -73,7 +73,7 @@ describe('LoginPage', () => {
 
     const idInput = screen.getByLabelText(/Student ID or University Email/i);
     const passInput = screen.getByLabelText(/^Password$/i);
-    const submitBtn = screen.getByRole('button', { name: /Sign In/i });
+    const submitBtn = screen.getByRole('button', { name: /^Sign In$/i });
 
     fireEvent.change(idInput, { target: { value: 'STU-123' } });
     fireEvent.change(passInput, { target: { value: 'password123' } });
