@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface GoogleSignInButtonProps {
   onSuccess: (credential: string) => void;
@@ -14,50 +15,90 @@ export function GoogleSignInButton({
   className = '',
   text = 'Continue with Google',
 }: GoogleSignInButtonProps) {
-  const hiddenBtnRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
+
   const clientId =
     (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
-    'mock-google-client-id.apps.googleusercontent.com';
+    '1039659774720-2fi6kd0j78lk7b5ekkunge7kd54ftts8.apps.googleusercontent.com';
 
   useEffect(() => {
-    // If Google Identity Services SDK script is already loaded
-    if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
-      try {
-        (window as any).google.accounts.id.initialize({
-          client_id: clientId,
-          callback: (response: any) => {
-            if (response.credential) {
-              onSuccess(response.credential);
-            }
-          },
-        });
-      } catch (e) {
-        // Ignore initialization errors in test environments
+    let checkInterval: any = null;
+
+    const setupGoogle = () => {
+      if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (response: any) => {
+              if (response?.credential) {
+                onSuccess(response.credential);
+              }
+            },
+          });
+
+          if (containerRef.current) {
+            (window as any).google.accounts.id.renderButton(containerRef.current, {
+              type: 'standard',
+              theme: 'outline',
+              size: 'large',
+              width: containerRef.current.offsetWidth || 300,
+              text: 'continue_with',
+            });
+            setIsGoogleLoaded(true);
+          }
+        } catch (err) {
+          console.warn('Google Identity Services setup warning:', err);
+        }
+        return true;
       }
+      return false;
+    };
+
+    if (!setupGoogle()) {
+      checkInterval = setInterval(() => {
+        if (setupGoogle()) {
+          clearInterval(checkInterval);
+        }
+      }, 250);
     }
+
+    return () => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
+    };
   }, [clientId, onSuccess]);
 
   const handleClick = () => {
+    // Return mock token strictly in test environments
+    if ((import.meta as any).env?.MODE === 'test') {
+      onSuccess('mock-google-token-' + Date.now());
+      return;
+    }
+
     if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
       try {
         (window as any).google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            // Fallback for tests or blocked popups
-            onSuccess('mock-google-token-' + Date.now());
+          if (notification?.isNotDisplayed?.()) {
+            toast.error(
+              'Google Sign-In prompt was suppressed by your browser. Please allow popups or try again.',
+            );
           }
         });
         return;
-      } catch {
-        // Fallback below
+      } catch (err) {
+        console.warn('Google prompt error:', err);
       }
     }
-    // Development / test fallback token
-    onSuccess('mock-google-token-' + Date.now());
+
+    toast.error(
+      'Google Sign-In is initializing or unavailable. Please check your network connection or sign in with your email.',
+    );
   };
 
   return (
-    <>
-      <div ref={hiddenBtnRef} style={{ display: 'none' }} />
+    <div className="relative w-full overflow-hidden rounded-md">
       <Button
         type="button"
         variant="outline"
@@ -66,7 +107,7 @@ export function GoogleSignInButton({
         className={`w-full font-medium flex items-center justify-center gap-2 border-border hover:bg-muted/50 cursor-pointer ${className}`}
         aria-label="Sign in with Google"
       >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -86,7 +127,14 @@ export function GoogleSignInButton({
         </svg>
         <span>{text}</span>
       </Button>
-    </>
+
+      {/* Invisible overlay of the official Google button iframe */}
+      <div
+        ref={containerRef}
+        className="absolute inset-0 w-full h-full opacity-[0.001] cursor-pointer overflow-hidden z-10 [&>iframe]:w-full [&>iframe]:h-full"
+        style={{ display: isGoogleLoaded && !disabled ? 'block' : 'none' }}
+        aria-hidden="true"
+      />
+    </div>
   );
 }
-
