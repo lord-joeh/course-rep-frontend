@@ -145,11 +145,17 @@ export function CreateAnnouncementDialog({
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as NotificationPriority)}
               >
-                <option value="normal">Normal</option>
-                <option value="high">High Priority</option>
-                <option value="urgent">Urgent Alert</option>
-                <option value="low">Low Priority</option>
+                <option value="low">Low (In-App only)</option>
+                <option value="normal">Normal (In-App + Push)</option>
+                <option value="high">High Priority (In-App + Push)</option>
+                <option value="urgent">Urgent Alert (In-App + Push + SMS)</option>
               </select>
+              <p className="text-[11px] text-muted-foreground">
+                {priority === 'low' && 'In-app notification feed only (quiet broadcast).'}
+                {priority === 'normal' && 'In-app feed + Push notification to subscribed devices.'}
+                {priority === 'high' && 'In-app feed + Priority push notification badge.'}
+                {priority === 'urgent' && 'In-app feed + Push notification + Emergency SMS fallback.'}
+              </p>
             </div>
           </div>
 
