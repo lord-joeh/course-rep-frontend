@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
-import { AppleSignInButton } from '@/components/auth/apple-sign-in-button';
 import { CompleteOAuthDialog } from '@/components/auth/complete-oauth-dialog';
 import { LoginPage } from '@/pages/auth/login-page';
 import { RegisterPage } from '@/pages/auth/register-page';
@@ -48,35 +47,6 @@ describe('OAuth Components & Integration', () => {
     it('honors disabled prop', () => {
       render(<GoogleSignInButton onSuccess={vi.fn()} disabled />);
       const button = screen.getByRole('button', { name: /Sign in with Google/i });
-      expect(button).toBeDisabled();
-    });
-  });
-
-  describe('AppleSignInButton', () => {
-    it('renders with default label', () => {
-      render(<AppleSignInButton onSuccess={vi.fn()} />);
-      expect(screen.getByRole('button', { name: /Sign in with Apple/i })).toBeInTheDocument();
-      expect(screen.getByText('Continue with Apple')).toBeInTheDocument();
-    });
-
-    it('renders with custom text and triggers onSuccess when clicked', () => {
-      const onSuccessMock = vi.fn();
-      render(<AppleSignInButton onSuccess={onSuccessMock} text="Apple Sign In" />);
-
-      expect(screen.getByText('Apple Sign In')).toBeInTheDocument();
-      const button = screen.getByRole('button', { name: /Sign in with Apple/i });
-      fireEvent.click(button);
-
-      expect(onSuccessMock).toHaveBeenCalledTimes(1);
-      expect(onSuccessMock).toHaveBeenCalledWith(
-        expect.stringContaining('mock-apple-token-'),
-        expect.objectContaining({ name: { firstName: 'Apple', lastName: 'User' } }),
-      );
-    });
-
-    it('honors disabled prop', () => {
-      render(<AppleSignInButton onSuccess={vi.fn()} disabled />);
-      const button = screen.getByRole('button', { name: /Sign in with Apple/i });
       expect(button).toBeDisabled();
     });
   });
@@ -170,19 +140,17 @@ describe('OAuth Components & Integration', () => {
   });
 
   describe('LoginPage & RegisterPage Integration', () => {
-    it('renders Google and Apple sign-in options on LoginPage', () => {
+    it('renders Google sign-in option on LoginPage', () => {
       renderWithProviders(<LoginPage />);
 
       expect(screen.getByRole('button', { name: /Sign in with Google/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Sign in with Apple/i })).toBeInTheDocument();
       expect(screen.getByText(/Or continue with/i)).toBeInTheDocument();
     });
 
-    it('renders Google and Apple sign-up options on RegisterPage', () => {
+    it('renders Google sign-up option on RegisterPage', () => {
       renderWithProviders(<RegisterPage />);
 
       expect(screen.getByRole('button', { name: /Sign in with Google/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Sign in with Apple/i })).toBeInTheDocument();
       expect(screen.getByText(/Or register with/i)).toBeInTheDocument();
     });
   });

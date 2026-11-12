@@ -6,11 +6,9 @@ import { Input } from '@/components/ui/input';
 import {
   useLoginMutation,
   useGoogleLoginMutation,
-  useAppleLoginMutation,
 } from '@/hooks/use-auth-mutations';
 import { loginSchema, type LoginFormData } from '@/lib/auth-validation';
 import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
-import { AppleSignInButton } from '@/components/auth/apple-sign-in-button';
 import { CompleteOAuthDialog } from '@/components/auth/complete-oauth-dialog';
 import type { OAuthCompletionRequiredResponse } from '@/types';
 import { GraduationCap, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
@@ -27,7 +25,6 @@ export function LoginPage() {
 
   const loginMutation = useLoginMutation();
   const googleLoginMutation = useGoogleLoginMutation((data) => setCompletionData(data));
-  const appleLoginMutation = useAppleLoginMutation((data) => setCompletionData(data));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,17 +151,12 @@ export function LoginPage() {
               </div>
             </div>
 
-            {/* OAuth Sign-In Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+            {/* OAuth Sign-In Button */}
+            <div className="w-full">
               <GoogleSignInButton
                 onSuccess={(idToken) => googleLoginMutation.mutate({ idToken })}
-                disabled={googleLoginMutation.isPending || appleLoginMutation.isPending}
-                text="Google"
-              />
-              <AppleSignInButton
-                onSuccess={(idToken, user) => appleLoginMutation.mutate({ idToken, user })}
-                disabled={googleLoginMutation.isPending || appleLoginMutation.isPending}
-                text="Apple"
+                disabled={googleLoginMutation.isPending}
+                text="Continue with Google"
               />
             </div>
 

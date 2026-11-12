@@ -86,7 +86,7 @@ export function CompleteOAuthDialog({
                 Complete Your Profile
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                First-time {data?.provider === 'google' ? 'Google' : 'Apple'} Sign-In. Link your University ID.
+                First-time Google Sign-In. Link your University ID.
               </DialogDescription>
             </div>
           </div>
@@ -115,7 +115,7 @@ export function CompleteOAuthDialog({
             <Input
               id="studentId"
               type="text"
-              placeholder="e.g. 10928374 or CPEN2026"
+              placeholder="e.g. 10928374"
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
               disabled={completeMutation.isPending}
