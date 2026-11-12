@@ -46,25 +46,13 @@ export interface OAuthCompletionRequiredResponse {
   email?: string;
   name?: string;
   avatarUrl?: string;
-  provider: 'google' | 'apple';
+  provider: 'google';
 }
 
 export type OAuthLoginResponse = LoginResponse | OAuthCompletionRequiredResponse;
 
 export interface GoogleAuthDto {
   idToken: string;
-}
-
-export interface AppleAuthDto {
-  idToken: string;
-  code?: string;
-  user?: {
-    name?: {
-      firstName?: string;
-      lastName?: string;
-    };
-    email?: string;
-  };
 }
 
 export interface CompleteOAuthRegistrationDto {
